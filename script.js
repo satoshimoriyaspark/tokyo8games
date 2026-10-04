@@ -1,0 +1,1 @@
+const play=document.querySelector('#wasshoi');play.addEventListener('click',e=>{e.preventDefault();alert('亀有わっしょいバトルへのPLAYリンクを接続中！');});const s=document.querySelector('#sound');s.addEventListener('click',()=>{s.textContent=s.textContent==='♪'?'×':'♪';});
