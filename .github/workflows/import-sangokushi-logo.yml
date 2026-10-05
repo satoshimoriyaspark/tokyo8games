@@ -1,0 +1,63 @@
+name: Import approved Sangokushi logo
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/import-sangokushi-logo.yml']
+permissions:
+  contents: write
+concurrency:
+  group: import-approved-sangokushi-logo
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Fetch the approved original PNG and verify integrity
+        env:
+          SOURCE_URL: 'https://oaisdmntprkoreacentral.blob.core.windows.net/files/00000000-04c4-8206-b02c-c13dbab2eb10/raw?se=2026-10-05T09%3A35%3A37Z&sp=r&sv=2026-02-06&sr=b&scid=01a10b61-cc08-7f21-b687-9ea8bd84c531&skoid=3e273c3d-5ea1-4088-9e18-79685531b184&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-05T00%3A02%3A03Z&ske=2026-10-06T00%3A02%3A03Z&sks=b&skv=2026-02-06&sig=kLm8QAVkTi3dLtz4ZCqveGC9CurgYQk4svkxjr9MZcw%3D'
+        run: |
+          echo "::add-mask::$SOURCE_URL"
+          mkdir -p assets/games/sangokushi-card-battle
+          curl --fail --silent --show-error --location --retry 2 --max-time 60 "$SOURCE_URL" -o assets/games/sangokushi-card-battle/logo.png
+          echo 'fb1663877af115b4024f04e8bc28c765e377438a38e7b4023180c02a1f56722f  assets/games/sangokushi-card-battle/logo.png' | sha256sum --check
+      - name: Update only the Sangokushi game card
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, struct
+          logo = Path('assets/games/sangokushi-card-battle/logo.png').read_bytes()
+          assert logo[:8] == b'\x89PNG\r\n\x1a\n', 'Not a PNG'
+          assert struct.unpack('>II', logo[16:24]) == (1991, 789), 'Unexpected dimensions'
+          assert logo[25] == 6, 'Expected original RGBA PNG'
+          path = Path('index.html')
+          html = path.read_text(encoding='utf-8')
+          pattern = r'<article\b[^>]*>(?:(?!</article>)[\s\S])*?<div class="thumb sangoku(?: official-logo)?">(?:(?!</article>)[\s\S])*?</article>'
+          matches = list(re.finditer(pattern, html))
+          assert len(matches) == 1, f'Expected one Sangokushi card, got {len(matches)}'
+          match = matches[0]
+          card = match.group(0)
+          assert re.search(r'<h3>三国志(?:大富豪|大乱闘カードバトル)</h3>', card), 'Unexpected game title'
+          thumb = '<div class="thumb sangoku official-logo"><img src="/assets/games/sangokushi-card-battle/logo.png" width="1991" height="789" alt="三国志大乱闘カードバトル" loading="lazy" decoding="async"></div>'
+          card, n = re.subn(r'<div class="thumb sangoku(?: official-logo)?">[\s\S]*?</div>', lambda _: thumb, card, count=1)
+          assert n == 1
+          card = card.replace('<h3>三国志大富豪</h3>', '<h3>三国志大乱闘カードバトル</h3>')
+          result = html[:match.start()] + card + html[match.end():]
+          assert '三国志大富豪' not in result, 'Old display title remains'
+          path.write_text(result, encoding='utf-8')
+          print('Updated the game title and original transparent PNG; other cards unchanged.')
+          PY
+          git diff --check
+      - name: Commit the logo and game-card update
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets/games/sangokushi-card-battle/logo.png
+          git commit -m 'feat: publish Sangokushi card battle name and approved logo'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git rev-parse HEAD
