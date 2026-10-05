@@ -143,3 +143,5 @@ footer{background:#225d83;border-top:7px solid #e94f70}
  -webkit-font-smoothing:antialiased;
 }
 .games h1,.category-head h2,.creator h2{font-weight:900;letter-spacing:.04em}
+
+.bgm-toggle{width:auto!important;min-width:104px;height:40px!important;border-radius:0!important;padding:0 10px;display:flex;gap:7px;align-items:center;justify-content:center;font-family:"PixelMplus12","Courier New",monospace;font-weight:900;font-size:12px}.bgm-toggle[aria-pressed="true"]{background:#ef4f73!important;color:#fff!important;box-shadow:3px 3px 0 #f6d54a!important}.bgm-toggle .note{font-size:18px;line-height:1}@media(max-width:680px){.bgm-toggle{min-width:92px;padding:0 8px}.sound-label{font-size:10px}}
