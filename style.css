@@ -207,3 +207,4 @@ footer{background:#225d83;border-top:7px solid #e94f70}
 .thanks-icon{width:84px;height:84px;margin:0 auto 20px;display:grid;place-items:center;background:#4bbd8c;color:#fff;border:5px solid #fff3b5;box-shadow:6px 6px 0 #e9557a;font:900 46px/1 "PixelMplus12",monospace}
 .thanks-screen p:not(.eyebrow){line-height:1.9;margin-bottom:30px}
 @media(max-width:680px){.contact-form{padding:20px 16px;box-shadow:6px 6px 0 #df506d}.contact-cta{padding-top:54px;padding-bottom:54px}.contact-hero{padding-top:48px}}
+\n.form-status{min-height:1.5em;margin:16px 0 0;font-weight:800;color:#17345c}.contact-submit:disabled{opacity:.65;cursor:wait}
