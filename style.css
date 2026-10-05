@@ -86,3 +86,24 @@ header{background:#25b9d0;border-bottom:5px solid #ef4f73;box-shadow:0 5px 0 #f6
 footer{background:#225d83;border-top:7px solid #e94f70}
 .brand,.tag,.start,.eyebrow,.category-nav a,.category-head h2,.category-head>span,.status,.copy a,.games h1,.copy h3,.creator h2,.studio,.company summary,footer{font-family:"DotGothic16","Hiragino Kaku Gothic ProN",sans-serif}
 @media(max-width:680px){.games{border-radius:0}.card{box-shadow:6px 6px 0 #df506d}.category-nav a{border-width:3px}}
+
+/* Strong pixel rendering — intentionally blocky */
+.brand,.tag,.start,.eyebrow,.category-nav a,.category-head h2,.category-head>span,.status,.copy a,.games h1,.copy h3,.creator h2,.studio,.company summary{
+  font-family:"DotGothic16","Courier New",monospace;
+  font-smooth:never;
+  -webkit-font-smoothing:none;
+  text-rendering:geometricPrecision;
+}
+.games h1,.category-head h2,.creator h2{
+  text-shadow:2px 0 0 currentColor,0 2px 0 currentColor,2px 2px 0 rgba(255,255,255,.35);
+}
+.brand,.tag,.start,.category-nav a,.copy a{
+  text-shadow:2px 2px 0 #245a84;
+}
+.start,.category-nav a,.copy a,.status{
+  clip-path:polygon(4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px),0 4px,4px 4px);
+}
+.eyebrow{letter-spacing:.22em}
+@media(max-width:680px){
+ .games h1,.category-head h2{letter-spacing:.04em}
+}
