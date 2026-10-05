@@ -114,3 +114,32 @@ footer{background:#225d83;border-top:7px solid #e94f70}
 }
 .category-head>span{ text-shadow:3px 3px 0 #fff09a!important; }
 .hero .tag{ text-shadow:2px 2px 0 #245a84!important; }
+
+/* PixelMplus12 — primary display font */
+@font-face{
+ font-family:"PixelMplus12";
+ src:url("https://cdn.leafscape.be/PixelMplus/PixelMplus12-Regular_web.woff2") format("woff2");
+ font-weight:400;
+ font-style:normal;
+ font-display:swap;
+}
+@font-face{
+ font-family:"PixelMplus12";
+ src:url("https://cdn.leafscape.be/PixelMplus/PixelMplus12-Bold_web.woff2") format("woff2");
+ font-weight:700 900;
+ font-style:normal;
+ font-display:swap;
+}
+.brand,.tag,.start,.eyebrow,.category-nav a,.category-head h2,.category-head>span,.status,.copy a,.games h1,.copy h3,.creator h2,.studio,.company summary,footer b{
+ font-family:"PixelMplus12","Courier New",monospace!important;
+ -webkit-font-smoothing:none;
+ font-smooth:never;
+ text-shadow:none!important;
+}
+.hero .tag{ text-shadow:none!important; }
+.category-head>span{ text-shadow:none!important; }
+.copy p,.category-intro,.creator>p:last-child,.company details div{
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif!important;
+ -webkit-font-smoothing:antialiased;
+}
+.games h1,.category-head h2,.creator h2{font-weight:900;letter-spacing:.04em}
