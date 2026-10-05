@@ -21,12 +21,7 @@
 </section>
 
 <section class="contact-wrap">
-  <form class="contact-form" action="https://formsubmit.co/satoshimoriya@gmail.com" method="POST">
-    <input type="hidden" name="_subject" value="【TOKYO 8 GAMES】Webサイトからのお問い合わせ">
-    <input type="hidden" name="_next" value="https://tokyo8games.com/thanks.html">
-    <input type="hidden" name="_template" value="table">
-    <input type="hidden" name="_url" value="https://tokyo8games.com/contact.html">
-    <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off">
+  <form class="contact-form" id="contact-form" action="/api/contact" method="POST"><input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off">
 
     <label>
       <span>お名前 <b>必須</b></span>
@@ -65,7 +60,7 @@
       <span>入力内容を確認し、返信のために送信することに同意します。</span>
     </label>
 
-    <button class="contact-submit" type="submit">MESSAGE SEND ▶</button>
+    <button class="contact-submit" type="submit">MESSAGE SEND ▶</button><p id="form-status" class="form-status" role="status" aria-live="polite"></p>
   </form>
   <p class="contact-note">送信内容はお問い合わせへの返信・対応のために利用します。</p>
 </section>
@@ -75,5 +70,5 @@
   <span>PLAY JAPAN. PLAY THE WORLD.</span>
   <small>© 2026 TOKYO 8 GAMES</small>
 </footer>
-</body>
+<script src="/contact.js"></script></body>
 </html>
