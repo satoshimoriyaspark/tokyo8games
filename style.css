@@ -38,3 +38,31 @@
   .category-head h2{letter-spacing:.03em}
   .eyebrow{font-size:11px;letter-spacing:.13em}
 }
+
+/* Bright Japanese anime/game palette v2 */
+:root{
+ --navy:#173b72;--sky:#62c9ff;--cyan:#5de7ef;--pink:#ff6fae;
+ --red:#ff4e5d;--yellow:#ffe04b;--cream:#fff8df;--ink:#18345d;
+}
+body{background:linear-gradient(180deg,#66ccff 0,#dff8ff 22%,#fff8df 48%,#ffeaf4 100%);color:var(--ink)}
+header{background:#ffffffed;border-bottom:4px solid var(--pink);box-shadow:0 3px 0 var(--yellow)}
+.brand{color:var(--navy)}.brand b{color:var(--red)}#sound{background:var(--yellow);color:var(--navy);border-color:var(--navy);box-shadow:3px 3px 0 var(--pink)}
+.hero{background:linear-gradient(#65cfff 0 60%,#9be67b 60% 66%,#fff1b8 66%);color:#fff}
+.hero:after{content:"";position:absolute;inset:auto 0 0;height:95px;background:linear-gradient(135deg,transparent 30%,#fff6d5 31% 45%,transparent 46%) 0 0/80px 80px;opacity:.35;pointer-events:none}
+.sun{background:#ff5b67;box-shadow:0 0 0 9px #ffe34d,0 0 40px #fff8a8}
+.tag{color:#fff;text-shadow:3px 3px 0 var(--navy),-1px -1px 0 var(--navy)}
+.jp{color:var(--navy);background:#ffffffd9;padding:5px 13px;border-radius:20px;font-weight:800}
+.start,.copy a{background:var(--yellow);color:var(--navy);border-color:#fff;box-shadow:5px 5px 0 var(--pink)}
+.games{background:#fffdf5;border-radius:34px 34px 0 0;box-shadow:0 -8px 0 #ffffff70;color:var(--ink)}
+.eyebrow{color:#168fc5}.games h1{color:var(--navy);text-shadow:3px 3px 0 #bfeeff}
+.category-nav a{background:#fff;color:var(--navy);border-color:var(--navy);box-shadow:4px 4px 0 var(--yellow)}
+.category-nav a:nth-child(2){box-shadow:4px 4px 0 var(--pink)}.category-nav a:nth-child(3){box-shadow:4px 4px 0 var(--cyan)}
+.category+.category{border-color:#ffc0da}.category-head>span{color:var(--red);text-shadow:3px 3px 0 var(--yellow)}.category-head h2{color:var(--navy)}
+.card{background:#fff;color:var(--ink);border-color:var(--navy);box-shadow:7px 7px 0 var(--pink);border-radius:8px}
+.copy p,.category-intro{color:#476482}.status{background:#61e8a6;color:#16375e}.status.soon{background:#d9d7ff;color:#493f79}.status.lesson{background:var(--cyan)}
+.thumb{background:linear-gradient(135deg,#ff7fb7,#ffd94f)}.command{background:linear-gradient(135deg,#55bfff,#65ebc6)}.magic{background:linear-gradient(135deg,#a982ff,#ff83c8)}.guild{background:linear-gradient(135deg,#ff7665,#ffc457)}.sangoku{background:linear-gradient(135deg,#ff795d,#e8a84b)}
+.creator{background:linear-gradient(135deg,#ffe44d,#ffef92);color:var(--ink);border-top:8px solid #fff}.creator .eyebrow{color:#d34d75}
+.company{background:#fff;color:var(--ink);max-width:none;padding-left:max(20px,calc((100% - 900px)/2));padding-right:max(20px,calc((100% - 900px)/2))}.company summary{border-color:#8fdcf4}.company details div{color:#536e8d}
+footer{background:var(--navy);border-top:6px solid var(--pink)}footer span,footer small{color:#dff7ff}
+.sakura{color:#ff7db6;text-shadow:2px 2px 0 #fff}
+@media(max-width:680px){.games{border-radius:24px 24px 0 0}.card{box-shadow:5px 5px 0 var(--pink)}.hero{min-height:560px}}
