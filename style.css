@@ -107,3 +107,10 @@ footer{background:#225d83;border-top:7px solid #e94f70}
 @media(max-width:680px){
  .games h1,.category-head h2{letter-spacing:.04em}
 }
+
+/* Readability fix: single-layer pixel text */
+.games h1,.category-head h2,.creator h2,.brand,.tag,.start,.category-nav a,.copy a{
+  text-shadow:none!important;
+}
+.category-head>span{ text-shadow:3px 3px 0 #fff09a!important; }
+.hero .tag{ text-shadow:2px 2px 0 #245a84!important; }
