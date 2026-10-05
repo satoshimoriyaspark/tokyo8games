@@ -6,3 +6,35 @@
 
 .category-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 55px}.category-nav a{padding:16px 10px;border:2px solid #fff;color:#fff;text-decoration:none;text-align:center;font-weight:900;background:#102750;box-shadow:4px 4px 0 #20d7ef}.category{padding:30px 0 55px;scroll-margin-top:70px}.category+.category{border-top:2px dashed #3f5f89}.category-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}.category-head>span{font-size:44px;font-weight:1000;color:#ff365d;text-shadow:3px 3px 0 #ffd83d}.category-head h2{margin:2px 0;font-size:clamp(30px,6vw,52px)}.category-intro{max-width:680px;color:#d7e6ff;line-height:1.9;margin:-8px 0 24px}.copy h3{margin:10px 0;font-size:22px}.official-logo{background:linear-gradient(135deg,#ffcf36,#ef4968);padding:18px}.official-logo img{width:100%;height:190px;object-fit:contain;filter:drop-shadow(0 5px 0 rgba(0,0,0,.18))}.status.lesson{background:#48e4f5}.sangoku{background:linear-gradient(135deg,#692d2d,#d49a3d)}
 @media(max-width:680px){.category-nav{grid-template-columns:1fr;margin-bottom:35px}.category-nav a{padding:13px}.category{padding:20px 0 42px}.category-head>span{font-size:34px}.official-logo img{height:155px}}
+
+/* TOKYO 8 GAMES pixel typography */
+:root{--pixel-shadow:2px 2px 0 #07162f}
+.brand,.tag,.start,.eyebrow,.category-nav a,.category-head h2,.category-head>span,.status,.copy a,footer b{
+  font-family:"Courier New","SFMono-Regular","Hiragino Kaku Gothic ProN",monospace;
+  font-weight:900;
+  font-variant-ligatures:none;
+}
+.brand,.tag,.category-head h2{letter-spacing:.08em}
+.start,.copy a,.category-nav a,.status{
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  border-radius:0;
+}
+.start,.copy a{box-shadow:5px 5px 0 #e73764;text-shadow:1px 1px 0 rgba(255,255,255,.25)}
+.eyebrow{font-size:12px;letter-spacing:.18em}
+.category-head>span{text-shadow:3px 3px 0 #ffd83d}
+.games h1,.creator h2{
+  font-family:"Arial Black","Hiragino Kaku Gothic ProN",sans-serif;
+  font-weight:900;
+  letter-spacing:.02em;
+}
+.copy p,.creator>p:last-child,.company, .category-intro{
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media(max-width:680px){
+  .brand{font-size:15px;letter-spacing:.04em}
+  .tag{font-size:16px;line-height:1.45}
+  .start,.copy a{font-size:14px;padding:14px 20px}
+  .category-head h2{letter-spacing:.03em}
+  .eyebrow{font-size:11px;letter-spacing:.13em}
+}
