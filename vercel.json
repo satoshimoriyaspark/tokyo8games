@@ -9,6 +9,11 @@
       "source": "/w",
       "destination": "https://kameari-wasshoi-battle2.vercel.app/",
       "permanent": false
+    },
+    {
+      "source": "/kks",
+      "destination": "https://katsushika-karuta-practice.satoshimoriya.chatgpt.site/",
+      "permanent": false
     }
   ]
 }
