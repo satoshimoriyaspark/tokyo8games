@@ -1,0 +1,398 @@
+[
+  {
+    "id": "い",
+    "text": "いくつもの　川が流れる　水のまち",
+    "image": "assets/city-karuta-01.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/872/ehuda-i.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/872/yomihuda-i.jpg",
+    "kana": "いくつもの、かわがながれる、みずのまち",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002872.html"
+  },
+  {
+    "id": "ろ",
+    "text": "櫓がきしむ　川面のどかな　矢切の渡し",
+    "image": "assets/city-karuta-02.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/873/efuda_02.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/873/yomihuda-ro.jpg",
+    "kana": "ろがきしむ、かわものどかな、やぎりのわたし",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002873.html"
+  },
+  {
+    "id": "は",
+    "text": "ハープ橋　ほんとになるかな　ポロロンと",
+    "image": "assets/city-karuta-03.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/874/ehuda-ha.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/874/yomihuda-ha.jpg",
+    "kana": "はーぷばし、ほんとになるかな、ぽろろんと",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002874.html"
+  },
+  {
+    "id": "に",
+    "text": "日常の　生活描く　綴り方",
+    "image": "assets/city-karuta-04.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/875/ehuda-ni.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/875/yomihuda-ni.jpg",
+    "kana": "にちじょうの、せいかつえがく、つづりかた",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002875.html"
+  },
+  {
+    "id": "ほ",
+    "text": "堀切の　菖蒲を描く　江戸百景",
+    "image": "assets/city-karuta-05.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/876/efuda_05.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/876/yomihuda-ho.jpg",
+    "kana": "ほりきりの、しょうぶをえがく、えどひゃっけい",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002876.html"
+  },
+  {
+    "id": "へ",
+    "text": "へぇ ほんと　金魚の形　葛飾区",
+    "image": "assets/city-karuta-06.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/877/ehuda-he.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/877/yomihuda-he.jpg",
+    "kana": "へえほんと、きんぎょのかたち、かつしかく",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002877.html"
+  },
+  {
+    "id": "と",
+    "text": "寅さんが　駅で故郷　ふりかえる",
+    "image": "assets/city-karuta-07.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/878/ehuda-to.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/878/yomihuda-to.jpg",
+    "kana": "とらさんが、えきでふるさと、ふりかえる",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002878.html"
+  },
+  {
+    "id": "ち",
+    "text": "中世の　遺跡が語る　葛西城",
+    "image": "assets/city-karuta-08.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/879/efuda_08.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/879/yomi_08.jpg",
+    "kana": "ちゅうせいの、いせきがかたる、かさいじょう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002879.html"
+  },
+  {
+    "id": "り",
+    "text": "両さんを　探しに亀有　出かけよう",
+    "image": "assets/city-karuta-09.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/880/ehuda-ri.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/880/yomihuda-ri.jpg",
+    "kana": "りょうさんを、さがしにかめあり、でかけよう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002880.html"
+  },
+  {
+    "id": "ぬ",
+    "text": "ぬくもりと　笑顔あふれる　商店街",
+    "image": "assets/city-karuta-10.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/881/efuda_10.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/881/yomihuda-nu.jpg",
+    "kana": "ぬくもりと、えがおあふれる、しょうてんがい",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002881.html"
+  },
+  {
+    "id": "る",
+    "text": "累代の　技術が染める　江戸小紋",
+    "image": "assets/city-karuta-11.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/882/ehuda-ru.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/882/yomihuda-ru.jpg",
+    "kana": "るいだいの、ぎじゅつがそめる、えどこもん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002882.html"
+  },
+  {
+    "id": "わ",
+    "text": "和と洋の　美が調和する　山本亭",
+    "image": "assets/city-karuta-12.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/883/ehuda-wa.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/883/yomihuda-wa.jpg",
+    "kana": "わとようの、びがちょうわする、やまもとてい",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002883.html"
+  },
+  {
+    "id": "か",
+    "text": "金町に　くらしささえる　浄水場",
+    "image": "assets/city-karuta-13.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/884/ehuda-ka.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/884/yomihuda-ka.jpg",
+    "kana": "かなまちに、くらしささえる、じょうすいじょう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002884.html"
+  },
+  {
+    "id": "よ",
+    "text": "吉宗の　病 治した　お花さん",
+    "image": "assets/city-karuta-14.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/885/ehuda-yo.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/885/yomihuda-yo.jpg",
+    "kana": "よしむねの、やまいなおした、おはなさん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002885.html"
+  },
+  {
+    "id": "た",
+    "text": "鷹狩に　将軍通った　小菅御殿",
+    "image": "assets/city-karuta-15.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/886/efuda_15.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/886/yomihuda-ta.jpg",
+    "kana": "たかがりに、しょうぐんかよった、こすげごてん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002886.html"
+  },
+  {
+    "id": "れ",
+    "text": "歴史から　治水を学ぶ　桜土手",
+    "image": "assets/city-karuta-16.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/887/efuda_16.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/887/yomihuda-re.jpg",
+    "kana": "れきしから、ちすいをまなぶ、さくらどて",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002887.html"
+  },
+  {
+    "id": "そ",
+    "text": "箏曲を　江戸で流行らせ　山田検校",
+    "image": "assets/city-karuta-17.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/888/ehuda-so.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/888/yomihuda-so.jpg",
+    "kana": "そうきょくを、えどではやらせ、やまだけんぎょう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002888.html"
+  },
+  {
+    "id": "つ",
+    "text": "綱で曳き　旅人いきかう　曳舟川",
+    "image": "assets/city-karuta-18.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/889/ehuda-tu.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/889/yomihuda-tu.jpg",
+    "kana": "つなでひき、たびびといきかう、ひきふねがわ",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002889.html"
+  },
+  {
+    "id": "ね",
+    "text": "年貢米　たくわえ備え　郷倉で",
+    "image": "assets/city-karuta-19.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/890/ehuda-ne.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/890/yomihuda-ne.jpg",
+    "kana": "ねんぐまい、たくわえそなえ、ごうぐらで",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002890.html"
+  },
+  {
+    "id": "な",
+    "text": "中川は　右に左に　七曲",
+    "image": "assets/city-karuta-20.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/891/efuda_20.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/891/yomihuda-na.jpg",
+    "kana": "なかがわは、みぎにひだりに、ななまがり",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002891.html"
+  },
+  {
+    "id": "ら",
+    "text": "ランナーが　今日もいきかう　河川敷",
+    "image": "assets/city-karuta-21.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/892/ehuda-ra.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/892/yomi_21.jpg",
+    "kana": "らんなーが、きょうもいきかう、かせんじき",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002892.html"
+  },
+  {
+    "id": "む",
+    "text": "虫の声　秋草そよぐ　野草園",
+    "image": "assets/city-karuta-22.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/893/ehuda-mu.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/893/yomihuda-mu.jpg",
+    "kana": "むしのこえ、あきくさそよぐ、やそうえん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002893.html"
+  },
+  {
+    "id": "う",
+    "text": "うたわれた　古代かつしか　万葉集",
+    "image": "assets/city-karuta-23.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/894/ehuda-u.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/894/yomihuda-u.jpg",
+    "kana": "うたわれた、こだいかつしか、まんようしゅう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002894.html"
+  },
+  {
+    "id": "の",
+    "text": "農村と　江戸を結んだ　葛西舟",
+    "image": "assets/city-karuta-24.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/895/efuda_24.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/895/yomi_24.jpg",
+    "kana": "のうそんと、えどをむすんだ、かさいぶね",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002895.html"
+  },
+  {
+    "id": "お",
+    "text": "鬼塚は　歴史つたえる　玉手箱",
+    "image": "assets/city-karuta-25.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/896/ehuda-o.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/896/yomihuda-o.jpg",
+    "kana": "おにづかは、れきしつたえる、たまてばこ",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002896.html"
+  },
+  {
+    "id": "く",
+    "text": "区歌うたう　光と希望　力あり",
+    "image": "assets/city-karuta-26.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/897/efuda_26.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/897/yomihuda-ku.jpg",
+    "kana": "くかうたう、ひかりときぼう、ちからあり",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002897.html"
+  },
+  {
+    "id": "や",
+    "text": "弥惣兵衛　よびよせつくる　小合溜",
+    "image": "assets/city-karuta-27.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/898/ehuda-ya.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/898/yomi_27.jpg",
+    "kana": "やそべえ、よびよせつくる、こあいため",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002898.html"
+  },
+  {
+    "id": "ま",
+    "text": "町工場　技とパワーが　あふれてる",
+    "image": "assets/city-karuta-28.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/899/ehuda-ma.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/899/yomihuda-ma.jpg",
+    "kana": "まちこうば、わざとぱわーが、あふれてる",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002899.html"
+  },
+  {
+    "id": "け",
+    "text": "懸命に　車夫がおっぺす　人車鉄道",
+    "image": "assets/city-karuta-29.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/900/efuda_29.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/900/yomihuda-ke.jpg",
+    "kana": "けんめいに、しゃふがおっぺす、じんしゃてつどう",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002900.html"
+  },
+  {
+    "id": "ふ",
+    "text": "故郷と　宇宙をつなぐ　博物館",
+    "image": "assets/city-karuta-30.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/901/ehuda-hu.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/901/yomihuda-hu.jpg",
+    "kana": "ふるさとと、うちゅうをつなぐ、はくぶつかん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002901.html"
+  },
+  {
+    "id": "こ",
+    "text": "古代では　立石様が　道しるべ",
+    "image": "assets/city-karuta-31.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/902/ehuda-ko.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/902/yomihuda-ko.jpg",
+    "kana": "こだいでは、たていしさまが、みちしるべ",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002902.html"
+  },
+  {
+    "id": "え",
+    "text": "笑顔生む　おもちゃ育てた　セルロイド",
+    "image": "assets/city-karuta-32.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/903/ehuda-e.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/903/yomihuda-e.jpg",
+    "kana": "えがおうむ、おもちゃそだてた、せるろいど",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002903.html"
+  },
+  {
+    "id": "て",
+    "text": "てんすけてん　葛西ばやしは　江戸囃子",
+    "image": "assets/city-karuta-33.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/904/ehuda-te.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/904/yomi_33.jpg",
+    "kana": "てんすけてん、かさいばやしは、えどばやし",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002904.html"
+  },
+  {
+    "id": "あ",
+    "text": "荒川は　人がつくった　放水路",
+    "image": "assets/city-karuta-34.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/905/ehuda-a.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/905/yomihuda-a.jpg",
+    "kana": "あらかわは、ひとがつくった、ほうすいろ",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002905.html"
+  },
+  {
+    "id": "さ",
+    "text": "参道の　にぎわい楽し　帝釈天",
+    "image": "assets/city-karuta-35.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/906/ehuda-sa.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/906/yomihuda-sa.jpg",
+    "kana": "さんどうの、にぎわいたのし、たいしゃくてん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002906.html"
+  },
+  {
+    "id": "き",
+    "text": "季節ごと　食卓いろどる　元気野菜",
+    "image": "assets/city-karuta-36.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/907/ehuda-ki.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/907/yomihuda-ki.jpg",
+    "kana": "きせつごと、しょくたくいろどる、げんきやさい",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002907.html"
+  },
+  {
+    "id": "ゆ",
+    "text": "友好を　ウィーンと育む　モーツァルト",
+    "image": "assets/city-karuta-37.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/908/ehuda-yu2.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/908/yomihuda-yu.jpg",
+    "kana": "ゆうこうを、うぃーんとはぐくむ、もーつぁると",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002908.html"
+  },
+  {
+    "id": "め",
+    "text": "明治の美　レンガを積んだ　閘門橋",
+    "image": "assets/city-karuta-38.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/909/efuda_38.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/909/yomihuda-me.jpg",
+    "kana": "めいじのび、れんがをつんだ、こうもんばし",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002909.html"
+  },
+  {
+    "id": "み",
+    "text": "水戸街道　人馬にぎわう　新宿のまち",
+    "image": "assets/city-karuta-39.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/910/ehuda-mi.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/910/yomihuda-mi.jpg",
+    "kana": "みとかいどう、じんばにぎわう、にいじゅくのまち",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002910.html"
+  },
+  {
+    "id": "し",
+    "text": "しばられて　願いかなえる　地蔵尊",
+    "image": "assets/city-karuta-40.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/911/ehuda-si.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/911/yomihuda-si.jpg",
+    "kana": "しばられて、ねがいかなえる、じぞうそん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002911.html"
+  },
+  {
+    "id": "ひ",
+    "text": "非核都市　平和を祈る　千羽鶴",
+    "image": "assets/city-karuta-41.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/912/ehuda-hi.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/912/yomihuda-hi.jpg",
+    "kana": "ひかくとし、へいわをいのる、せんばづる",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002912.html"
+  },
+  {
+    "id": "も",
+    "text": "餅つきの　うさぎと眺める　スカイツリー",
+    "image": "assets/city-karuta-42.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/913/efuda_42.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/913/yomihuda-mo.jpg",
+    "kana": "もちつきの、うさぎとながめる、すかいつりー",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002913.html"
+  },
+  {
+    "id": "せ",
+    "text": "せんべいの　手焼きの姿　あちこちに",
+    "image": "assets/city-karuta-43.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/914/ehuda-se.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/914/yomihuda-se.jpg",
+    "kana": "せんべいの、てやきのすがた、あちこちに",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002914.html"
+  },
+  {
+    "id": "す",
+    "text": "水郷の　景観残す　水元公園",
+    "image": "assets/city-karuta-44.jpg",
+    "source": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/915/ehuda-su.jpg",
+    "readSource": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/002/915/yomihuda-su.jpg",
+    "kana": "すいごうの、けいかんのこす、みずもとこうえん",
+    "sourcePage": "https://www.city.katsushika.lg.jp/kosodate/1002752/1027557/1002848/1002915.html"
+  }
+]
