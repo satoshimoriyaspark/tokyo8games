@@ -9,4 +9,4 @@
 - Before production, check direct canonical access with no external navigation, PC/iPhone/iPad layouts and input, assets, speech/audio, title return, portal navigation and unaffected existing routes. Distinguish browser emulation from real-device testing.
 - Report changed files, commit, production URL, verification evidence and any remaining limitations. Never claim unperformed device or audio checks.
 
-Current scope: `/kks` uses local hosting. `/kwb` and legacy `/w` retain their existing behavior until their game receives a separate migration; do not break them while migrating another game.
+Current scope: `/kks` and `/kwb` use local hosting. Legacy `/w` redirects only to the canonical same-origin `/kwb`. KWB is a solo beta; keep its existing ranking data service running until that data dependency is migrated.

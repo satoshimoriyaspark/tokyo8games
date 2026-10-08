@@ -1,13 +1,8 @@
 {
   "redirects": [
     {
-      "source": "/kwb",
-      "destination": "https://kameari-wasshoi-battle2.vercel.app/",
-      "permanent": false
-    },
-    {
       "source": "/w",
-      "destination": "https://kameari-wasshoi-battle2.vercel.app/",
+      "destination": "/kwb",
       "permanent": false
     }
   ],
@@ -19,6 +14,14 @@
     {
       "source": "/kks/",
       "destination": "/games/kks/index.html"
+    },
+    {
+      "source": "/kwb",
+      "destination": "/games/kwb/index.html"
+    },
+    {
+      "source": "/kwb/",
+      "destination": "/games/kwb/index.html"
     }
   ]
 }
