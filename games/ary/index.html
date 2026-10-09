@@ -9,7 +9,7 @@
  .bar #action{margin-right:auto}
 }
 #fullscreen{background:#7de4ca}
-</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">キャラクター描画は安定版の仮スプライトに一時的に戻しています。</span></p></main><script>
+</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">アリィ原画の特徴を反映したQC用ドット絵。動作確認後に正式スプライト化します。</span></p></main><script>
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0},last=0,acc=0;
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
@@ -50,7 +50,52 @@ function building(x,i,layer){const w=44+(i%3)*8,y=46+(i%3)*9;rect(x,y,w,ground-y
 function background(){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');rect(0,27,320,8,'#c4e4ec');for(let i=0;i<8;i++){const x=((i*65-scroll*.25)%460+460)%460-65;rect(x,54+(i%3)*7,45,84,'#9db6ae')}for(let i=0;i<9;i++){const x=((i*54-scroll*.55)%486+486)%486-54;building(x,i,0)}rect(0,138,320,42,'#6e7886');rect(0,136,320,3,'#ead9b4');for(let i=0;i<10;i++){let x=((i*42-scroll*1.8)%420+420)%420;rect(x,161,19,2,'#eee3bb')}}
 // Original pixel sprite draft, based on the FIX character's key visual traits.
 // Deliberately kept as QC artwork: not a traced or approved production sprite.
-function avatar(){let x=50,y=Number.isFinite(p.y)?Math.max(35,Math.min(113,p.y)):113,sl=p.slide>0;rect(x+2,y-23,14,12,'#423951');rect(x+4,y-20,10,10,'#f4c8a4');rect(x+2,y-10,14,sl?11:17,'#e7687b');rect(x+5,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x+12,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x-3,y+19,36,3,'#304b5f');rect(x-1,y+22,7,6,'#1b2b3c');rect(x+27,y+22,7,6,'#1b2b3c');rect(x+28,y-4,3,22,'#304b5f')}
+// QC-only procedural sprite: key silhouette based on official ARII reference.
+// No external assets, no asynchronous loads, no array-indexed frame reads.
+function avatar(){
+ const x=50, y=Number.isFinite(p.y)?Math.max(35,Math.min(113,p.y)):113;
+ const slide=p.slide>0, airborne=y<112, motion=Math.floor(tick/9)%2;
+ const pink='#ee77ad',pinkShadow='#b84983',pinkLight='#ffadd0';
+ const navy='#273c69',navyLight='#42619b',skin='#f4c6ab',ink='#24324c';
+ // Scooter first: the board is a separate logical layer from the rider.
+ rect(x-6,y+19,40,3,ink);rect(x-4,y+18,37,2,'#db648f');
+ rect(x-4,y+21,7,7,ink);rect(x-2,y+23,3,3,'#8ea4cf');
+ rect(x+28,y+21,7,7,ink);rect(x+30,y+23,3,3,'#8ea4cf');
+ rect(x+28,y-5,3,25,ink);rect(x+25,y-6,9,3,ink);
+ // Twin tails: pink, long, separated, flowing behind the rider.
+ const sway=motion?2:0;
+ rect(x-11-sway,y-30,9,9,pinkShadow);
+ rect(x-17-sway,y-24,13,10,pink);
+ rect(x-22-sway,y-17,13,8,pinkLight);
+ rect(x-19-sway,y-9,9,7,pink);
+ rect(x+15,y-25,7,10,pinkShadow);
+ rect(x+18,y-16,8,10,pink);
+ rect(x+20,y-7,6,8,pinkLight);
+ // Black tights, navy pleated skirt, blue-white sneakers.
+ if(slide){
+  rect(x+3,y+4,21,7,navy);rect(x+11,y+11,13,6,'#343449');
+  rect(x+18,y+17,10,3,'#f5f5fa');
+ }else{
+  rect(x+1,y+4,17,7,navy);
+  rect(x+4,y+10,5,8,'#333746');rect(x+13,y+10,5,8,'#333746');
+  rect(x+3,y+17,10,3,'#f4f5ff');rect(x+12,y+17,10,3,'#f4f5ff');
+  rect(x+4,y+18,6,2,'#2960a9');
+ }
+ // Hooded navy jacket, white shirt, crossbody bag.
+ rect(x,y-12,20,17,navy);rect(x+1,y-11,17,3,navyLight);
+ rect(x+7,y-9,6,10,'#f8f7f1');rect(x+8,y-7,3,5,'#2869b9');
+ rect(x+15,y-6,8,10,ink);rect(x+16,y-5,6,8,navyLight);
+ rect(x+12,y-12,2,15,'#c7a05d');
+ rect(x+19,y-10,7,4,navy);rect(x+24,y-8,4,4,skin);
+ // Head is lowered in slide; bright blue eye and black/gold headset.
+ const h=y-(slide?30:34);
+ rect(x+2,h,18,16,pinkShadow);rect(x+4,h-2,15,6,pink);
+ rect(x+5,h+5,14,11,skin);rect(x+4,h+2,5,8,pink);
+ rect(x+11,h+2,8,5,pinkLight);rect(x+14,h+10,3,3,'#287ed5');
+ rect(x+17,h+10,2,2,'#e7f8ff');
+ rect(x+1,h,6,7,ink);rect(x+2,h+1,4,5,'#d8ae58');
+ if(airborne)rect(x-12,y+27,45,1,'#b7d9e6');
+}
 function spawn(){if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});if(tick%115===0)items.push({x:328,y:126,k:'cone',done:false})}
 function update(){tick++;scroll+=2.25;if(!Number.isFinite(p.y)||!Number.isFinite(p.vy)){p.y=113;p.vy=0;p.j=0}p.vy+=.29;p.y+=p.vy;if(p.y<35){p.y=35;p.vy=Math.max(0,p.vy)}if(p.y>=113){p.y=113;p.vy=0;p.j=0}if(p.slide>0)p.slide--;spawn();for(const o of items){o.x-=2.25;if(o.done)continue;const near=o.x>=43&&o.x<=69;if(!near)continue;if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10}else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500}else if(o.k==='cone'&&p.y>103){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3)state='fail'}}items=items.filter(o=>o.x>-20&&!o.done);if(tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}}
 function hexChip(x,y){
