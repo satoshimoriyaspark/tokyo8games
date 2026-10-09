@@ -1,5 +1,5 @@
 {
-  "ride": "Byte-identical copy of user attachment ary_ride_game(1).png; no palette conversion or re-encoding.",
+  "ride": "Approved user PNG with alpha-only removal of white matte fringe; every RGB pixel and frame coordinate preserved. Original byte-identical version is retained in parent Git commit 60c05b16c776281389f1a329f566e9223627b80b.",
   "actions": "Cropped from approved CC25583D-7C63-41D2-867E-B6330F1A887E.jpeg; near-white background mask, 0.59x nearest-neighbor; RGB unmodified, RGBA PNG output.",
   "source_sha256": "e6a004cadeebefacdc2f16bdcaf209ffaa14710e609e121775ccbe3eeb4bd432",
   "files": [
@@ -9,7 +9,7 @@
         96,
         48
       ],
-      "sha256": "3801fb9e838b566bde927a4a8ded007d188451f5d40291e34369d42979ba5d73"
+      "sha256": "b3d42140f18f1b87f9223c4a96e0ad44f34c67f9b2d68cc65e6272e08dd5e720"
     },
     {
       "file": "ary_double_jump.png",
@@ -17,7 +17,7 @@
         216,
         88
       ],
-      "sha256": "637343f3ab383bac2a2e5867852f75290235bafa32242e7b388e8ee0fef0da4f"
+      "sha256": "4c33efb36ac7fa536bd897c1db183bba1103a3184ff13f4414927a24924b1be2"
     },
     {
       "file": "ary_jump.png",
@@ -25,7 +25,7 @@
         360,
         88
       ],
-      "sha256": "dea52b2ffefdb7852d701c14d9291d9c536b4e8d10e27c2c55bcf4561b49c465"
+      "sha256": "55200cf03b48fd53f592445c762e26ea41769b0fc1cf4fe06e99acfc2c92b682"
     },
     {
       "file": "ary_ride_game.png",
@@ -33,7 +33,7 @@
         384,
         80
       ],
-      "sha256": "b4984e6345e021b0da6b350100aa96761421d2073b10073f1b2246e2f9d23158"
+      "sha256": "070313d6a7dd5a522b379abe05dde21efa89ca2f71452d4008681905aa874470"
     },
     {
       "file": "ary_slide.png",
@@ -41,7 +41,8 @@
         216,
         88
       ],
-      "sha256": "da45774bcd4be1113518b0abf6a1fea28e17a14eb3ef2f9edd9d1a635e03be5a"
+      "sha256": "330b49c3dda628fb5f640cd102990bb5d1cedc0ec49afccf1fad9f949cff33fa"
     }
-  ]
+  ],
+  "alpha_cleanup": "tools/clean-alpha.py: remove near-neutral pale pixels within 2px of transparency, isolated specks, and bounded speed-streak residue. No RGB edits, smoothing, resizing or palette quantization."
 }
