@@ -44,7 +44,20 @@ function avatar(){
 function mysteryCat(){
  if(state==='play'||state==='intro')ArySprites.draw(g,{key:'cat',frame:Math.floor(tick/8)%2},264,138,.55);
 }
-function spawn(){if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});if(tick%115===0)items.push({x:328,y:126,k:'cone',done:false});if(tick%210===105)items.push({x:328,y:88,k:'sign',done:false})}
+function spawn(){
+ if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});
+ if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});
+ // Alternate encounters, three seconds apart. Crow starts offscreen for advance warning.
+ if(tick%360===90)items.push({x:328,y:119,k:'cone',done:false});
+ if(tick%360===270)items.push({x:400,y:84,k:'crow',done:false});
+}
+function overlaps(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function hazardHit(o){
+ const player={x:51,y:p.y-(p.slide>0?8:23),w:24,h:p.slide>0?30:45};
+ // Solid body only: the crow's wing tips and the cone's ground shadow are decorative.
+ const hazard=o.k==='crow'?{x:o.x+4,y:o.y+1,w:22,h:10}:{x:o.x+4,y:o.y+2,w:14,h:17};
+ return overlaps(player,hazard);
+}
 function update(){
  if(state!=='play'||paused||!ArySprites.ready())return;
  tick++;scroll+=2.25;
@@ -57,14 +70,16 @@ function update(){
  if(p.slide>0)p.slide--;
  spawn();
  for(const o of items){
-  o.x-=2.25;if(o.done)continue;
-  const near=o.x>=43&&o.x<=69;if(!near)continue;
+  o.x-=o.k==='crow'?3:2.25;if(o.done)continue;
+  const near=o.x>=43&&o.x<=69;
+  if(o.k==='cone'||o.k==='crow'){
+   if(hazardHit(o)){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3){state='fail';break}}
+   continue;
+  }
+  if(!near)continue;
   if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10}
   else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500}
-  else if((o.k==='cone'&&p.y>103)||(o.k==='sign'&&p.slide<=0&&p.y>90)){
-   o.done=true;hits++;score=Math.max(0,score-500);
-   if(hits>=3){state='fail';break}
-  }
+
  }
  items=items.filter(o=>o.x>-20&&!o.done);
  if(state==='play'&&tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}
@@ -82,7 +97,47 @@ function hexChip(x,y){
  const q=['.###.','##.##','...##','..##.','..#..','.....','..#..'];
  for(let j=0;j<q.length;j++)for(let i=0;i<q[j].length;i++)if(q[j][i]==='#')rect(x+4+i,y+2+j,1,1,'#64431e');
 }
-function drawItems(){for(const o of items){if(o.k==='coin'){hexChip(o.x,o.y)}else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}else if(o.k==='sign'){rect(o.x,o.y,20,4,'#293c62');rect(o.x+1,o.y+4,18,9,'#e9c65b');rect(o.x+2,o.y+6,16,4,'#83582d');rect(o.x+17,o.y-4,2,4,'#293c62')}else{rect(o.x+3,o.y,8,13,'#f07845');rect(o.x+1,o.y+11,12,3,'#fff3dc')}}}
+// Code-native pixel artwork, using the same logical pixel grid as the street.
+function drawCone(x,y){
+ rect(x,y+18,24,2,'#50596b');
+ rect(x+9,y,5,3,'#293147');rect(x+8,y+3,7,3,'#293147');
+ rect(x+6,y+6,11,5,'#293147');rect(x+4,y+11,15,6,'#293147');
+ rect(x+10,y+1,3,4,'#ff974e');rect(x+9,y+5,5,3,'#f8eee0');
+ rect(x+7,y+8,9,4,'#f27739');rect(x+6,y+12,11,3,'#f8eee0');
+ rect(x+5,y+15,13,2,'#e45e2c');rect(x+2,y+17,20,3,'#293147');
+ rect(x+4,y+17,16,1,'#fb974b');
+}
+function drawCrow(x,y){
+ const phase=Math.floor(tick/7)%4;
+ // Pointed beak faces the player; blue highlights distinguish it from the story cat.
+ rect(x+5,136,23,2,'#596577');
+ rect(x+6,y+3,16,8,'#192238');rect(x+3,y+1,8,7,'#192238');
+ rect(x,y+4,5,3,'#bbad83');rect(x+4,y+2,2,2,'#f8eee0');
+ rect(x+9,y+3,10,3,'#435675');rect(x+21,y+6,7,3,'#192238');
+ rect(x+25,y+4,4,3,'#192238');
+ if(phase===0||phase===3){
+  rect(x+13,y-4,7,8,'#25324d');rect(x+17,y-9,6,7,'#25324d');
+  rect(x+21,y-12,3,6,'#192238');rect(x+15,y-4,2,6,'#536a88');
+ }else{
+  rect(x+12,y+5,9,5,'#25324d');rect(x+15,y+9,8,4,'#25324d');
+  rect(x+20,y+12,4,3,'#192238');rect(x+14,y+7,4,2,'#536a88');
+ }
+ rect(x+9,y+11,2,2,'#b6a580');rect(x+15,y+11,2,2,'#b6a580');
+}
+function drawItems(){
+ for(const o of items){
+  if(o.k==='coin')hexChip(o.x,o.y);
+  else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}
+  else if(o.k==='cone')drawCone(o.x,o.y);
+  else if(o.k==='crow')drawCrow(o.x,o.y);
+ }
+ const approaching=items.find(o=>(o.k==='crow'||o.k==='cone')&&!o.done&&o.x>82);
+ if(approaching){
+  const crow=approaching.k==='crow';
+  box(193,29,122,19);txt(crow?'↓ くぐろう！':'↑ ジャンプ！',199,42,10,'#ffe18b');
+  if(crow&&approaching.x>285){rect(302,80,12,15,'#172a46');txt('!',305,92,12,'#ffdd64')}
+ }
+}
 function overlay(title,lines){box(19,49,282,85);txt(title,31,67,13,'#ffe18b');lines.forEach((s,i)=>txt(s,31,86+i*13,9))}
 function render(){
  drawLayer('background',background);
@@ -90,7 +145,7 @@ function render(){
  drawLayer('cat',mysteryCat);
  drawLayer('avatar',avatar);
 rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);
-if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','街の「？」を集めよう。','STARTで走行開始']);
+if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'STARTで走行開始']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
 if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','STARTで再挑戦']);
 if(state==='fail')overlay('GAME OVER',['障害物に3回接触しました。','SCORE '+score+'  ?CHIP '+coins,'STARTで再挑戦']);

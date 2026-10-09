@@ -94,9 +94,14 @@ async function main(){
   assert.equal(slideFrames.size,3);assert.equal(h.diagnostics().pose.key,'ride');
   h.run("reset();items=[{k:'coin',x:62,y:105},{k:'clue',x:62,y:112}];update();render()");
   assert.equal(h.diagnostics().coins,1);assert.equal(h.diagnostics().clues,1);assert.equal(h.diagnostics().score,510);
-  h.run("items=[{k:'cone',x:62,y:126}];update()");assert.equal(h.diagnostics().hits,1);assert.equal(h.diagnostics().score,10);
-  h.run("reset();slide();items=[{k:'sign',x:62,y:88}];update()");assert.equal(h.diagnostics().hits,0,'slide avoids low sign');
-  h.run("reset();items=[{k:'sign',x:62,y:88}];update()");assert.equal(h.diagnostics().hits,1);
+  h.run("items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().hits,1);assert.equal(h.diagnostics().score,10);
+  h.run("reset();slide();items=[{k:'crow',x:62,y:84}];update()");assert.equal(h.diagnostics().hits,0,'slide avoids flying crow');
+  h.run("reset();items=[{k:'crow',x:62,y:84}];update()");assert.equal(h.diagnostics().hits,1);
+  // Colliders follow vertical position: jumping over cones is safe; landing into a crow is not.
+  h.run("reset();p.y=88;p.vy=0;p.j=1;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().hits,0);
+  h.run("reset();p.y=96;p.vy=1;p.j=1;items=[{k:'crow',x:62,y:84}];update()");assert.equal(h.diagnostics().hits,1);
+  h.run("reset();items=[{k:'cone',x:160,y:119},{k:'crow',x:255,y:84}];render()");h.capture('06-obstacles');
+  h.run("reset();slide();items=[{k:'crow',x:60,y:84}];render()");h.capture('07-crow-slide');
   h.run('reset();paused=true;update()');assert.equal(h.diagnostics().tick,0);
   h.el('#pause').onclick();h.run('update()');assert.equal(h.diagnostics().tick,1);
   h.document.hidden=true;h.documentEvents.visibilitychange();assert(h.diagnostics().paused);
@@ -111,7 +116,7 @@ async function main(){
   const finalScore=h.diagnostics().score;h.run('update();update()');assert.equal(h.diagnostics().score,finalScore,'clear awarded only once');
   h.run('next();render()');h.capture('05-clear');assert.equal(h.diagnostics().state,'result');
   h.run('next()');assert.equal(h.diagnostics().tick,0);
-  h.run("hits=2;items=[{k:'cone',x:62,y:126}];update()");assert.equal(h.diagnostics().state,'fail');
+  h.run("hits=2;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
   h.run('next()');assert.equal(h.diagnostics().hits,0);
   // Render failure is injected only in the VM and must not hide the avatar.
   h.run("var savedDrawItems=drawItems;drawItems=()=>{throw Error('injected item failure')};render()");
@@ -135,7 +140,7 @@ async function main(){
   failed.recover();failed.el('#retry-assets').onclick();await failed.flush();
   failed.run('reset();slide();render()');assert.equal(failed.diagnostics().pose.key,'slide');
   assert.equal(failed.diagnostics().assets.slide,'ready');assert.equal(failed.timers.size,0);
-  console.log('PASS: PNG load/retry, 6 run frames at 10fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/sign avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
+  console.log('PASS: PNG load/retry, 6 run frames at 10fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
   console.log('LIMIT: Node Canvas + simulated DOM; not iPhone Safari / Android Chrome / PC browser or real-time endurance.');
   if(captureDir){
     const record=await harness();await record.flush();record.run('reset()');

@@ -39,3 +39,13 @@
 ## 白い輪郭の修正
 
 ユーザーの実機確認で見つかった白い縁・背景残片を `tools/clean-alpha.py` で除去。透明領域から2px以内の明るい無彩色に近いピクセル、孤立した残片、背後の速度線の白い残りだけを透明化。髪・服・瞳等のRGB値は全ピクセルで維持。元PNGは親コミット `60c05b1` に保管されている。再処理は必ず補正前のPNGを入力し、重ねがけしない。
+
+## Obstacle readability update — 2026-10-10
+
+- Ground obstacle: orange/white traffic cone with tapered silhouette, dark outline and wide base; jump to clear it.
+- Overhead obstacle: left-facing crow, four-tick wing cycle (two wing silhouettes), blue feather highlights, beak and ground shadow; slide underneath. Replaces the ambiguous floating sign.
+- Artwork is native Canvas pixel geometry in `game.js`; no new image dependency or changes to approved Ary PNGs.
+- Crow body stays at logical y=84; an offscreen `!` and `↓ くぐろう！` announce arrival. Cone hint is `↑ ジャンプ！`.
+- Alternate hazards every 180 simulation ticks, approximately three seconds apart at the player. Crow scrolls at 3px/tick, cones at 2.25px/tick.
+- Solid-body AABB collision uses actual vertical position and slide posture. Wing tips and shadows are not solid. Jumping can also clear a crow if the player's body is fully above it.
+- Regression coverage: cone contact/jump clearance, standing crow contact/slide clearance, airborne crow contact, existing scoring and 180-second rendered simulation. Real-device iOS/Android testing remains pending.
