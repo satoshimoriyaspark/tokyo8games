@@ -9,7 +9,7 @@
  .bar #action{margin-right:auto}
 }
 #fullscreen{background:#7de4ca}
-</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">アリィのFIX原画を参考にしたドット絵QC試作です（正式承認前）。</span></p></main><script>
+</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">キャラクター描画は安定版の仮スプライトに一時的に戻しています。</span></p></main><script>
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0},last=0,acc=0;
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
@@ -50,48 +50,7 @@ function building(x,i,layer){const w=44+(i%3)*8,y=46+(i%3)*9;rect(x,y,w,ground-y
 function background(){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');rect(0,27,320,8,'#c4e4ec');for(let i=0;i<8;i++){const x=((i*65-scroll*.25)%460+460)%460-65;rect(x,54+(i%3)*7,45,84,'#9db6ae')}for(let i=0;i<9;i++){const x=((i*54-scroll*.55)%486+486)%486-54;building(x,i,0)}rect(0,138,320,42,'#6e7886');rect(0,136,320,3,'#ead9b4');for(let i=0;i<10;i++){let x=((i*42-scroll*1.8)%420+420)%420;rect(x,161,19,2,'#eee3bb')}}
 // Original pixel sprite draft, based on the FIX character's key visual traits.
 // Deliberately kept as QC artwork: not a traced or approved production sprite.
-function avatar(){
- const x=49,y=p.y,sl=p.slide>0,air=p.y<112,phase=Math.floor(tick/8)%4;
- const pink='#ed659f',pinkHi='#ff9ac3',pinkDark='#b9477d',navy='#253e70',navyHi='#4267a1',skin='#f8c6ac',ink='#253047',gold='#edc266',blue='#2879cb';
- // scooter: separate visual layer; wheels and frame retain the same registration point
- rect(x-4,y+19,38,3,ink);rect(x-2,y+18,31,2,'#f17e9d');
- rect(x-3,y+21,7,7,ink);rect(x-1,y+23,3,3,'#8ab2d1');
- rect(x+27,y+21,7,7,ink);rect(x+29,y+23,3,3,'#8ab2d1');
- rect(x+28,y-5,3,25,ink);rect(x+24,y-6,10,3,ink);rect(x+28,y-3,2,19,'#f279a4');
- // rear flowing twin-tail, exaggerated enough to read at game resolution
- const wave=(phase%2===0?1:-1);
- rect(x-12+wave,y-25,10,6,pinkDark);rect(x-17+wave,y-21,12,8,pink);
- rect(x-22+wave,y-17,14,7,pink);rect(x-23+wave,y-11,10,5,pinkHi);
- rect(x-7,y-26,7,9,pink);
- // legs, sneakers and pleated skirt (crouched on board for slide)
- if(sl){
-  rect(x+2,y+7,21,6,navy);rect(x+11,y+13,13,4,'#30334b');
-  rect(x+18,y+17,9,3,'#edf1f9');
- }else{
-  rect(x+1,y+3,15,7,navy);rect(x+5,y+10,5,8,'#33394d');
-  rect(x+13,y+10,5,8,'#33394d');rect(x+3,y+17,9,3,'#f4f6ff');
-  rect(x+12,y+17,9,3,'#f4f6ff');rect(x+6,y+18,5,2,blue);
- }
- // navy hooded jacket, white shirt, crossbody bag
- rect(x-1,y-12,20,16,navy);rect(x+1,y-10,17,3,navyHi);
- rect(x+6,y-9,6,10,'#f4f1eb');rect(x+8,y-7,3,5,blue);
- rect(x+14,y-8,8,11,'#192d54');rect(x+16,y-5,5,7,navyHi);
- rect(x+10,y-12,2,15,gold);
- // hands holding the handle
- rect(x+17,y-10,8,4,navy);rect(x+23,y-8,5,4,skin);
- // head and bangs
- const headY=sl?y-29:y-33;
- rect(x+1,headY,19,15,pinkDark);rect(x+3,headY-2,15,5,pink);
- rect(x+4,headY+5,14,11,skin);rect(x+3,headY+3,5,7,pink);
- rect(x+10,headY+2,9,5,pinkHi);rect(x+16,headY+4,4,7,pink);
- rect(x+13,headY+10,3,3,blue);rect(x+17,headY+10,2,2,'#f9fbff');
- // twin-tail base and black-gold circular headphone
- rect(x+1,headY-1,5,7,ink);rect(x+2,headY,3,5,gold);
- rect(x-1,headY+5,5,14,pink);rect(x-4,headY+16,7,10,pinkDark);
- // front trailing lock to maintain two long tails
- rect(x+18,headY+5,5,15,pink);rect(x+20,headY+17,5,10,pinkHi);
- if(air){rect(x-17,y+27,45,1,'#d8edf1')}
-}
+function avatar(){let x=50,y=p.y,sl=p.slide>0;rect(x+2,y-23,14,12,'#423951');rect(x+4,y-20,10,10,'#f4c8a4');rect(x+2,y-10,14,sl?11:17,'#e7687b');rect(x+5,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x+12,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x-3,y+19,36,3,'#304b5f');rect(x-1,y+22,7,6,'#1b2b3c');rect(x+27,y+22,7,6,'#1b2b3c');rect(x+28,y-4,3,22,'#304b5f')}
 function spawn(){if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});if(tick%115===0)items.push({x:328,y:126,k:'cone',done:false})}
 function update(){tick++;scroll+=2.25;p.vy+=.29;p.y+=p.vy;if(p.y>=113){p.y=113;p.vy=0;p.j=0}if(p.slide>0)p.slide--;spawn();for(const o of items){o.x-=2.25;if(o.done)continue;const near=o.x>=43&&o.x<=69;if(!near)continue;if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10}else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500}else if(o.k==='cone'&&p.y>103){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3)state='fail'}}items=items.filter(o=>o.x>-20&&!o.done);if(tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}}
 function hexChip(x,y){
