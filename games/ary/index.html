@@ -9,7 +9,7 @@
  .bar #action{margin-right:auto}
 }
 #fullscreen{background:#7de4ca}
-</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">SLIDEで低い看板をくぐろう。アリィ原画の特徴を反映したQC用ドット絵。動作確認後に正式スプライト化します。</span></p></main><script>
+</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">FIXデザインの走行6コマを実装中。スライド時は一時的に簡易スプライトに切り替わります。動作確認後に正式スプライト化します。</span></p></main><script src="/games/ary/assets/ride-sprite.js"></script><script>
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0},last=0,acc=0;
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
@@ -117,7 +117,7 @@ function render(){
  background();drawItems();
  // Draw player on an isolated layer; no stage overlay or background can erase it.
  g.save();
- try{avatar()}finally{g.restore()}
+ try{if(!(window.drawArySprite&&window.drawArySprite(g,p.y,tick,p.slide>0)))avatar()}finally{g.restore()}
 rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);
 if(state==='intro')overlay('KAMEARI / 01',['アリィの取材がはじまる！','街の「？」を集めよう。','STARTで走行開始']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「次の取材へ行こう！」','タップでリザルトへ']);
