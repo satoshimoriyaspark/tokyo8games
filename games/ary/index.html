@@ -9,7 +9,7 @@
  .bar #action{margin-right:auto}
 }
 #fullscreen{background:#7de4ca}
-</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">キャラクターは正式アリィではない仮スプライトです。</span></p></main><script>
+</style></head><body><main><h1>カツコレ！ アリィのスクーターRUN <small>亀有 β</small></h1><canvas id="game" width="320" height="180" aria-label="亀有商店街を走る横スクロールゲーム"></canvas><div class="bar"><button id="action">START / NEXT</button><button id="jump">JUMP</button><button id="slide">SLIDE</button><button id="pause">PAUSE</button><button id="fullscreen">FULL</button></div><p>六角形の？チップ（ハテナチップ）を集めよう。タップ / Space：ジャンプ（二段まで）　下スワイプ / ↓：スライド　Esc：一時停止。<span class="note">キャラクターは正式アリィではない仮スプライトです。</span></p></main><script>
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0},last=0,acc=0;
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
@@ -51,7 +51,20 @@ function background(){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');re
 function avatar(){let x=50,y=p.y,sl=p.slide>0;rect(x+2,y-23,14,12,'#423951');rect(x+4,y-20,10,10,'#f4c8a4');rect(x+2,y-10,14,sl?11:17,'#e7687b');rect(x+5,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x+12,y+(sl?0:7),4,sl?6:8,'#364f76');rect(x-3,y+19,36,3,'#304b5f');rect(x-1,y+22,7,6,'#1b2b3c');rect(x+27,y+22,7,6,'#1b2b3c');rect(x+28,y-4,3,22,'#304b5f')}
 function spawn(){if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});if(tick%115===0)items.push({x:328,y:126,k:'cone',done:false})}
 function update(){tick++;scroll+=2.25;p.vy+=.29;p.y+=p.vy;if(p.y>=113){p.y=113;p.vy=0;p.j=0}if(p.slide>0)p.slide--;spawn();for(const o of items){o.x-=2.25;if(o.done)continue;const near=o.x>=43&&o.x<=69;if(!near)continue;if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10}else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500}else if(o.k==='cone'&&p.y>103){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3)state='fail'}}items=items.filter(o=>o.x>-20&&!o.done);if(tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}}
-function drawItems(){for(const o of items){if(o.k==='coin'){rect(o.x,o.y,10,10,'#ffce45');rect(o.x+1,o.y+1,8,8,'#fff3a6');txt('?',o.x+3,o.y+8,7,'#394d77')}else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}else{rect(o.x+3,o.y,8,13,'#f07845');rect(o.x+1,o.y+11,12,3,'#fff3dc')}}}
+function hexChip(x,y){
+ // 12x12 pixel-grid hexagon: dark rim, gold edge, light face and centered question mark.
+ const rows=['....####....','..########..','.##########.','############','############','############','############','############','.##########.','..########..','....####....'];
+ for(let j=0;j<12;j++)for(let i=0;i<12;i++)if(rows[j][i]==='#'){
+  let color='#9c611c';
+  if(j>=1&&j<=10&&i>=2&&i<=9)color='#e6a42a';
+  if(j>=3&&j<=8&&i>=3&&i<=8)color='#f9d768';
+  rect(x+i,y+j,1,1,color);
+ }
+ // Question mark rendered as pixel blocks, not antialiased browser text.
+ const q=['.###.','##.##','...##','..##.','..#..','.....','..#..'];
+ for(let j=0;j<q.length;j++)for(let i=0;i<5;i++)if(q[j][i]==='#')rect(x+4+i,y+2+j,1,1,'#64431e');
+}
+function drawItems(){for(const o of items){if(o.k==='coin'){hexChip(o.x,o.y)}else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}else{rect(o.x+3,o.y,8,13,'#f07845');rect(o.x+1,o.y+11,12,3,'#fff3dc')}}}
 function overlay(title,lines){box(19,49,282,85);txt(title,31,67,13,'#ffe18b');lines.forEach((s,i)=>txt(s,31,86+i*13,9))}
 function render(){background();drawItems();avatar();rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);
 if(state==='intro')overlay('KAMEARI / 01',['アリィの取材がはじまる！','街の「？」を集めよう。','STARTで走行開始']);
