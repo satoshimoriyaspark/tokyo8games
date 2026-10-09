@@ -1,18 +1,37 @@
-# アリィ スプライト制作QC
+# アリィ FIXスプライト実装（2026-10-10）
 
-デザイン基準: ユーザー承認済みのキャラクターシート `CC25583D-7C63-41D2-867E-B6330F1A887E.jpeg`。
+対象: `feature/ary-sprite-qc` の `games/ary/`。main・安定版・他ゲーム・DNSは変更しない。
 
-- 走行6コマ: `ary_ride_qc.png`（384×80、各コマ64×80、背景透過、制作中QC素材）
-- 順序: 走行1→走行2→走行3→走行4→走行5→走行6
-- 描画基準: 最近傍補間、同一座標で表示、アニメーションは8〜12fps
-- 本スプライトはユーザー提供のFIXデザインシートからの切り出し。背景除去の縁やラベル混入などは実機QCが必要
-- ジャンプ、スライド、ゴール、探索は別シートから切り出して検証する
-- 現在のWebゲームには未組み込み。PNG本体は制作成果物として別途提供し、リポジトリへの配置後に画像読み込み処理を実装する
-- 安定版 `feature/ary-run-beta` は変更しない
+## 素材
 
-## 2026-10-10 QC progress
-- Verified the extracted source PNG is 384×80 RGBA, six 64×80 frames.
-- Built a self-contained browser preview `ary_ride_animation_qc.html` with the actual PNG embedded, nearest-neighbor scaling, adjustable 3–16fps, pause and frame-step controls.
-- Preview and PNG are delivered as conversation artifacts; the binary PNG has **not yet been committed** to GitHub, so the deployed game still uses its procedural QC character.
-- Next step: upload the approved binary sprite to `games/ary/assets/ary_ride_qc.png`, then integrate an Image-based animation with a fallback sprite, followed by slide/jump frame extraction and visual QC.
-- Keep `feature/ary-run-beta` unchanged until regression tests pass.
+- 正式原画: Google Drive `KATSUCOLLE_CHAR_ARII_FIX_v1.0_20260919.png`（確認済み）。
+- 走行: ユーザー添付 `ary_ride_game(1).png` を `ary_ride_game.png` としてバイト単位でそのまま配置。384×80、64×80の6コマ。
+- アクション: 承認済みシート `CC25583D-7C63-41D2-867E-B6330F1A887E.jpeg` から切り出し。ジャンプ5、二段ジャンプ3、スライド3。各72×88。同じシートから謎の猫の走行2コマも切り出し。
+- ジャンプ等は背景マスクと最近傍縮小のみ。RGB変更・再生成・描き直し・色数削減・独自パレット変換をしない。JPEG原本に由来する縁は端末で最終確認が必要。
+- 走行用の入力PNGは提供時点でパレット形式だが、そのファイルを再変換せずブラウザで標準デコードする。アクションの出力はRGBA。
+- `asset-manifest.json` に寸法・SHA-256を記録。再切出しは `tools/extract-actions.py` に原本パスを指定する。
+
+## 実装
+
+- `sprites.js`: 外部PNGの読込、寸法検証、15秒タイムアウト、再試行、フレーム選択、Canvas描画。走行10fps。
+- 走行の前輪位置・接地基準をフレーム別アンカーで合わせる。アリィとキックボードは一体の画像として描画する。
+- `game.js`: 既存の60Hz進行・115秒ステージ・得点・接触判定・操作を維持。描画レイヤーのエラーを隔離し、アイテムの描画失敗でアリィを消さない。
+- 起動時は必要なPNGが読めるまでスタートを待ち、失敗時は再試行を表示する。簡易キャラクターへの差し戻しはない。
+- 一段ジャンプは開始/上昇/頂点/下降/着地。二段ジャンプは専用3コマ。スライドは開始6tick/低姿勢30tick/復帰6tick。
+- リサイズや縦横切替でCanvasを作り直さず、CSSで表示サイズだけを変更する。背景タブ移動は自動一時停止。
+- 旧 `ride-sprite.js` のBase64/インデックス色復元処理は削除。
+
+## 検証と制約
+
+`node games/ary/tests/regression.cjs`（Node.js、`@napi-rs/canvas@0.1.100`）:
+
+- 実PNGデコード、画像エラー/再試行、最近傍、フレーム境界。
+- 走行6コマ、ジャンプ5段階、二段ジャンプ/三段目禁止、スライド3段階。
+- チップ/取材メモ取得と得点、コーン/看板接触、スライドで看板回避。
+- タップ/下スワイプのイベント入力、一時停止/再開、タブ非表示、クリア/リトライ。
+- 描画例外注入時にもアリィを描画、3分相当（10,800tick）のシミュレーションと毎フレームの実Canvas描画・ピンク髪ピクセル検査。
+- ステージクリア加点の重複と、クリア直前のゲームオーバー上書きを防止。
+
+これはNode Canvasと模擬DOMによる検証。iPhone Safari・Android Chrome・PCブラウザ、実端末の縦横切替、実時間3分の確認は別途必要。実機確認済みと扱わない。
+
+`qa/ary-animation-preview.mp4` はゲーム描画コードで作成した7秒の動作見本。走行/ジャンプ/二段ジャンプ/スライドを表示する。撮影用に障害物を除いた描画検証であり、端末の録画ではない。

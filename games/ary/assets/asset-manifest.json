@@ -1,0 +1,47 @@
+{
+  "ride": "Byte-identical copy of user attachment ary_ride_game(1).png; no palette conversion or re-encoding.",
+  "actions": "Cropped from approved CC25583D-7C63-41D2-867E-B6330F1A887E.jpeg; near-white background mask, 0.59x nearest-neighbor; RGB unmodified, RGBA PNG output.",
+  "source_sha256": "e6a004cadeebefacdc2f16bdcaf209ffaa14710e609e121775ccbe3eeb4bd432",
+  "files": [
+    {
+      "file": "ary_cat.png",
+      "size": [
+        96,
+        48
+      ],
+      "sha256": "3801fb9e838b566bde927a4a8ded007d188451f5d40291e34369d42979ba5d73"
+    },
+    {
+      "file": "ary_double_jump.png",
+      "size": [
+        216,
+        88
+      ],
+      "sha256": "637343f3ab383bac2a2e5867852f75290235bafa32242e7b388e8ee0fef0da4f"
+    },
+    {
+      "file": "ary_jump.png",
+      "size": [
+        360,
+        88
+      ],
+      "sha256": "dea52b2ffefdb7852d701c14d9291d9c536b4e8d10e27c2c55bcf4561b49c465"
+    },
+    {
+      "file": "ary_ride_game.png",
+      "size": [
+        384,
+        80
+      ],
+      "sha256": "b4984e6345e021b0da6b350100aa96761421d2073b10073f1b2246e2f9d23158"
+    },
+    {
+      "file": "ary_slide.png",
+      "size": [
+        216,
+        88
+      ],
+      "sha256": "da45774bcd4be1113518b0abf6a1fea28e17a14eb3ef2f9edd9d1a635e03be5a"
+    }
+  ]
+}
