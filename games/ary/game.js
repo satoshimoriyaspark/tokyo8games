@@ -139,12 +139,22 @@ function drawItems(){
  }
 }
 function overlay(title,lines){box(19,49,282,85);txt(title,31,67,13,'#ffe18b');lines.forEach((s,i)=>txt(s,31,86+i*13,9))}
+function goalProgress(){
+ const progress=Math.max(0,Math.min(1,tick/(DURATION*60)));
+ txt('GOAL '+Math.floor(progress*100)+'%',196,9,7,'#dce4f5');
+ rect(196,13,118,8,'#dce4f5');rect(197,14,116,6,'#34445e');
+ const width=Math.floor(116*progress);
+ if(width>0){rect(197,14,width,6,progress===1?'#ffdd64':'#7de4ca');rect(197,14,width,1,'#d9fff2')}
+ // Checkered finish flag, kept entirely inside the HUD.
+ rect(307,2,1,9,'#dce4f5');
+ for(let y=0;y<3;y++)for(let x=0;x<3;x++)rect(308+x*2,2+y*2,2,2,(x+y)%2?'#172a46':'#fff3dc');
+}
 function render(){
  drawLayer('background',background);
  drawLayer('items',drawItems);
  drawLayer('cat',mysteryCat);
  drawLayer('avatar',avatar);
-rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);
+rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);goalProgress();
 if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'STARTで走行開始']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
 if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','STARTで再挑戦']);
