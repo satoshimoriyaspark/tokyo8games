@@ -17,7 +17,7 @@ async function harness(failFile = '') {
   let fail = failFile, timer=0;
   function el(id) {
     if(!elements.has(id))elements.set(id,{textContent:'',hidden:false,disabled:false,events:{},
-      addEventListener(name,fn){this.events[name]=fn},setPointerCapture(){},
+      addEventListener(name,fn){this.events[name]=fn},setPointerCapture(){},setAttribute(name,value){this[name]=value},
       getContext(){return ctx}});
     return elements.get(id);
   }
@@ -103,12 +103,15 @@ async function main(){
   h.run("reset();items=[{k:'cone',x:160,y:119},{k:'crow',x:255,y:84}];render()");h.capture('06-obstacles');
   h.run("reset();slide();items=[{k:'crow',x:60,y:84}];render()");h.capture('07-crow-slide');
   // Fractional render frames move smoothly without advancing simulation or collisions.
-  h.run('reset();jump();update();render(0)');const before=h.draws.at(-1).coords[5];
+  h.run('reset();jump();update();render(0)');const before=h.draws.filter(d=>d.file.endsWith('ary_jump.png')).at(-1).coords[5];
   const fixedTick=h.diagnostics().tick;
-  h.run('render(.5)');const middle=h.draws.at(-1).coords[5];
-  h.run('render(1)');const after=h.draws.at(-1).coords[5];
+  h.run('render(.5)');const middle=h.draws.filter(d=>d.file.endsWith('ary_jump.png')).at(-1).coords[5];
+  h.run('render(1)');const after=h.draws.filter(d=>d.file.endsWith('ary_jump.png')).at(-1).coords[5];
   assert(before>middle&&middle>after,'interpolated jump position at half tick');
   assert.equal(h.diagnostics().tick,fixedTick,'render does not advance gameplay');
+  h.run('reset();render()');assert(h.el('#action').hidden);assert(!h.el('#jump').hidden);assert(!h.el('#pause').hidden);
+  h.el('#pause').onclick();h.run('render()');assert(!h.el('#action').hidden);assert(h.el('#jump').hidden);
+  h.el('#action').onclick();assert.equal(h.diagnostics().paused,false);
   h.run('reset();paused=true;update()');assert.equal(h.diagnostics().tick,0);
   h.el('#pause').onclick();h.run('update()');assert.equal(h.diagnostics().tick,1);
   h.document.hidden=true;h.documentEvents.visibilitychange();assert(h.diagnostics().paused);
@@ -144,7 +147,7 @@ async function main(){
   // Render failure is injected only in the VM and must not hide the avatar.
   h.run("var savedDrawItems=drawItems;drawItems=()=>{throw Error('injected item failure')};render()");
   assert(h.diagnostics().runtimeError.includes('injected item failure'));
-  assert(h.draws.at(-1).file.endsWith('ary_ride_game.png'));
+  assert(h.draws.slice(-2).some(d=>d.file.endsWith('ary_ride_game.png')));
   h.run('drawItems=savedDrawItems;reset()');
   // 180 seconds at 60Hz: real collisions, collects, retries, and renders every frame.
   for(let t=0;t<10800;t++){

@@ -1,9 +1,10 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
+let controlKey='';
 let previous={y:113,scroll:0};
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
 function reset(){if(!ArySprites.ready())return;state='play';tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
-function next(){if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
+function next(){if(state==='play'&&paused){paused=false;return}if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
 $('#fullscreen').onclick=async()=>{
@@ -15,7 +16,7 @@ $('#fullscreen').onclick=async()=>{
  }catch(_){$('#fullscreen').textContent='横画面で表示'}
 };
 document.addEventListener('fullscreenchange',()=>{
- $('#fullscreen').textContent=document.fullscreenElement?'EXIT':'FULL';
+ $('#fullscreen').textContent=document.fullscreenElement?'全画面を終了':'全画面';
 });
 $('#action').onclick=next;$('#jump').onclick=()=>state==='intro'?next():jump();$('#slide').onpointerdown=e=>{if(e.button===0){e.preventDefault();slide()}};$('#slide').onclick=e=>{if(!e||e.detail===0)slide()};$('#pause').onclick=()=>{if(state==='play')paused=!paused};
 let touchY=0,touchX=0,pointerStart=null,swipeHandled=false;
@@ -152,25 +153,47 @@ function drawItems(alpha=1){
 function overlay(title,lines){box(19,49,282,85);txt(title,31,67,13,'#ffe18b');lines.forEach((s,i)=>txt(s,31,86+i*13,9))}
 function goalProgress(){
  const progress=Math.max(0,Math.min(1,tick/(DURATION*60)));
- txt('GOAL '+Math.floor(progress*100)+'%',196,9,7,'#dce4f5');
- rect(196,13,118,8,'#dce4f5');rect(197,14,116,6,'#34445e');
- const width=Math.floor(116*progress);
- if(width>0){rect(197,14,width,6,progress===1?'#ffdd64':'#7de4ca');rect(197,14,width,1,'#d9fff2')}
- // Checkered finish flag, kept entirely inside the HUD.
- rect(307,2,1,9,'#dce4f5');
- for(let y=0;y<3;y++)for(let x=0;x<3;x++)rect(308+x*2,2+y*2,2,2,(x+y)%2?'#172a46':'#fff3dc');
+ txt('GOAL '+Math.floor(progress*100)+'%',174,10,7,'#dce4f5');
+ rect(174,15,111,6,'#dce4f5');rect(175,16,109,4,'#34445e');
+ const width=Math.floor(109*progress);
+ if(width>0)rect(175,16,width,4,progress===1?'#ffdd64':'#7de4ca');
+ rect(278,2,1,9,'#dce4f5');
+ for(let y=0;y<3;y++)for(let x=0;x<3;x++)rect(279+x*2,2+y*2,2,2,(x+y)%2?'#172a46':'#fff3dc');
+}
+function heart(x,y,filled){
+ const rows=['.##.##.','#######','#######','.#####.','..###..','...#...'];
+ for(let j=0;j<rows.length;j++)for(let i=0;i<7;i++)if(rows[j][i]==='#')rect(x+i,y+j,1,1,filled?'#f59bb8':'#43516a');
+}
+function hud(){
+ rect(0,0,320,26,'#172a46');rect(0,25,320,1,'#e0bf75');
+ hexChip(6,5);txt(String(coins).padStart(3,'0'),24,14,9,'#ffdd78');
+ rect(53,4,10,12,'#91e3d2');rect(55,5,7,9,'#fff3dc');
+ rect(57,7,4,1,'#50657c');rect(57,10,4,1,'#50657c');
+ txt(String(clues).padStart(2,'0'),67,14,9,'#91e3d2');
+ for(let i=0;i<3;i++)heart(104+i*11,7,i<3-hits);
+ txt('SCORE '+score,6,23,6,'#dce4f5');txt('LIFE',105,23,6,'#dce4f5');
+ goalProgress();
+}
+function syncControls(){
+ const key=state+':'+paused+':'+ArySprites.ready();if(key===controlKey)return;controlKey=key;
+ const playing=state==='play',active=playing&&!paused;
+ $('#action').hidden=active;
+ $('#action').textContent=paused&&playing?'つづける':state==='story'?'結果を見る':state==='fail'||state==='result'?'もう一度遊ぶ':'スタート';
+ $('#jump').hidden=!active;$('#slide').hidden=!active;$('#pause').hidden=!playing;
+ $('#pause').textContent=paused?'▶':'Ⅱ';
+ $('#pause').setAttribute('aria-label',paused?'ゲームを再開':'一時停止');
 }
 function render(alpha=1){
  drawLayer('background',()=>background(previous.scroll+(scroll-previous.scroll)*alpha));
  drawLayer('items',()=>drawItems(alpha));
  drawLayer('cat',mysteryCat);
  drawLayer('avatar',()=>avatar(previous.y+(p.y-previous.y)*alpha));
-rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);goalProgress();
-if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'STARTで走行開始']);
+drawLayer('hud',hud);syncControls();
+if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'下のボタンでスタート！']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
-if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','STARTで再挑戦']);
-if(state==='fail')overlay('GAME OVER',['障害物に3回接触しました。','SCORE '+score+'  ?CHIP '+coins,'STARTで再挑戦']);
-if(paused&&state==='play')overlay('PAUSE',['一時停止中','PAUSE / Escで再開'])}
+if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','もう一度、猫を追いかけよう！']);
+if(state==='fail')overlay('GAME OVER',['障害物に3回接触しました。','SCORE '+score+'  ?CHIP '+coins,'もう一度、猫を追いかけよう！']);
+if(paused&&state==='play')overlay('PAUSE',['一時停止中','つづけるボタン / Escで再開'])}
 let runtimeError='';
 function reportError(layer,error){
  const message=layer+': '+String(error&&error.message||error);
