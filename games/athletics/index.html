@@ -135,7 +135,7 @@ function runner(x,y,shirt,t,seed,travel,phase){
   p[8]=11+(p[8]-11)*1.08;
   p[12]=7+(p[12]-7)*1.08;
  }
- const bob=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.85):0;
+ const bob=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.7):0;
  y+=bob;
  // Far arm and leg (darker shades), elbows and knees drawn as unmistakable bends.
  pixelLimb(x+8,y+29,x+p[4],y+p[5],'#ad7758',3);
@@ -146,16 +146,23 @@ function runner(x,y,shirt,t,seed,travel,phase){
  pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#bf8b67',2);
  rect(x+p[12]-1,y+p[13]-1,3,3,'#d49b75');
  // Body tilted to the right, narrow torso and single visible eye.
- rect(x+7,y+14,7,14,shirt);
- rect(x+6,y+27,8,4,'#29374e');
- rect(x+9,y+12,3,3,'#e0a47a');
- rect(x+6,y+2,7,10,'#efb789');
- rect(x+5,y+1,7,3,'#302b37');
- rect(x+5,y+4,2,5,'#302b37');
- rect(x+13,y+6,3,3,'#f2b982');
- rect(x+11,y+5,2,2,'#182334');
+ // Friendly, slightly larger 3-heads-tall profile: rounded pixel outline without losing rightward gaze.
+ // Chest is fuller but does not obscure the independently animated elbows.
+ rect(x+7,y+15,9,13,shirt);
+ rect(x+6,y+16,2,10,shirt);
+ rect(x+6,y+27,9,4,'#29374e');
+ rect(x+10,y+13,3,3,'#e0a47a');
+ // Head: 11x12 pixels, one eye at the forward edge, cheek and small smile.
+ rect(x+4,y+2,10,11,'#edb484');
+ rect(x+6,y+1,9,3,'#302b37');
+ rect(x+4,y+4,2,6,'#302b37');
+ rect(x+6,y+0,5,2,'#302b37'); // soft hair tuft
+ rect(x+14,y+7,3,3,'#f2b982'); // nose points to the right
+ rect(x+12,y+6,2,2,'#182334'); // single visible eye
+ rect(x+12,y+10,2,2,'#da8f6c'); // cheek
+ rect(x+13,y+12,2,1,'#ad6d57'); // mouth
  // Near arm bends at elbow; hand is an independent end point.
- pixelLimb(x+13,y+17,x+p[8],y+p[9],'#f2b982',3);
+ pixelLimb(x+14,y+18,x+p[8],y+p[9],'#f2b982',3);
  rect(x+p[8]-1,y+p[9]-1,4,4,'#f6c397');
  pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#f2b982',2);
  rect(x+p[10]-1,y+p[11]-1,3,3,'#efad7e');
