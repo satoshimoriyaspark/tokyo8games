@@ -101,13 +101,13 @@ function pixelLimb(x1,y1,x2,y2,color,weight=2){
  for(let i=0;i<=steps;i++){const f=i/steps;rect(x1+dx*f,y1+dy*f,weight,weight,color)}
 }
 const sprintPoses=[
- // leading knee / foot, trailing knee / foot, front elbow / hand, rear elbow / hand
- [18,35,25,44, 16,18,20,25, 3,22,-1,15],
- [21,33,27,39, 4,38,-4,44, 4,19, 0,15],
- [16,39,21,46, 2,34,-5,39, 8,20, 4,14],
- [ 5,36, 0,44,16,34,22,40, 17,23,21,17],
- [ 2,33,-4,39,20,37,27,44, 16,20,20,15],
- [ 7,39, 3,46,21,35,25,40, 10,20, 6,14]
+ // front knee/foot ; rear knee/foot ; front elbow/hand ; rear elbow/hand
+ [18,35,25,44, 3,37,-3,44, 16,21,20,15, 4,22, 0,29],
+ [21,33,27,39, 4,39,-4,45, 16,23,22,27, 3,20,-1,14],
+ [15,39,20,46, 3,34,-4,40, 15,22,19,17, 5,23, 1,30],
+ [ 5,36, 0,44,16,34,22,40,  5,22, 0,15,16,22,20,28],
+ [ 2,33,-4,39,20,37,27,44,  4,23,-1,27,17,20,21,14],
+ [ 7,39, 3,46,21,35,25,40,  9,21, 5,15,17,23,21,29]
 ];
 function runner(x,y,shirt,t,seed,travel,phase){
  const moving=(phase==='run'||phase==='finishDash')&&travel>0.1;
