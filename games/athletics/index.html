@@ -36,8 +36,19 @@ if(selected===3&&k==='B')finishAttempt()}
 function release(k){if(k==='B'&&bHeld){bHeld=false;if(mode==='run'&&selected===4)finishAttempt()}}
 function flash(s){feedback=s;feedbackTime=elapsed+.75}
 function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(attempt+'回目：'+(v?label(selected,v):'ファウル'))}
-function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);if(improved){best[selected]=v;try{localStorage.setItem('athletics_bests_v1',JSON.stringify(best))}catch{}}let p=points(selected,v);let cpuPts=rivals.map((r,j)=>points(selected,selected<3?+(elapsed*(j===0?.91:j===1?1.03:1.12)).toFixed(2):(cpuRecords[j]||0)));if(selected<3){cpuPts=rivals.map((r,j)=>points(selected,+((j===0?0.94:j===1?1.035:1.10)*elapsed).toFixed(2)))}const thisRank=1+cpuPts.filter(x=>x>p).length;ceremonyRank=thisRank;ceremonyTotal=false;ceremonyScores=[];
-const ranking=[{name:'YOU',score:p,you:true},...cpuPts.map((score,j)=>({name:'CPU '+(j+1),score,you:false}))].sort((a,b)=>b.score-a.score);
+function cpuRaceTime(j,i){
+ const r=rivals[j],goal=i===1?150:i===2?110:100;
+ let dist=0,sec=0,dt=1/60;
+ for(let n=0;n<18000;n++){
+  const pace=(i===1?4.8:i===0?4.65:6.8)*r.skill*(i===1?(sec>18?1.25:sec<8?.87:1):1);
+  const next=dist+pace*dt;
+  if(next>=goal)return sec+(goal-dist)/pace;
+  dist=next;sec+=dt;
+ }
+ return 300;
+}
+function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);if(improved){best[selected]=v;try{localStorage.setItem('athletics_bests_v1',JSON.stringify(best))}catch{}}let p=points(selected,v);let cpuVals=rivals.map((r,j)=>selected<3?cpuRaceTime(j,selected):(cpuRecords[j]||0));let cpuPts=cpuVals.map(val=>points(selected,val));const thisRank=1+cpuVals.filter(val=>selected<3?val<v-0.005:val>v+0.005).length;ceremonyRank=thisRank;ceremonyTotal=false;ceremonyScores=[];
+const ranking=[{name:'YOU',score:p,record:v,you:true},...cpuPts.map((score,j)=>({name:'CPU '+(j+1),score,record:cpuVals[j],you:false}))].sort((a,b)=>selected<3?a.record-b.record:b.record-a.record);
 $('#resultPanel').hidden=true;
 $('#resultHeading').textContent=events[selected][0]+' 競技結果';
 $('#resultRecord').textContent=label(selected,v);
@@ -45,7 +56,7 @@ $('#resultRank').textContent=thisRank===1?'1位！ 優勝！':thisRank+'位 / 4�
 $('#resultMeta').replaceChildren();
 for(const item of [p+' / 1000点',improved?'★ NEW BEST!':'記録確定']){const span=document.createElement('span');span.textContent=item;$('#resultMeta').appendChild(span)}
 $('#resultRanking').replaceChildren();
-ranking.forEach((r,i)=>{const tr=document.createElement('tr');if(r.you)tr.className='you';for(const value of [(i+1)+'位',r.name,r.score+'点']){const td=document.createElement('td');td.textContent=value;tr.appendChild(td)}$('#resultRanking').appendChild(tr)});
+ranking.forEach((r,i)=>{const tr=document.createElement('tr');if(r.you)tr.className='you';for(const value of [(i+1)+'位',r.name,label(selected,r.record)+' / '+r.score+'点']){const td=document.createElement('td');td.textContent=value;tr.appendChild(td)}$('#resultRanking').appendChild(tr)});
 $('#resultHint').textContent=cup?'この競技の結果です。次の競技へ進んでください。':'記録を更新できるか、もう一度挑戦しよう！';
 cpuTotal=cpuTotal.map((a,j)=>a+cpuPts[j]);if(cup){results.push({i:selected,v,p});if(results.length===5){mode='finished';ceremonyTotal=true;let t=results.reduce((s,r)=>s+r.p,0),rank=1+cpuTotal.filter(a=>a>t).length;ceremonyRank=rank;ceremonyScores=[{name:'YOU',score:t,color:'#ffcb54'},...cpuTotal.map((score,j)=>({name:'CPU '+(j+1),score,color:rivals[j].color}))].sort((a,b)=>b.score-a.score);message('大会終了！ 表彰式！');
 $('#resultHeading').textContent='5種競技 総合結果';
@@ -68,9 +79,10 @@ if(mode==='finishDash'){
 }
 if(mode==='ready'){let remain=Math.ceil((deadline-t)/1000);if(remain>0)message('スタートまで '+remain+' 秒');if(t>=deadline){mode='run';message(events[selected][1])}}if(mode==='between'&&t>=deadline){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
 if(selected===4&&bHeld)angle=30+27*Math.sin(elapsed*4.6);
-if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:selected===0?4.65:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});currentRank=1+rivals.filter(r=>r.dist>pos).length;}
+if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:selected===0?4.65:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});}
 if(selected===1){spd=Math.max(0,spd-(sta<8?2.3:1.35)*dt);sta=lim(sta+(spd<7?10:3)*dt,0,100)}else spd=Math.max(0,spd-1.55*dt);
 let factor=selected===0?.39:selected===1?1.85:selected>=3?.85:1.1,old=pos;pos+=spd*factor*dt;
+if(selected<3)currentRank=1+rivals.filter(r=>r.dist>pos).length;
 if(selected===2){for(let i=0;i<10;i++){const h=12+10*i;if(old<h&&pos>=h&&!hit.has(i)){hit.add(i);if(elapsed>invuln){spd*=.48;flash('HIT!')}else flash('CLEAR!')}}}
 const goal=selected===1?150:selected===2?110:selected>=3?40:100;
 if(pos>=goal){
@@ -123,8 +135,8 @@ function frontRunner(x,y,shirt){
 }
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
-let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1:54+(pos-cam)*scale-22;
-if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-22;if(rx>-24&&rx<398){runner(rx,82+j*53,r.color,t,j,r.dist,mode);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
+let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1:54+(pos-cam)*scale-14;
+if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){runner(rx,82+j*53,r.color,t,j,r.dist,mode);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
 if(selected<3&&mode==='run'&&pos>goal-18&&pos<goal){const lineX=54+(goal-cam)*scale;if(lineX>0&&lineX<384){rect(lineX-3,252,24,3,'#ffecba');rect(lineX+1,250,3,8,'#fff');}}
 if(selected<3){let spacing=selected===1?12.5:selected===2?10:25;for(let d=spacing;d<goal;d+=spacing){let mx=54+(d-cam)*scale;if(mx>15&&mx<370){rect(mx,77,1,211,selected===1?'#e5b97d':'#e8c99b');let meter=selected===1?Math.round(d*10):Math.round(d);if(selected!==1||meter%250===0)txt(meter+'m',mx+3,298,10,'#fff4d3')}}}
 if(selected===2)for(let i=0;i<10;i++){let h=54+(12+i*10-cam)*scale;if(h>-10&&h<390){rect(h,242,4,44,'#f7eedf');rect(h-4,239,21,5,'#ffdc64');if(h>35&&h<150&&mode==='run')txt('B!',h,229,12,'#ffdb65','center')}}
