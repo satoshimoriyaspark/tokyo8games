@@ -87,6 +87,8 @@ function update(){
  if(state==='play'&&tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}
 }
 function hexChip(x,y){
+ if(ArySprites.drawChip(g,x,y,tick))return;
+ // Preserve a readable chip if its optional PNG fails to load.
  // 12x12 pixel-grid hexagon: dark rim, gold edge, light face and centered question mark.
  const rows=['....####....','..########..','.##########.','############','############','############','############','############','.##########.','..########..','....####....'];
  for(let j=0;j<rows.length;j++)for(let i=0;i<rows[j].length;i++)if(rows[j][i]==='#'){

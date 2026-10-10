@@ -7,6 +7,7 @@ window.ArySprites = (() => {
     jump: { file: 'ary_jump.png', width: 72, height: 88, count: 5 },
     double: { file: 'ary_double_jump.png', width: 72, height: 88, count: 3 },
     slide: { file: 'ary_slide.png', width: 72, height: 88, count: 3 },
+    chip: { file:'hatena-chip.png', width:16, height:16, count:4, optional:true },
     cat: { file: 'ary_cat.png', width: 48, height: 48, count: 2, optional: true }
   };
   const assets = Object.fromEntries(Object.keys(specs).map(key => [key, {state:'loading', image:null}]));
@@ -57,7 +58,14 @@ window.ArySprites = (() => {
     lastPose = {key,frame};
     return true;
   }
-  return {ready, status, loadAll, pose, draw, specs,
+  function drawChip(ctx,x,y,tick){
+    if(assets.chip.state!=='ready')return false;
+    const phase=tick%120,frame=phase<30?1+Math.floor(phase/10):0;
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(assets.chip.image,frame*16,0,16,16,Math.round((x-2)*3)/3,Math.round((y-2)*3)/3,16,16);
+    return true;
+  }
+  return {ready, status, loadAll, pose, draw, drawChip, specs,
     onChange(fn) { notify = fn; notify(); },
     errors() { return Object.values(assets).filter(a => a.error).map(a => a.error); }
   };
