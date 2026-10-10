@@ -3,9 +3,19 @@
 <p class="rotate">スマホを横にすると、大きな画面で遊べます。</p>
 <div class="stage">
 <canvas id="game" width="960" height="540" aria-label="亀有商店街を走る横スクロールゲーム"></canvas>
+<section id="title-screen" class="entry-screen" aria-label="タイトル画面">
+<div class="title-brand"><div class="brand-mark"><img id="brand-logo" src="/games/ary/assets/katsucolle-logo-system-fix.png" alt="カツコレ！ Re:Discovery" draggable="false"></div><p id="brand-fallback" hidden>カツコレ！</p></div>
+<h2>アリィのスクーターRUN</h2><p class="title-tagline">謎の猫を追って、街の「？」を集めよう。</p>
+<p class="title-course">STAGE 01 <span>亀有</span></p>
+</section>
+<section id="opening-screen" class="entry-screen" aria-label="オープニングストーリー" hidden>
+<div class="story-card" aria-live="polite" aria-atomic="true"><p id="story-count" class="story-count"></p><h2 id="story-heading"></h2><p id="story-copy"></p></div>
+</section>
+<button id="story-back" class="entry-nav" hidden>← 戻る</button><button id="skip-story" class="entry-nav" hidden>スキップ →</button>
+<button id="title-return" class="entry-nav" hidden>タイトルへ</button>
 <button id="pause" aria-label="一時停止" title="一時停止 / Esc" hidden>Ⅱ</button>
 <div class="controls"><button id="slide" aria-label="スライディング" hidden><b aria-hidden="true">↓</b><span>スライド<small>SLIDE</small></span></button><button id="jump" aria-label="ジャンプ・二段ジャンプ" hidden><b aria-hidden="true">↑</b><span>ジャンプ<small>JUMP</small></span></button></div>
-<button id="action">スタート</button>
+<button id="action">はじめる</button>
 <div class="asset-panel"><div id="asset-status" role="status" aria-live="polite">アリィの画像を読み込み中…</div><button id="retry-assets" hidden>画像を再読み込み</button></div>
 </div>
 <p class="help"><strong>タップでジャンプ ／ 下スワイプでスライド</strong>　空中でもう一度タップすると二段ジャンプ。<br>六角形の「？チップ（ハテナチップ）」を集めよう。コーンはジャンプ、カラスはスライド！<br>PC：Space / ↑ ジャンプ・↓ スライド・Esc 一時停止</p>

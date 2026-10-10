@@ -1,6 +1,12 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
 let controlKey='',damageTaken=0;
+let openingPage=0;
+const OPENING=[
+ {label:'亀有の街角',heading:'今日も、街の「？」を探しに。',copy:'スクーターに乗って、亀有へ。\nアリィの取材がはじまる。'},
+ {label:'謎の猫',heading:'「あれ？ あの猫……」',copy:'商店街の先へ、するりと消えた影。\n何か面白い発見が待っていそう！'},
+ {label:'STAGE 01 / 亀有',heading:'「よし、追いかけてみよう！」',copy:'商店街からモール周辺を抜けて、狛亀へ。\nハテナチップと取材メモを集めよう！'}
+];
 const MAX_LIFE=5;
 const POWER_TICKS={shield:360,boost:300};
 let shieldUntil=0,boostUntil=0,hurtUntil=0,speedFactor=1,particles=[],notices=[];
@@ -45,7 +51,21 @@ function updateFinish(){
 }
 
 function reset(){if(!ArySprites.ready())return;state='play';finishAge=0;clearAwarded=false;damageTaken=0;shieldUntil=0;boostUntil=0;hurtUntil=0;speedFactor=1;particles=[];notices=[];pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
-function next(){if((state==='play'||state==='finish')&&paused){paused=false;return}if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
+function next(){
+ if((state==='play'||state==='finish')&&paused){paused=false;return}
+ if(state==='intro'){if(ArySprites.ready()){openingPage=0;state='opening'}}
+ else if(state==='opening'){if(openingPage<OPENING.length-1)openingPage++;else reset()}
+ else if(state==='fail'||state==='result')reset();
+ else if(state==='story')state='result';
+ else if(state==='play')jump();
+}
+$('#skip-story').onclick=()=>{if(state==='opening')reset()};
+$('#story-back').onclick=()=>{if(state==='opening'){if(openingPage>0)openingPage--;else state='intro'}};
+$('#title-return').onclick=()=>{if(state==='result'||state==='fail'){state='intro';paused=false;openingPage=0}};
+const brandLogo=$('#brand-logo');
+function logoUnavailable(){$('.brand-mark').hidden=true;$('#brand-fallback').hidden=false}
+brandLogo.addEventListener('error',logoUnavailable);
+if(brandLogo.complete&&!brandLogo.naturalWidth)logoUnavailable();
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
 $('#fullscreen').onclick=async()=>{
@@ -81,7 +101,16 @@ c.addEventListener('pointerup',e=>{
  const dy=e.clientY-touchY,dx=e.clientX-touchX;
  if(isDownSwipe(e))slide();
  else if(Math.abs(dx)<45&&dy>-35){if(state==='play')jump();else next()}
-});document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','Escape','Enter'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='Space'||e.code==='ArrowUp')state==='intro'?next():jump();if(e.code==='ArrowDown')slide();if(e.code==='Escape'&&(state==='play'||state==='finish'))paused=!paused;if(e.code==='Enter'&&state!=='play')next()});
+});document.addEventListener('keydown',e=>{
+ // Let focused buttons keep their native Enter/Space activation (including Skip/Back).
+ if(e.target&&e.target.tagName==='BUTTON'&&(e.code==='Space'||e.code==='Enter'))return;
+ if(['Space','ArrowUp','ArrowDown','Escape','Enter'].includes(e.code))e.preventDefault();
+ if(e.repeat)return;
+ if(e.code==='Space'||e.code==='ArrowUp')state==='intro'||state==='opening'?next():jump();
+ if(e.code==='ArrowDown')slide();
+ if(e.code==='Escape'&&(state==='play'||state==='finish'))paused=!paused;
+ if(e.code==='Enter'&&state!=='play')next();
+});
 function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x*3)/3,Math.round(y*3)/3,w,h)}function txt(s,x,y,size=9,col='#fff'){g.font='bold '+size+'px monospace';g.fillStyle=col;g.fillText(s,x,y)}function box(x,y,w,h){rect(x,y,w,h,'#172a46');rect(x,y,w,2,'#ffdd64');rect(x,y+h-2,w,2,'#ffdd64')}
 function building(x,i,layer){const w=44+(i%3)*8,y=46+(i%3)*9;rect(x,y,w,ground-y,['#dba38d','#b7c4bc','#e8c99e','#aeb8d5'][i%4]);rect(x-2,y-3,w+4,4,'#5c6579');rect(x+5,y+14,w-10,12,'#f9e5b6');rect(x+8,y+32,11,17,'#6e9cad');rect(x+25,y+32,12,17,'#6e9cad');rect(x+2,ground-21,w-4,4,['#b55c6c','#638d9a'][i%2]);if(layer===0){rect(x+4,ground-16,w-8,12,'#e7c9a0');rect(x+7,ground-14,14,9,'#719b9d')}}
 function background(viewScroll=scroll){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');rect(0,27,320,8,'#c4e4ec');for(let i=0;i<8;i++){const x=((i*65-viewScroll*.25)%460+460)%460-65;rect(x,54+(i%3)*7,45,84,'#9db6ae')}for(let i=0;i<9;i++){const x=((i*54-viewScroll*.55)%486+486)%486-54;building(x,i,0)}rect(0,138,320,42,'#6e7886');rect(0,136,320,3,'#ead9b4');for(let i=0;i<10;i++){let x=((i*42-viewScroll*1.8)%420+420)%420;rect(x,161,19,2,'#eee3bb')}}
@@ -324,23 +353,43 @@ function hud(){
  goalProgress();
 }
 function syncControls(){
- const key=state+':'+paused+':'+ArySprites.ready();if(key===controlKey)return;controlKey=key;
+ const key=state+':'+openingPage+':'+paused+':'+ArySprites.ready();if(key===controlKey)return;controlKey=key;
  const playing=state==='play'||state==='finish',active=state==='play'&&!paused;
+ $('#title-screen').hidden=state!=='intro';$('#opening-screen').hidden=state!=='opening';
+ $('#story-back').hidden=state!=='opening';$('#skip-story').hidden=state!=='opening';
+ $('#title-return').hidden=state!=='result'&&state!=='fail';
+ if(state==='opening'){
+  const page=OPENING[openingPage];
+  $('#story-count').textContent=(openingPage+1)+' / '+OPENING.length+'　'+page.label;
+  $('#story-heading').textContent=page.heading;$('#story-copy').textContent=page.copy;
+ }
  $('#action').hidden=active||(state==='finish'&&!paused);
- $('#action').textContent=paused&&playing?'つづける':state==='story'?'結果を見る':state==='fail'||state==='result'?'もう一度遊ぶ':'スタート';
+ $('#action').textContent=paused&&playing?'つづける':state==='story'?'結果を見る':state==='fail'||state==='result'?'もう一度遊ぶ':state==='opening'?(openingPage===OPENING.length-1?'走り出す！':'次へ →'):'はじめる';
  $('#jump').hidden=!active;$('#slide').hidden=!active;$('#pause').hidden=!playing;
  $('#pause').textContent=paused?'▶':'Ⅱ';
  $('#pause').setAttribute('aria-label',paused?'ゲームを再開':'一時停止');
 }
+function entryScene(){
+ background(0);
+ if(state==='intro'){
+  rect(0,0,320,120,'#fff');
+  ArySprites.draw(g,{key:'ride',frame:0},65,151,.9);
+  ArySprites.draw(g,{key:'cat',frame:0},275,151,.7);
+ }else{
+  ArySprites.draw(g,{key:'ride',frame:0},98,138,1.25);
+  ArySprites.draw(g,{key:'cat',frame:openingPage===1?1:0},openingPage===0?290:openingPage===1?267:305,138,.7);
+ }
+}
 function render(alpha=1){
+ syncControls();
+ if(state==='intro'||state==='opening'){drawLayer('entry',entryScene);return}
  drawLayer('background',()=>background(previous.scroll+(scroll-previous.scroll)*alpha));
  drawLayer('scenery',()=>stageScenery(previous.scroll+(scroll-previous.scroll)*alpha));
  drawLayer('items',()=>drawItems(alpha));
  drawLayer('cat',mysteryCat);
  drawLayer('power-effects',()=>playerEffects(previous.y+(p.y-previous.y)*alpha));
  drawLayer('avatar',()=>avatar(previous.y+(p.y-previous.y)*alpha));
-drawLayer('feedback',pickupFeedback);drawLayer('hud',hud);syncControls();
-if(state==='intro')overlay('STAGE 01 / 亀有',['商店街 → モール周辺 → 狛亀','謎の猫を追ってゴールへ！',clearRecord.cleared?'取材済み / BEST '+clearRecord.best:'全15面予定・まずは亀有から']);
+drawLayer('feedback',pickupFeedback);drawLayer('hud',hud);
 if(state==='finish'){box(25,147,270,24);txt('狛亀に到着！',102,163,12,'#ffe18b')}
 if(state==='story'){box(12,29,296,46);txt('亀有・狛亀  取材完了！',23,44,12,'#ffe18b');txt('アリィ「あの猫、金町の方へ行ったよ！」',23,61,9)}
 if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','次の街：金町（準備中）']);
@@ -364,7 +413,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 function syncAssetStatus(){
  const ready=ArySprites.ready(),errors=ArySprites.errors();
- $('#action').disabled=!ready;$('#jump').disabled=!ready;$('#slide').disabled=!ready;
+ $('#action').disabled=!ready;$('#skip-story').disabled=!ready;$('#jump').disabled=!ready;$('#slide').disabled=!ready;
  $('#asset-status').textContent=ready?'':errors.length?'アリィの画像を読み込めませんでした。再読み込みしてください。':'アリィの画像を読み込み中…';
  $('#retry-assets').hidden=errors.length===0;
 }
@@ -386,6 +435,6 @@ function loop(now){
  if(runtimeError){rect(0,166,320,14,'#8b173b');txt('ERROR '+runtimeError.slice(0,42),4,176,8)}
 }
 // Read-only diagnostics for QA; no cheats or state setters in the shipped game.
-window.aryDiagnostics=()=>({stage:{...STAGE,progress:stageProgress(),zone:stageZone(),planned:PLANNED_STAGES,finishAge,clearAwarded},state,tick,score,coins,clues,hits,damageTaken,paused,life:MAX_LIFE-hits,maxLife:MAX_LIFE,
+window.aryDiagnostics=()=>({stage:{...STAGE,progress:stageProgress(),zone:stageZone(),planned:PLANNED_STAGES,finishAge,clearAwarded},state,openingPage,tick,score,coins,clues,hits,damageTaken,paused,life:MAX_LIFE-hits,maxLife:MAX_LIFE,
  powers:{shield:Math.max(0,shieldUntil-tick),boost:Math.max(0,boostUntil-tick),hurt:Math.max(0,hurtUntil-tick),speedFactor},effects:particles.length,player:{...p},pose:ArySprites.pose(p,tick),assets:ArySprites.status(),runtimeError});
 requestAnimationFrame(loop);

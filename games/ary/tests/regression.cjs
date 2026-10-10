@@ -68,6 +68,32 @@ async function main(){
   h.run('reset()');assert.equal(h.diagnostics().state,'intro','start waits for PNGs');
   await h.flush();assert(Object.values(h.diagnostics().assets).every(x=>x==='ready'));
   assert.equal(h.el('#action').disabled,false);
+  // Title -> manually paged prologue -> play. Reading never starts the course clock.
+  h.run('render()');assert(!h.el('#title-screen').hidden);assert(h.el('#jump').hidden);assert(h.el('#pause').hidden);
+  h.el('#action').onclick();h.run('render()');assert.equal(h.diagnostics().state,'opening');
+  assert(!h.el('#opening-screen').hidden);assert(!h.el('#skip-story').hidden);
+  assert(h.el('#story-count').textContent.startsWith('1 / 3'));
+  h.run('for(let i=0;i<120;i++)update();render()');
+  assert.equal(h.diagnostics().tick,0);assert.equal(h.diagnostics().stage.progress,0);
+  h.documentEvents.keydown({code:'Space',repeat:false,preventDefault(){}});h.run('render()');
+  assert.equal(h.diagnostics().openingPage,1);assert.equal(h.diagnostics().state,'opening');
+  h.el('#story-back').onclick();assert.equal(h.diagnostics().openingPage,0);
+  h.el('#story-back').onclick();assert.equal(h.diagnostics().state,'intro');
+  h.el('#action').onclick();h.el('#action').onclick();h.el('#action').onclick();h.run('render()');
+  assert.equal(h.el('#action').textContent,'走り出す！');assert.equal(h.diagnostics().tick,0);
+  h.el('#action').onclick();h.run('render()');assert.equal(h.diagnostics().state,'play');
+  assert.equal(h.diagnostics().player.j,0,'start click never jumps');assert.equal(h.diagnostics().score,0);
+  assert(h.el('#opening-screen').hidden);assert(h.el('#skip-story').hidden);assert(!h.el('#jump').hidden);
+  for(let page=0;page<3;page++){
+    h.run(`state='intro';next();openingPage=${page};render()`);
+    h.el('#skip-story').onclick();assert.equal(h.diagnostics().state,'play');assert.equal(h.diagnostics().tick,0);
+  }
+  h.run("state='fail';render()");assert(!h.el('#title-return').hidden);
+  h.el('#title-return').onclick();h.run('render()');assert.equal(h.diagnostics().state,'intro');
+  h.el('#brand-logo').events.error();assert(!h.el('#brand-fallback').hidden);
+  h.el('#action').onclick();assert.equal(h.diagnostics().state,'opening','optional logo failure never blocks entry');
+  h.documentEvents.keydown({code:'Enter',repeat:false,target:{tagName:'BUTTON'},preventDefault(){throw Error('native button activation blocked')}});
+  assert.equal(h.diagnostics().openingPage,0,'focused Skip/Back keeps native activation');
   h.run('reset();render()');h.capture('01-run');
   const runFrames=new Set();
   for(let t=0;t<36;t++){h.run(`tick=${t};render()`);runFrames.add(h.diagnostics().pose.frame);assert(h.pinkPixels()>400,'visible pink-haired PNG every run frame')}
@@ -207,12 +233,12 @@ async function main(){
   // Failed action image: no crash, no substitute character, explicit retry.
   const failed=await harness('ary_slide.png');await failed.flush();
   assert.equal(failed.diagnostics().assets.slide,'error');assert(failed.el('#action').disabled);
-  failed.run('reset();loop(0)');assert.equal(failed.diagnostics().state,'intro');
+  failed.run('reset();next();loop(0)');assert.equal(failed.diagnostics().state,'intro');
   assert.equal(failed.el('#retry-assets').hidden,false);
   failed.recover();failed.el('#retry-assets').onclick();await failed.flush();
   failed.run('reset();slide();render()');assert.equal(failed.diagnostics().pose.key,'slide');
   assert.equal(failed.diagnostics().assets.slide,'ready');assert.equal(failed.timers.size,0);
-  console.log('PASS: PNG load/retry, 6 run frames at 12fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
+  console.log('PASS: title/story/play, manual story pages/back/skip, frozen opening clock, direct retry/title return, logo failure, PNG load/retry, 6 run frames at 12fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
   console.log('LIMIT: Node Canvas + simulated DOM; not iPhone Safari / Android Chrome / PC browser or real-time endurance.');
   if(captureDir){
     const record=await harness();await record.flush();record.run('reset()');
