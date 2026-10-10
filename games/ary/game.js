@@ -1,6 +1,6 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
-let controlKey='';
+let controlKey='',damageTaken=0;
 const POWER_TICKS={shield:360,boost:300};
 let shieldUntil=0,boostUntil=0,hurtUntil=0,speedFactor=1,particles=[],notices=[];
 function burst(x,y,color,count=10){
@@ -19,7 +19,7 @@ let pickupFx=[],memoUntil=0,tips=[],activeTip=null,seenTips=new Set();
 function teach(key,text){if(!seenTips.has(key)){seenTips.add(key);tips.push(text)}}
 let previous={y:113,scroll:0};
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
-function reset(){if(!ArySprites.ready())return;state='play';shieldUntil=0;boostUntil=0;hurtUntil=0;speedFactor=1;particles=[];notices=[];pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
+function reset(){if(!ArySprites.ready())return;state='play';damageTaken=0;shieldUntil=0;boostUntil=0;hurtUntil=0;speedFactor=1;particles=[];notices=[];pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
 function next(){if(state==='play'&&paused){paused=false;return}if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
@@ -73,6 +73,7 @@ function spawn(){
  if(tick%165===70){items.push({x:328,y:112,k:'clue',done:false});teach('clue','取材メモを見つけよう！')}
  if(tick%1200===300){items.push({x:328,y:100,k:'shield',done:false});teach('shield','盾を取ると6秒間むてき！')}
  if(tick%1200===660){items.push({x:328,y:100,k:'boost',done:false});teach('boost','稲妻を取ると5秒間かそく！')}
+ if(tick%1200===540){items.push({x:328,y:100,k:'heart',done:false});teach('heart','ハートでライフを1つ回復！')}
  // Alternate encounters, three seconds apart. Crow starts offscreen for advance warning.
  if(tick%360===90)items.push({x:328,y:119,k:'cone',done:false});
  if(tick%360===270)items.push({x:400,y:84,k:'crow',done:false});
@@ -111,7 +112,7 @@ function update(){
     o.done=true;
     if(tick<shieldUntil){burst(o.x+10,o.y+8,'#91edff',12);notice('ガード！','#91edff')}
     else if(tick>=hurtUntil){
-     hurtUntil=tick+60;hits++;score=Math.max(0,score-500);
+     hurtUntil=tick+60;hits++;damageTaken++;score=Math.max(0,score-500);
      burst(65,p.y-10,'#ff839f',16);notice('ヒット！','#ff9fb3');
      if(hits>=3){state='fail';break}
     }
@@ -121,11 +122,15 @@ function update(){
   if(!near)continue;
   if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10;pickupFx.push({x:o.x,y:o.y,born:tick});burst(o.x+8,o.y+8,'#ffe18b',8)}
   else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500;memoUntil=tick+75;burst(o.x+8,o.y+8,'#91e3d2',12)}
+  else if(o.k==='heart'&&Math.abs(o.y-(p.y-8))<28){
+   o.done=true;const recovered=hits>0;hits=Math.max(0,hits-1);
+   burst(o.x+8,o.y+8,'#ff9fb3',14);notice(recovered?'ハート＋1':'ライフ満タン','#ffb5cd');
+  }
   else if((o.k==='shield'||o.k==='boost')&&Math.abs(o.y-(p.y-8))<28){o.done=true;takePower(o.k)}
 
  }
  items=items.filter(o=>o.x>-20&&!o.done);
- if(state==='play'&&tick>=DURATION*60){score+=5000+(hits===0?3000:0)+clues*100;state='story'}
+ if(state==='play'&&tick>=DURATION*60){score+=5000+(damageTaken===0?3000:0)+clues*100;state='story'}
 }
 function hexChip(x,y){
  if(ArySprites.drawChip(g,x,y,tick))return;
@@ -217,6 +222,10 @@ function drawItems(alpha=1){
   const o={...item,x:Number.isFinite(item.previousX)?item.previousX+(item.x-item.previousX)*alpha:item.x};
   if(o.k==='coin')hexChip(o.x,o.y);
   else if(o.k==='clue')drawMemo(o.x-5,o.y-6+Math.sin(tick/18)*2);
+  else if(o.k==='heart'){
+   g.save();g.translate(o.x,o.y+Math.sin(tick/18)*2);g.scale(2.5,2.5);heart(0,0,true);
+   rect(1,1,1,1,'#fff3dc');rect(5,4,3,1,'#fff3dc');rect(6,3,1,3,'#fff3dc');g.restore();
+  }
   else if(o.k==='shield'||o.k==='boost')drawPower(o.x,o.y+Math.sin(tick/18)*2,o.k);
   else if(o.k==='cone')drawCone(o.x,o.y);
   else if(o.k==='crow')drawCrow(o.x,o.y);
@@ -314,6 +323,6 @@ function loop(now){
  if(runtimeError){rect(0,166,320,14,'#8b173b');txt('ERROR '+runtimeError.slice(0,42),4,176,8)}
 }
 // Read-only diagnostics for QA; no cheats or state setters in the shipped game.
-window.aryDiagnostics=()=>({state,tick,score,coins,clues,hits,paused,
+window.aryDiagnostics=()=>({state,tick,score,coins,clues,hits,damageTaken,paused,
  powers:{shield:Math.max(0,shieldUntil-tick),boost:Math.max(0,boostUntil-tick),hurt:Math.max(0,hurtUntil-tick),speedFactor},effects:particles.length,player:{...p},pose:ArySprites.pose(p,tick),assets:ArySprites.status(),runtimeError});
 requestAnimationFrame(loop);

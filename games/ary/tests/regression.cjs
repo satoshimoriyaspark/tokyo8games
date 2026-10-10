@@ -144,6 +144,16 @@ async function main(){
   h.run('next()');assert.equal(h.diagnostics().tick,0);
   h.run("hits=2;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
   h.run('next()');assert.equal(h.diagnostics().hits,0);
+  // Hearts recover one life, cap at three, and do not erase damage history.
+  h.run("reset();items=[{k:'cone',x:62,y:119}];update();items=[{k:'heart',x:62,y:100}];update();render()");
+  assert.equal(h.diagnostics().hits,0);assert.equal(h.diagnostics().damageTaken,1);
+  assert(h.diagnostics().effects>0);
+  h.run("items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().hits,0,'full life is capped');
+  h.run("hits=2;items=[{k:'heart',x:62,y:100}];update();update()");assert.equal(h.diagnostics().hits,1,'one recovery per item');
+  h.run("hits=0;tick=DURATION*60-1;items=[];update()");assert.equal(h.diagnostics().score,5000,'healing does not award no-hit bonus');
+  h.run("reset();paused=true;hits=1;items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().hits,1,'pause freezes pickups');
+  h.run("paused=false;items=[{k:'heart',x:62,y:30}];update()");assert.equal(h.diagnostics().hits,1,'must overlap heart');
+  h.run('reset();tick=539;items=[];update()');assert(h.run("items.some(o=>o.k==='heart')"),'heart spawns during play');
   // Powerups affect gameplay, expire on game time, and never survive a retry.
   h.run("reset();items=[{k:'shield',x:62,y:100}];update();render()");
   assert.equal(h.diagnostics().powers.shield,360);
