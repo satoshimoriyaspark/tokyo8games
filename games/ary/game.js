@@ -1,9 +1,11 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
 let controlKey='';
+let pickupFx=[],memoUntil=0,tips=[],activeTip=null,seenTips=new Set();
+function teach(key,text){if(!seenTips.has(key)){seenTips.add(key);tips.push(text)}}
 let previous={y:113,scroll:0};
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
-function reset(){if(!ArySprites.ready())return;state='play';tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
+function reset(){if(!ArySprites.ready())return;state='play';pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
 function next(){if(state==='play'&&paused){paused=false;return}if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
@@ -53,8 +55,8 @@ function mysteryCat(){
  if(state==='play'||state==='intro')ArySprites.draw(g,{key:'cat',frame:Math.floor(tick/8)%2},264,138,.55);
 }
 function spawn(){
- if(tick%39===0)items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});
- if(tick%165===70)items.push({x:328,y:112,k:'clue',done:false});
+ if(tick%39===0){items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});teach('coin','チップを集めよう！')}
+ if(tick%165===70){items.push({x:328,y:112,k:'clue',done:false});teach('clue','取材メモを見つけよう！')}
  // Alternate encounters, three seconds apart. Crow starts offscreen for advance warning.
  if(tick%360===90)items.push({x:328,y:119,k:'cone',done:false});
  if(tick%360===270)items.push({x:400,y:84,k:'crow',done:false});
@@ -78,6 +80,9 @@ function update(){
  if(p.y>=113){if(p.j>0)p.land=7;p.y=113;p.vy=0;p.j=0}
  if(p.slide>0)p.slide--;
  spawn();
+ pickupFx=pickupFx.filter(f=>tick-f.born<36);
+ if(activeTip&&tick>=activeTip.until)activeTip=null;
+ if(!activeTip&&tips.length)activeTip={text:tips.shift(),until:tick+120};
  for(const o of items){
   o.previousX=o.x;o.x-=o.k==='crow'?3:2.25;if(o.done)continue;
   const near=o.x>=43&&o.x<=69;
@@ -86,8 +91,8 @@ function update(){
    continue;
   }
   if(!near)continue;
-  if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10}
-  else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500}
+  if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10;pickupFx.push({x:o.x,y:o.y,born:tick})}
+  else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500;memoUntil=tick+75}
 
  }
  items=items.filter(o=>o.x>-20&&!o.done);
@@ -135,11 +140,30 @@ function drawCrow(x,y){
  }
  rect(x+9,y+11,2,2,'#b6a580');rect(x+15,y+11,2,2,'#b6a580');
 }
+function drawMemo(x,y,scale=1){
+ g.save();g.translate(x,y);g.scale(scale,scale);
+ // 24px blue notebook: white pages, bound spine and a separate yellow pencil.
+ rect(2,2,17,21,'#172a46');rect(3,1,15,2,'#172a46');
+ rect(3,3,15,18,'#398fbf');rect(5,3,2,18,'#24618e');
+ rect(8,4,9,14,'#fff3dc');rect(10,7,5,1,'#68809a');
+ rect(10,10,5,1,'#68809a');rect(10,13,3,1,'#68809a');
+ for(let i=0;i<4;i++)rect(1,5+i*4,4,1,'#c6eaf0');
+ rect(8,19,9,1,'#8edbdc');
+ for(let i=0;i<10;i++){rect(20-Math.floor(i/3),7+i,3,2,'#624329');rect(21-Math.floor(i/3),7+i,1,2,'#ffdc65')}
+ rect(20,5,3,3,'#f59bb8');rect(17,18,2,2,'#e8c69a');rect(17,20,1,1,'#172a46');
+ g.restore();
+}
+function pickupFeedback(){
+ if(state!=='play')return;
+ for(const f of pickupFx){const y=f.y-4-(tick-f.born)*.35;txt('+10',f.x+1,y+1,8,'#69421e');txt('+10',f.x,y,8,'#fff0a2')}
+ if(tick<memoUntil){box(104,52,119,19);txt('取材メモ発見！',110,65,9,'#91e3d2')}
+ if(activeTip){box(7,148,142,20);txt(activeTip.text,12,161,8,'#fff3dc')}
+}
 function drawItems(alpha=1){
  for(const item of items){
   const o={...item,x:Number.isFinite(item.previousX)?item.previousX+(item.x-item.previousX)*alpha:item.x};
   if(o.k==='coin')hexChip(o.x,o.y);
-  else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}
+  else if(o.k==='clue')drawMemo(o.x-5,o.y-6+Math.sin(tick/18)*2);
   else if(o.k==='cone')drawCone(o.x,o.y);
   else if(o.k==='crow')drawCrow(o.x,o.y);
  }
@@ -166,10 +190,11 @@ function heart(x,y,filled){
 }
 function hud(){
  rect(0,0,320,26,'#172a46');rect(0,25,320,1,'#e0bf75');
- hexChip(6,5);txt(String(coins).padStart(3,'0'),24,14,9,'#ffdd78');
- rect(53,4,10,12,'#91e3d2');rect(55,5,7,9,'#fff3dc');
- rect(57,7,4,1,'#50657c');rect(57,10,4,1,'#50657c');
- txt(String(clues).padStart(2,'0'),67,14,9,'#91e3d2');
+ hexChip(6,5);txt('チップ',24,7,6,'#ffdd78');txt(String(coins).padStart(3,'0'),24,16,8,'#ffdd78');
+ drawMemo(49,3,.65);txt('取材メモ',67,7,6,'#91e3d2');
+ txt(String(clues).padStart(2,'0'),67,16,8,'#91e3d2');
+ // First five collected memos fill in; total count above continues beyond five.
+ for(let i=0;i<5;i++){rect(67+i*5,19,3,4,i<clues?'#91e3d2':'#43516a');if(i<clues)rect(68+i*5,20,1,2,'#fff3dc')}
  for(let i=0;i<3;i++)heart(104+i*11,7,i<3-hits);
  txt('SCORE '+score,6,23,6,'#dce4f5');txt('LIFE',105,23,6,'#dce4f5');
  goalProgress();
@@ -188,7 +213,7 @@ function render(alpha=1){
  drawLayer('items',()=>drawItems(alpha));
  drawLayer('cat',mysteryCat);
  drawLayer('avatar',()=>avatar(previous.y+(p.y-previous.y)*alpha));
-drawLayer('hud',hud);syncControls();
+drawLayer('feedback',pickupFeedback);drawLayer('hud',hud);syncControls();
 if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'下のボタンでスタート！']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
 if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','もう一度、猫を追いかけよう！']);
