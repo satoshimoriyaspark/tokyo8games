@@ -112,38 +112,58 @@ const sprintPoses=[
  [ 6,36, 0,46, 16,37,10,47,   9,17,16,12, 16,23,22,18],
  [14,38,22,46,  8,35,-1,42,  17,17,10,12,  6,23, 0,17]
 ];
+// Anatomical two-link arms and legs: interpolate discrete pixel-art joint poses.
+// Frame cadence follows distance actually travelled, so faster runners swing faster.
 function runner(x,y,shirt,t,seed,travel,phase){
  const moving=(phase==='run'||phase==='finishDash')&&travel>0.1;
- const frame=moving?Math.floor(travel*3.3+seed*1.1)%8:0;
- const p=moving?sprintPoses[frame]:[9,38,9,47,6,38,6,47,17,24,18,31,4,24,3,31];
- y+=moving?[0,-1,-2,-1,0,-1,-2,-1][frame]:0;
- // Far limbs: make the knee and elbow bends visually distinct.
- pixelLimb(x+8,y+29,x+p[4],y+p[5],'#aa6b4e',3);
- pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#bf8160',2);
- rect(x+p[4]-1,y+p[5]-1,4,4,'#c98c68');
- rect(x+p[6]-1,y+p[7],7,3,'#d9d3c6');
- pixelLimb(x+7,y+17,x+p[12],y+p[13],'#a76e52',3);
- pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#b97d5b',2);
- rect(x+p[12]-1,y+p[13]-1,3,3,'#ce9973');
- // Slim, leaning torso: face and shoulders project to the right.
+ const sprint=selected===0, distanceRace=selected===1;
+ const cyclesPerUnit=sprint?0.32:distanceRace?0.18:0.26;
+ const progression=moving?travel*cyclesPerUnit*8+seed*.9:0;
+ const idx=Math.floor(progression)%8, blend=progression-Math.floor(progression);
+ const poseA=sprintPoses[idx],poseB=sprintPoses[(idx+1)%8];
+ const idle=[9,38,9,47,6,38,6,47,17,24,18,31,4,24,3,31];
+ const p=moving?poseA.map((v,i)=>v+(poseB[i]-v)*blend):idle;
+ // Sprint: more forward knee drive and larger shoulder rotation.
+ // Distance: compact motion to suggest economical cadence and relaxed form.
+ if(moving&&distanceRace){
+  const neutral=[10,38,10,44,7,38,7,44,13,21,13,23,7,21,7,23];
+  for(let i=0;i<p.length;i++)p[i]=neutral[i]+(p[i]-neutral[i])*.72;
+ }
+ if(moving&&sprint){
+  p[0]=10+(p[0]-10)*1.09;
+  p[4]=8+(p[4]-8)*1.09;
+  p[8]=11+(p[8]-11)*1.08;
+  p[12]=7+(p[12]-7)*1.08;
+ }
+ const bob=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.85):0;
+ y+=bob;
+ // Far arm and leg (darker shades), elbows and knees drawn as unmistakable bends.
+ pixelLimb(x+8,y+29,x+p[4],y+p[5],'#ad7758',3);
+ pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#c18a66',2);
+ rect(x+p[4]-1,y+p[5]-1,3,3,'#d69a75');
+ rect(x+p[6]-1,y+p[7],7,3,'#d5cec2');
+ pixelLimb(x+7,y+17,x+p[12],y+p[13],'#ab7657',3);
+ pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#bf8b67',2);
+ rect(x+p[12]-1,y+p[13]-1,3,3,'#d49b75');
+ // Body tilted to the right, narrow torso and single visible eye.
  rect(x+7,y+14,7,14,shirt);
- rect(x+6,y+27,8,4,'#2b3850');
+ rect(x+6,y+27,8,4,'#29374e');
  rect(x+9,y+12,3,3,'#e0a47a');
  rect(x+6,y+2,7,10,'#efb789');
  rect(x+5,y+1,7,3,'#302b37');
  rect(x+5,y+4,2,5,'#302b37');
  rect(x+13,y+6,3,3,'#f2b982');
  rect(x+11,y+5,2,2,'#182334');
- // Near arm is bent at a sharply visible elbow.
+ // Near arm bends at elbow; hand is an independent end point.
  pixelLimb(x+13,y+17,x+p[8],y+p[9],'#f2b982',3);
- rect(x+p[8]-2,y+p[9]-2,5,5,'#f6c397');
+ rect(x+p[8]-1,y+p[9]-1,4,4,'#f6c397');
  pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#f2b982',2);
- rect(x+p[10]-1,y+p[11]-1,4,4,'#efad7e');
- // Upper leg, knee joint, shin are separately rendered with a pronounced zigzag.
+ rect(x+p[10]-1,y+p[11]-1,3,3,'#efad7e');
+ // Near leg: thigh -> knee -> shin -> shoe; each segment rotates distinctly.
  pixelLimb(x+10,y+30,x+p[0],y+p[1],'#f2b982',3);
- rect(x+p[0]-2,y+p[1]-2,5,5,'#f8c99f');
+ rect(x+p[0]-1,y+p[1]-1,4,4,'#f8c99f');
  pixelLimb(x+p[0],y+p[1],x+p[2],y+p[3],'#f2b982',2);
- rect(x+p[2]-1,y+p[3],8,3,'#ffffff');
+ rect(x+p[2]-1,y+p[3],7,3,'#ffffff');
 }
 function frontRunner(x,y,shirt){
  // Front-facing podium pose: symmetric face, torso and feet.
