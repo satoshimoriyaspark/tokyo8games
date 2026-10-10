@@ -8,7 +8,7 @@
 const events=[['100m走','A・Bを交互に連打','time'],['1500m走','A連打。スタミナに注意！','time'],['110mハードル','A連打で走り、Bでジャンプ','time'],['走り幅跳び','A連打→踏切線でB。3回挑戦','length'],['ジャベボール投げ','A連打→B長押しで角度→離して投げる','length']];
 const cv=document.querySelector('#screen'),c=cv.getContext('2d'),$=x=>document.querySelector(x),lim=(v,a,b)=>Math.max(a,Math.min(b,v));c.imageSmoothingEnabled=false;
 let selected=0,mode='menu',cup=false,results=[],attempt=1,records=[],pos=0,spd=0,sta=100,last='',angle=42,bHeld=false,elapsed=0,prev=0,carry=0,deadline=0,invuln=0,hit=new Set(),feedback='',feedbackTime=0,downs=new Set();
-let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1;
+let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1,finishDashTime=0,finishDashRecord=0,finishDashSpeed=0;
 let best={};try{best=JSON.parse(localStorage.getItem('athletics_bests_v1')||'{}')}catch{}
 const message=s=>$('#msg').textContent=s;
 const guides=[
@@ -24,8 +24,8 @@ function begin(){ $('#tutorial').hidden=true;cpuRecords=[];resetRun();attempt=1;
 $('#tutorialGo').onclick=begin;
 const label=(i,v)=>events[i][2]==='time'?v.toFixed(2)+'秒':v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
-function resetRun(){rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
-function select(i){if(['run','ready'].includes(mode))return;selected=i;cup=false;mode='menu';render();message(events[i][0]+' を選択しました')}
+function resetRun(){finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
+function select(i){if(['run','ready','finishDash'].includes(mode))return;selected=i;cup=false;mode='menu';render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+e[0];b.className=i===selected?'selected':'';b.onclick=()=>select(i);$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
 function start(){showGuide()}
 function input(k){if(mode!=='run')return;if(selected===4&&k==='B'){bHeld=true;return}
@@ -37,19 +37,32 @@ function release(k){if(k==='B'&&bHeld){bHeld=false;if(mode==='run'&&selected===4
 function flash(s){feedback=s;feedbackTime=elapsed+.75}
 function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(attempt+'回目：'+(v?label(selected,v):'ファウル'))}
 function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);if(improved){best[selected]=v;try{localStorage.setItem('athletics_bests_v1',JSON.stringify(best))}catch{}}let p=points(selected,v);let cpuPts=rivals.map((r,j)=>points(selected,selected<3?+(elapsed*(j===0?.91:j===1?1.03:1.12)).toFixed(2):(cpuRecords[j]||0)));if(selected<3){cpuPts=rivals.map((r,j)=>points(selected,+((j===0?0.94:j===1?1.035:1.10)*elapsed).toFixed(2)))}const thisRank=1+cpuPts.filter(x=>x>p).length;cpuTotal=cpuTotal.map((a,j)=>a+cpuPts[j]);if(cup){results.push({i:selected,v,p});if(results.length===5){mode='finished';let t=results.reduce((s,r)=>s+r.p,0),rank=1+cpuTotal.filter(a=>a>t).length;message('大会終了！ 総合'+rank+'位 / 4人　'+t+'/5000点');$('#start').textContent='もう一度大会'}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人');$('#start').textContent='次の種目へ'}}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人'+(improved?' ★NEW BEST!':''));$('#start').textContent='もう一度'}render()}
-function step(dt,t){if(mode==='ready'){let remain=Math.ceil((deadline-t)/1000);if(remain>0)message('スタートまで '+remain+' 秒');if(t>=deadline){mode='run';message(events[selected][1])}}if(mode==='between'&&t>=deadline){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
+function step(dt,t){
+if(mode==='finishDash'){
+ finishDashTime+=dt;
+ // The clock and rank are frozen at the line. Animation continues beyond it.
+ pos+=Math.max(3,finishDashSpeed*(1-finishDashTime*.28))*dt;
+ rivals.forEach(r=>{r.dist+=Math.max(3,finishDashSpeed*.92*r.skill)*dt});
+ if(finishDashTime>=2.1)finish(finishDashRecord);
+ return;
+}
+if(mode==='ready'){let remain=Math.ceil((deadline-t)/1000);if(remain>0)message('スタートまで '+remain+' 秒');if(t>=deadline){mode='run';message(events[selected][1])}}if(mode==='between'&&t>=deadline){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
 if(selected===4&&bHeld)angle=30+27*Math.sin(elapsed*4.6);
 if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:selected===0?4.65:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});currentRank=1+rivals.filter(r=>r.dist>pos).length;}
 if(selected===1){spd=Math.max(0,spd-(sta<8?2.3:1.35)*dt);sta=lim(sta+(spd<7?10:3)*dt,0,100)}else spd=Math.max(0,spd-1.55*dt);
 let factor=selected===0?.39:selected===1?1.85:selected>=3?.85:1.1,old=pos;pos+=spd*factor*dt;
 if(selected===2){for(let i=0;i<10;i++){const h=12+10*i;if(old<h&&pos>=h&&!hit.has(i)){hit.add(i);if(elapsed>invuln){spd*=.48;flash('HIT!')}else flash('CLEAR!')}}}
 const goal=selected===1?150:selected===2?110:selected>=3?40:100;
-if(pos>=goal){pos=goal;if(selected>=3)finishAttempt();else finish(elapsed)}
+if(pos>=goal){
+ pos=goal;
+ if(selected>=3)finishAttempt();
+ else {finishDashRecord=elapsed;finishDashSpeed=Math.max(7,spd*(selected===0?.39:selected===1?1.85:1.1));finishDashTime=0;mode='finishDash';message('GOAL! 駆け抜けろ！')}
+}
 if(elapsed>150){if(selected>=3)finishAttempt();else finish(elapsed)}
 }
 const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},txt=(s,x,y,size=11,col='#fff',align='left')=>{c.font='bold '+size+'px monospace';c.fillStyle=col;c.textAlign=align;c.fillText(s,x,y);c.textAlign='left'};
 function runner(x,y,shirt,t,seed,travel,phase){
- const running=phase==='run'&&travel>0.1;
+ const running=(phase==='run'||phase==='finishDash')&&travel>0.1;
  const frame=running?Math.floor(travel*2.6+seed)%4:0;
  const kick=[0,5,0,-5][frame],arm=[0,-4,0,4][frame];
  const bob=running?(frame===1||frame===3?-2:0):0;
@@ -68,11 +81,11 @@ if(selected<3){let spacing=selected===1?12.5:selected===2?10:25;for(let d=spacin
 if(selected===2)for(let i=0;i<10;i++){let h=54+(12+i*10-cam)*scale;if(h>-10&&h<390){rect(h,242,4,44,'#f7eedf');rect(h-4,239,21,5,'#ffdc64');if(h>35&&h<150&&mode==='run')txt('B!',h,229,12,'#ffdb65','center')}}
 if(selected>=3){rect(326,77,4,212,'#ffde65');if(selected===3){rect(299,265,27,8,'#72db91');rect(330,190,54,99,'#d9b474');txt('Bで踏切!',290,177,12,'#ffdb65','center')}else txt('B長押し→離す',192,177,12,'#ffdb65','center')}
 let y=selected<3?241:241;if(selected===2&&elapsed<invuln)y-=17;runner(x,y,'#ffcb54',t,4,pos,mode);if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
-if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('LAP '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',290,69,12,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',266,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),192,66,18,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,192,68,17,'#ffdb65','center');
-if(mode!=='run'){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
+if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('LAP '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',290,69,12,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',266,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),192,66,18,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,192,68,17,'#ffdb65','center');
+if(mode!=='run'&&mode!=='finishDash'){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
 function loop(t){const dt=Math.min((t-prev||16)/1000,.05);prev=t;carry+=dt;let n=0;while(carry>=1/60&&n++<4){step(1/60,t);carry-=1/60}draw(t);requestAnimationFrame(loop)}
-$('#start').onclick=()=>{if(cup&&mode==='result'&&results.length<5){selected=results.length;render();start()}else if(cup&&mode==='finished'){results=[];cpuTotal=[0,0,0];selected=0;render();start()}else start()};
-$('#cup').onclick=()=>{cup=true;selected=0;results=[];cpuTotal=[0,0,0];$('#start').textContent='次の種目へ';render();start()};
+$('#start').onclick=()=>{if(mode==='finishDash')return;if(cup&&mode==='result'&&results.length<5){selected=results.length;render();start()}else if(cup&&mode==='finished'){results=[];cpuTotal=[0,0,0];selected=0;render();start()}else start()};
+$('#cup').onclick=()=>{if(mode==='finishDash')return;cup=true;selected=0;results=[];cpuTotal=[0,0,0];$('#start').textContent='次の種目へ';render();start()};
 $('#reset').onclick=()=>{$('#tutorial').hidden=true;cup=false;results=[];cpuTotal=[0,0,0];mode='menu';resetRun();$('#start').textContent='START';render();message('競技を選んでSTART！')};
 for(const k of ['a','b']){const el=$('#'+k),K=k.toUpperCase();el.addEventListener('pointerdown',e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch{}el.classList.add('active');input(K)});for(const event of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(event,e=>{e.preventDefault();el.classList.remove('active');release(K)})}
 document.addEventListener('keydown',e=>{let k=e.key.toUpperCase();if(!['A','B'].includes(k))return;e.preventDefault();if(downs.has(k))return;downs.add(k);$('#'+k.toLowerCase()).classList.add('active');input(k)});
