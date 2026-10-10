@@ -35,7 +35,7 @@ window.ArySprites = (() => {
   }
   async function loadAll() { await Promise.all(Object.keys(specs).filter(key => assets[key].state !== 'ready').map(load)); }
   function pose(p, tick) {
-    if(p.slide > 0) return {key:'slide', frame:p.slide > 36 ? 0 : p.slide > 6 ? 1 : 2};
+    if(p.slide > 0) return {key:'slide', frame:p.slide > 39 ? 0 : p.slide > 6 ? 1 : 2};
     if(p.j > 0) {
       if(p.j === 2) return {key:'double', frame:p.jumpAge < 5 ? 0 : p.vy < .6 ? 1 : 2};
       return {key:'jump', frame:p.jumpAge < 5 ? 0 : p.vy < -.8 ? 1 : p.vy <= .8 ? 2 : 3};

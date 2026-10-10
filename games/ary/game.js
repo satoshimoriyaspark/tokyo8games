@@ -17,21 +17,27 @@ $('#fullscreen').onclick=async()=>{
 document.addEventListener('fullscreenchange',()=>{
  $('#fullscreen').textContent=document.fullscreenElement?'EXIT':'FULL';
 });
-$('#action').onclick=next;$('#jump').onclick=()=>state==='intro'?next():jump();$('#slide').onclick=slide;$('#pause').onclick=()=>{if(state==='play')paused=!paused};
-let touchY=0,touchX=0,pointerStart=null;
+$('#action').onclick=next;$('#jump').onclick=()=>state==='intro'?next():jump();$('#slide').onpointerdown=e=>{if(e.button===0){e.preventDefault();slide()}};$('#slide').onclick=e=>{if(!e||e.detail===0)slide()};$('#pause').onclick=()=>{if(state==='play')paused=!paused};
+let touchY=0,touchX=0,pointerStart=null,swipeHandled=false;
+function isDownSwipe(e){const dy=e.clientY-touchY,dx=e.clientX-touchX;return dy>=18&&dy>Math.abs(dx)*1.1}
 c.addEventListener('contextmenu',e=>e.preventDefault());
 c.addEventListener('dragstart',e=>e.preventDefault());
 c.addEventListener('pointerdown',e=>{
  if(pointerStart!==null||(e.pointerType==='mouse'&&e.button!==0))return;
- touchY=e.clientY;touchX=e.clientX;pointerStart=e.pointerId;
+ touchY=e.clientY;touchX=e.clientX;pointerStart=e.pointerId;swipeHandled=false;
  try{c.setPointerCapture(e.pointerId)}catch(_){}
 });
-c.addEventListener('pointercancel',()=>{pointerStart=null});
+c.addEventListener('pointermove',e=>{
+ if(pointerStart!==e.pointerId||swipeHandled)return;
+ if(isDownSwipe(e)){swipeHandled=true;slide()}
+});
+c.addEventListener('pointercancel',()=>{pointerStart=null;swipeHandled=false});
 c.addEventListener('pointerup',e=>{
  if(pointerStart!==e.pointerId)return;
  pointerStart=null;
+ if(swipeHandled){swipeHandled=false;return}
  const dy=e.clientY-touchY,dx=e.clientX-touchX;
- if(dy>25&&Math.abs(dy)>Math.abs(dx)*1.1)slide();
+ if(isDownSwipe(e))slide();
  else if(Math.abs(dx)<45&&dy>-35){if(state==='play')jump();else next()}
 });document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','Escape','Enter'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='Space'||e.code==='ArrowUp')state==='intro'?next():jump();if(e.code==='ArrowDown')slide();if(e.code==='Escape'&&state==='play')paused=!paused;if(e.code==='Enter'&&state!=='play')next()});
 function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x*3)/3,Math.round(y*3)/3,w,h)}function txt(s,x,y,size=9,col='#fff'){g.font='bold '+size+'px monospace';g.fillStyle=col;g.fillText(s,x,y)}function box(x,y,w,h){rect(x,y,w,h,'#172a46');rect(x,y,w,2,'#ffdd64');rect(x,y+h-2,w,2,'#ffdd64')}
