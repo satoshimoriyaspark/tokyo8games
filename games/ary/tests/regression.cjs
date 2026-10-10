@@ -142,9 +142,13 @@ async function main(){
   const finalScore=h.diagnostics().score;h.run('update();update()');assert.equal(h.diagnostics().score,finalScore,'clear awarded only once');
   h.run('next();render()');h.capture('05-clear');assert.equal(h.diagnostics().state,'result');
   h.run('next()');assert.equal(h.diagnostics().tick,0);
-  h.run("hits=2;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
+  h.run("hits=4;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
   h.run('next()');assert.equal(h.diagnostics().hits,0);
-  // Hearts recover one life, cap at three, and do not erase damage history.
+  h.run('reset()');assert.equal(h.diagnostics().life,5);assert.equal(h.diagnostics().maxLife,5);
+  h.run("hits=3;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'play');assert.equal(h.diagnostics().life,1,'four hits leave one heart');
+  h.run("items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().life,2);
+  h.run("hits=0;items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().life,5,'recovery cannot exceed five');
+  // Hearts recover one life, cap at five, and do not erase damage history.
   h.run("reset();items=[{k:'cone',x:62,y:119}];update();items=[{k:'heart',x:62,y:100}];update();render()");
   assert.equal(h.diagnostics().hits,0);assert.equal(h.diagnostics().damageTaken,1);
   assert(h.diagnostics().effects>0);

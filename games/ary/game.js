@@ -1,6 +1,7 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
 let controlKey='',damageTaken=0;
+const MAX_LIFE=5;
 const POWER_TICKS={shield:360,boost:300};
 let shieldUntil=0,boostUntil=0,hurtUntil=0,speedFactor=1,particles=[],notices=[];
 function burst(x,y,color,count=10){
@@ -114,7 +115,7 @@ function update(){
     else if(tick>=hurtUntil){
      hurtUntil=tick+60;hits++;damageTaken++;score=Math.max(0,score-500);
      burst(65,p.y-10,'#ff839f',16);notice('ヒット！','#ff9fb3');
-     if(hits>=3){state='fail';break}
+     if(hits>=MAX_LIFE){state='fail';break}
     }
    }
    continue;
@@ -258,7 +259,7 @@ function hud(){
  txt(String(clues).padStart(2,'0'),67,16,8,'#91e3d2');
  // First five collected memos fill in; total count above continues beyond five.
  for(let i=0;i<5;i++){rect(67+i*5,19,3,4,i<clues?'#91e3d2':'#43516a');if(i<clues)rect(68+i*5,20,1,2,'#fff3dc')}
- for(let i=0;i<3;i++)heart(104+i*11,7,i<3-hits);
+ for(let i=0;i<MAX_LIFE;i++)heart(104+i*11,7,i<MAX_LIFE-hits);
  txt('SCORE '+score,6,23,6,'#dce4f5');txt('LIFE',105,23,6,'#dce4f5');
  goalProgress();
 }
@@ -281,7 +282,7 @@ drawLayer('feedback',pickupFeedback);drawLayer('hud',hud);syncControls();
 if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'下のボタンでスタート！']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
 if(state==='result')overlay('STAGE CLEAR',['SCORE '+score+'   ?CHIP '+coins,'MEMO '+clues+'  / 取材の記録','もう一度、猫を追いかけよう！']);
-if(state==='fail')overlay('GAME OVER',['障害物に3回接触しました。','SCORE '+score+'  ?CHIP '+coins,'もう一度、猫を追いかけよう！']);
+if(state==='fail')overlay('GAME OVER',['ライフがなくなりました。','SCORE '+score+'  ?CHIP '+coins,'もう一度、猫を追いかけよう！']);
 if(paused&&state==='play')overlay('PAUSE',['一時停止中','つづけるボタン / Escで再開'])}
 let runtimeError='';
 function reportError(layer,error){
@@ -323,6 +324,6 @@ function loop(now){
  if(runtimeError){rect(0,166,320,14,'#8b173b');txt('ERROR '+runtimeError.slice(0,42),4,176,8)}
 }
 // Read-only diagnostics for QA; no cheats or state setters in the shipped game.
-window.aryDiagnostics=()=>({state,tick,score,coins,clues,hits,damageTaken,paused,
+window.aryDiagnostics=()=>({state,tick,score,coins,clues,hits,damageTaken,paused,life:MAX_LIFE-hits,maxLife:MAX_LIFE,
  powers:{shield:Math.max(0,shieldUntil-tick),boost:Math.max(0,boostUntil-tick),hurt:Math.max(0,hurtUntil-tick),speedFactor},effects:particles.length,player:{...p},pose:ArySprites.pose(p,tick),assets:ArySprites.status(),runtimeError});
 requestAnimationFrame(loop);
