@@ -144,6 +144,28 @@ async function main(){
   h.run('next()');assert.equal(h.diagnostics().tick,0);
   h.run("hits=2;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
   h.run('next()');assert.equal(h.diagnostics().hits,0);
+  // Powerups affect gameplay, expire on game time, and never survive a retry.
+  h.run("reset();items=[{k:'shield',x:62,y:100}];update();render()");
+  assert.equal(h.diagnostics().powers.shield,360);
+  assert(h.diagnostics().effects>0,'pickup particles');
+  h.run("items=[{k:'cone',x:62,y:119}];update();render()");
+  assert.equal(h.diagnostics().hits,0,'shield blocks damage');
+  h.run('paused=true;update()');assert.equal(h.diagnostics().powers.shield,359,'pause freezes duration');
+  h.run("paused=false;tick=shieldUntil-1;items=[{k:'cone',x:62,y:119}];update()");
+  assert.equal(h.diagnostics().hits,1,'damage resumes on expiry');
+  h.run("items=[{k:'crow',x:62,y:84}];update()");assert.equal(h.diagnostics().hits,1,'hit grace blocks consecutive damage');
+  h.run("tick=hurtUntil-1;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().hits,2);
+  h.run("reset();items=[{k:'boost',x:62,y:100}];update()");
+  assert.equal(h.diagnostics().powers.boost,300);
+  h.run('for(let i=0;i<25;i++){items=[];update()}');
+  assert(Math.abs(h.diagnostics().powers.speedFactor-1.35)<.0001);
+  h.run("items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().hits,1,'boost does not grant invulnerability');
+  h.run("items=[{k:'shield',x:62,y:100}];update();render()");
+  assert(h.diagnostics().powers.shield>0&&h.diagnostics().powers.boost>0,'powers combine');
+  h.capture('08-powers');
+  h.run('tick=boostUntil;for(let i=0;i<25;i++){items=[];update()}');
+  assert.equal(h.diagnostics().powers.speedFactor,1,'speed eases back to normal');
+  h.run('reset()');assert.equal(h.diagnostics().powers.shield,0);assert.equal(h.diagnostics().powers.boost,0);assert.equal(h.diagnostics().effects,0);
   // Render failure is injected only in the VM and must not hide the avatar.
   h.run("var savedDrawItems=drawItems;drawItems=()=>{throw Error('injected item failure')};render()");
   assert(h.diagnostics().runtimeError.includes('injected item failure'));

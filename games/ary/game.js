@@ -1,11 +1,25 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
 let controlKey='';
+const POWER_TICKS={shield:360,boost:300};
+let shieldUntil=0,boostUntil=0,hurtUntil=0,speedFactor=1,particles=[],notices=[];
+function burst(x,y,color,count=10){
+ for(let i=0;i<count;i++){const a=i*Math.PI*2/count;particles.push({x,y,vx:Math.cos(a)*1.2,vy:Math.sin(a)*1.2-.4,color,born:tick})}
+ particles=particles.slice(-96);
+}
+function notice(text,color){notices.push({text,color,until:tick+75});notices=notices.slice(-2)}
+function takePower(kind){
+ if(kind==='shield')shieldUntil=tick+POWER_TICKS.shield;
+ else boostUntil=tick+POWER_TICKS.boost;
+ const color=kind==='shield'?'#91edff':'#ffc76e';
+ burst(65,p.y-12,color,16);notice(kind==='shield'?'無敵！ 6秒':'加速！ 5秒',color);
+}
+
 let pickupFx=[],memoUntil=0,tips=[],activeTip=null,seenTips=new Set();
 function teach(key,text){if(!seenTips.has(key)){seenTips.add(key);tips.push(text)}}
 let previous={y:113,scroll:0};
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
-function reset(){if(!ArySprites.ready())return;state='play';pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
+function reset(){if(!ArySprites.ready())return;state='play';shieldUntil=0;boostUntil=0;hurtUntil=0;speedFactor=1;particles=[];notices=[];pickupFx=[];memoUntil=0;tips=[];activeTip=null;seenTips.clear();tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
 function next(){if(state==='play'&&paused){paused=false;return}if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
@@ -57,6 +71,8 @@ function mysteryCat(){
 function spawn(){
  if(tick%39===0){items.push({x:328,y:95+(tick%3)*8,k:'coin',done:false});teach('coin','チップを集めよう！')}
  if(tick%165===70){items.push({x:328,y:112,k:'clue',done:false});teach('clue','取材メモを見つけよう！')}
+ if(tick%1200===300){items.push({x:328,y:100,k:'shield',done:false});teach('shield','盾を取ると6秒間むてき！')}
+ if(tick%1200===660){items.push({x:328,y:100,k:'boost',done:false});teach('boost','稲妻を取ると5秒間かそく！')}
  // Alternate encounters, three seconds apart. Crow starts offscreen for advance warning.
  if(tick%360===90)items.push({x:328,y:119,k:'cone',done:false});
  if(tick%360===270)items.push({x:400,y:84,k:'crow',done:false});
@@ -71,7 +87,11 @@ function hazardHit(o){
 function update(){
  if(state!=='play'||paused||!ArySprites.ready())return;
  previous={y:p.y,scroll};
- tick++;scroll+=2.25;
+ tick++;
+ const targetSpeed=tick<boostUntil?1.35:1;
+ speedFactor+=Math.max(-.02,Math.min(.02,targetSpeed-speedFactor));
+ scroll+=2.25*speedFactor;
+ particles=particles.filter(f=>tick-f.born<28);notices=notices.filter(f=>tick<f.until);
  if(!Number.isFinite(p.y)||!Number.isFinite(p.vy)){p.y=113;p.vy=0;p.j=0}
  if(p.land>0)p.land--;
  if(p.j>0)p.jumpAge++;
@@ -84,15 +104,24 @@ function update(){
  if(activeTip&&tick>=activeTip.until)activeTip=null;
  if(!activeTip&&tips.length)activeTip={text:tips.shift(),until:tick+120};
  for(const o of items){
-  o.previousX=o.x;o.x-=o.k==='crow'?3:2.25;if(o.done)continue;
+  o.previousX=o.x;o.x-=(o.k==='crow'?3:2.25)*speedFactor;if(o.done)continue;
   const near=o.x>=43&&o.x<=69;
   if(o.k==='cone'||o.k==='crow'){
-   if(hazardHit(o)){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3){state='fail';break}}
+   if(hazardHit(o)){
+    o.done=true;
+    if(tick<shieldUntil){burst(o.x+10,o.y+8,'#91edff',12);notice('ガード！','#91edff')}
+    else if(tick>=hurtUntil){
+     hurtUntil=tick+60;hits++;score=Math.max(0,score-500);
+     burst(65,p.y-10,'#ff839f',16);notice('ヒット！','#ff9fb3');
+     if(hits>=3){state='fail';break}
+    }
+   }
    continue;
   }
   if(!near)continue;
-  if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10;pickupFx.push({x:o.x,y:o.y,born:tick})}
-  else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500;memoUntil=tick+75}
+  if(o.k==='coin'&&Math.abs(o.y-(p.y-8))<28){o.done=true;coins++;score+=10;pickupFx.push({x:o.x,y:o.y,born:tick});burst(o.x+8,o.y+8,'#ffe18b',8)}
+  else if(o.k==='clue'&&Math.abs(o.y-(p.y-7))<31){o.done=true;clues++;score+=500;memoUntil=tick+75;burst(o.x+8,o.y+8,'#91e3d2',12)}
+  else if((o.k==='shield'||o.k==='boost')&&Math.abs(o.y-(p.y-8))<28){o.done=true;takePower(o.k)}
 
  }
  items=items.filter(o=>o.x>-20&&!o.done);
@@ -153,8 +182,32 @@ function drawMemo(x,y,scale=1){
  rect(20,5,3,3,'#f59bb8');rect(17,18,2,2,'#e8c69a');rect(17,20,1,1,'#172a46');
  g.restore();
 }
-function pickupFeedback(){
+function drawPower(x,y,kind){
+ rect(x,y,20,20,'#172a46');rect(x+1,y+1,18,18,kind==='shield'?'#286882':'#925432');
+ const rows=kind==='shield'?['#######','#######','##.#.##','##.#.##','##...##','.#####.','..###..','...#...']:['...###.','..###..','.###...','######.','...##..','..##...','.##....'];
+ for(let j=0;j<rows.length;j++)for(let i=0;i<rows[j].length;i++)if(rows[j][i]==='#')rect(x+3+i*2,y+2+j*2,2,2,kind==='shield'?'#91edff':'#ffe18b');
+}
+function playerEffects(viewY){
  if(state!=='play')return;
+ if(tick<boostUntil){for(let i=0;i<5;i++){const x=28-((tick*2+i*9)%30);rect(x,viewY-25+i*10,10+i%3*3,1,'#ffc76e')}}
+ if(tick<shieldUntil||tick<hurtUntil){
+  const color=tick<shieldUntil?'#91edff':'#ff9fb3';
+  // Outline only: never tint, hide or replace the approved character PNG.
+  g.strokeStyle=color;g.lineWidth=1;g.beginPath();g.ellipse(64,viewY-8,30,36,0,0,Math.PI*2);g.stroke();
+ }
+}
+function pickupFeedback(){
+ if(state!=='play'&&state!=='fail')return;
+ for(const f of particles){const age=tick-f.born;rect(f.x+f.vx*age,f.y+f.vy*age+age*age*.025,age<14?2:1,age<14?2:1,f.color)}
+ if(notices.length){const n=notices[notices.length-1];box(8,74,95,17);txt(n.text,12,86,8,n.color)}
+ if(state!=='play')return;
+ let statusY=29;
+ for(const [kind,until,label,color] of [['shield',shieldUntil,'無敵','#91edff'],['boost',boostUntil,'加速','#ffc76e']]){
+  if(tick>=until)continue;
+  box(7,statusY,91,19);txt(label+' '+((until-tick)/60).toFixed(1)+'秒',12,statusY+10,8,color);
+  rect(12,statusY+13,80,2,'#43516a');rect(12,statusY+13,80*(until-tick)/POWER_TICKS[kind],2,color);statusY+=21;
+ }
+
  for(const f of pickupFx){const y=f.y-4-(tick-f.born)*.35;txt('+10',f.x+1,y+1,8,'#69421e');txt('+10',f.x,y,8,'#fff0a2')}
  if(tick<memoUntil){box(104,52,119,19);txt('取材メモ発見！',110,65,9,'#91e3d2')}
  if(activeTip){box(7,148,142,20);txt(activeTip.text,12,161,8,'#fff3dc')}
@@ -164,6 +217,7 @@ function drawItems(alpha=1){
   const o={...item,x:Number.isFinite(item.previousX)?item.previousX+(item.x-item.previousX)*alpha:item.x};
   if(o.k==='coin')hexChip(o.x,o.y);
   else if(o.k==='clue')drawMemo(o.x-5,o.y-6+Math.sin(tick/18)*2);
+  else if(o.k==='shield'||o.k==='boost')drawPower(o.x,o.y+Math.sin(tick/18)*2,o.k);
   else if(o.k==='cone')drawCone(o.x,o.y);
   else if(o.k==='crow')drawCrow(o.x,o.y);
  }
@@ -212,6 +266,7 @@ function render(alpha=1){
  drawLayer('background',()=>background(previous.scroll+(scroll-previous.scroll)*alpha));
  drawLayer('items',()=>drawItems(alpha));
  drawLayer('cat',mysteryCat);
+ drawLayer('power-effects',()=>playerEffects(previous.y+(p.y-previous.y)*alpha));
  drawLayer('avatar',()=>avatar(previous.y+(p.y-previous.y)*alpha));
 drawLayer('feedback',pickupFeedback);drawLayer('hud',hud);syncControls();
 if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'下のボタンでスタート！']);
@@ -260,5 +315,5 @@ function loop(now){
 }
 // Read-only diagnostics for QA; no cheats or state setters in the shipped game.
 window.aryDiagnostics=()=>({state,tick,score,coins,clues,hits,paused,
- player:{...p},pose:ArySprites.pose(p,tick),assets:ArySprites.status(),runtimeError});
+ powers:{shield:Math.max(0,shieldUntil-tick),boost:Math.max(0,boostUntil-tick),hurt:Math.max(0,hurtUntil-tick),speedFactor},effects:particles.length,player:{...p},pose:ArySprites.pose(p,tick),assets:ArySprites.status(),runtimeError});
 requestAnimationFrame(loop);
