@@ -94,34 +94,52 @@ if(elapsed>150){if(selected>=3)finishAttempt();else finish(elapsed)}
 }
 const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},txt=(s,x,y,size=11,col='#fff',align='left')=>{c.font='bold '+size+'px monospace';c.fillStyle=col;c.textAlign=align;c.fillText(s,x,y);c.textAlign='left'};
 // Racing sprites face right. Ceremony sprites deliberately face the audience.
+// Six distinct right-facing running poses. Hands, elbows, knees and feet have separate joints.
+// Coordinates describe a slim sprite, not a front-facing stick figure.
+function pixelLimb(x1,y1,x2,y2,color,weight=2){
+ const dx=x2-x1,dy=y2-y1,steps=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))));
+ for(let i=0;i<=steps;i++){const f=i/steps;rect(x1+dx*f,y1+dy*f,weight,weight,color)}
+}
+const sprintPoses=[
+ // leading knee / foot, trailing knee / foot, front elbow / hand, rear elbow / hand
+ [18,35,25,44, 16,18,20,25, 3,22,-1,15],
+ [21,33,27,39, 4,38,-4,44, 4,19, 0,15],
+ [16,39,21,46, 2,34,-5,39, 8,20, 4,14],
+ [ 5,36, 0,44,16,34,22,40, 17,23,21,17],
+ [ 2,33,-4,39,20,37,27,44, 16,20,20,15],
+ [ 7,39, 3,46,21,35,25,40, 10,20, 6,14]
+];
 function runner(x,y,shirt,t,seed,travel,phase){
- // Slender 3/4-ish right profile drawn on a ~17 x 48 pixel silhouette.
- // The far-side limbs use muted tones; the only visible eye faces right.
- const running=(phase==='run'||phase==='finishDash')&&travel>0.1;
- const frame=running?Math.floor(travel*2.4+seed)%4:0;
- const front=[1,5,1,-4][frame],rear=[-2,-5,1,4][frame];
- const bob=running&&(frame===1||frame===3)?-1:0;
- y+=bob;
- // Hair stops at the rear-left. Exposed forehead, forward nose and chin face RIGHT.
- rect(x+5,y+2,7,10,'#edb078');                 // narrow side profile
- rect(x+4,y+1,7,3,'#302b37');                 // crown
- rect(x+4,y+4,2,5,'#302b37');                 // tiny rear hair
- rect(x+12,y+5,3,3,'#f2b982');                // prominent nose to the right
- rect(x+10,y+4,2,2,'#1d2430');                // ONE eye on the forward side
- rect(x+10,y+10,3,2,'#da936b');               // chin
- rect(x+7,y+12,3,3,'#edb078');                // neck
- // One-pixel forward lean: hips behind shoulders.
- rect(x+7,y+15,7,15,shirt);
+ const moving=(phase==='run'||phase==='finishDash')&&travel>0.1;
+ // Distance-based frames: idle is completely still, faster travel produces quicker footwork.
+ const frame=moving?Math.floor(travel*3.6+seed*1.1)%6:0;
+ const p=moving?sprintPoses[frame]:[11,34,11,46,6,34,6,46,16,23,17,29,5,23,4,29];
+ const bounce=moving?[0,-1,-2,-1,0,-1][frame]:0;
+ y+=bounce;
+ // Back-side limbs first, shaded so the front/back action is legible.
+ pixelLimb(x+8,y+30,x+p[4],y+p[5],'#ad7559',2);
+ pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#bd8560',2);
+ rect(x+p[6]-1,y+p[7],6,3,'#cbc7bb');
+ pixelLimb(x+7,y+17,x+p[12],y+p[13],'#ad7559',2);
+ pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#bd8560',2);
+ // Forward-leaning, narrow chest and hips.
+ rect(x+7,y+14,7,15,shirt);
  rect(x+6,y+27,7,4,'#28374b');
- // Rear arm is dark and behind the torso; the leading elbow points forward.
- rect(x+4-rear,y+17,2,10,'#bd815e');
- rect(x+12+front,y+16,2,10,'#f2b982');
- rect(x+13+front,y+24,3,3,'#f2b982');
- // Legs: two-pixel shins and small shoes, opposite stride positions.
- rect(x+7+rear,y+31,2,12,'#bc805e');
- rect(x+9+front,y+31,2,12,'#f2b982');
- rect(x+5+rear,y+42,6,3,'#e6dfd0');
- rect(x+9+front,y+42,6,3,'#ffffff');
+ rect(x+8,y+12,3,3,'#df9d73');
+ // Side profile: one eye, unmistakable nose protrudes right.
+ rect(x+6,y+2,7,10,'#eeb684');
+ rect(x+5,y+1,7,3,'#302b37');
+ rect(x+5,y+4,2,5,'#302b37');
+ rect(x+13,y+6,3,3,'#f2b982');
+ rect(x+11,y+5,2,2,'#192332');
+ rect(x+11,y+11,3,1,'#c88b65');
+ // Near-side bent arm, then separated knee and shin in front.
+ pixelLimb(x+12,y+17,x+p[8],y+p[9],'#f2b982',2);
+ pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#f2b982',2);
+ rect(x+p[10],y+p[11],3,3,'#f2b982');
+ pixelLimb(x+10,y+30,x+p[0],y+p[1],'#f2b982',3);
+ pixelLimb(x+p[0],y+p[1],x+p[2],y+p[3],'#f2b982',2);
+ rect(x+p[2]-1,y+p[3],7,3,'#ffffff');
 }
 function frontRunner(x,y,shirt){
  // Front-facing podium pose: symmetric face, torso and feet.
