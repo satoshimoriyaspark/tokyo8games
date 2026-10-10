@@ -81,17 +81,39 @@ if(pos>=goal){
 if(elapsed>150){if(selected>=3)finishAttempt();else finish(elapsed)}
 }
 const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},txt=(s,x,y,size=11,col='#fff',align='left')=>{c.font='bold '+size+'px monospace';c.fillStyle=col;c.textAlign=align;c.fillText(s,x,y);c.textAlign='left'};
+// Racing sprites face right. Ceremony sprites deliberately face the audience.
 function runner(x,y,shirt,t,seed,travel,phase){
  const running=(phase==='run'||phase==='finishDash')&&travel>0.1;
- const frame=running?Math.floor(travel*2.6+seed)%4:0;
- const kick=[0,5,0,-5][frame],arm=[0,-4,0,4][frame];
- const bob=running?(frame===1||frame===3?-2:0):0;
- y+=bob;
- rect(x+6,y,9,9,'#f2b982');rect(x+5,y,11,3,'#322d33');
- rect(x+7,y+9,8,17,shirt);
- rect(x+3,y+13+arm,4,12,'#f2b982');rect(x+16,y+13-arm,4,12,'#f2b982');
- rect(x+7+kick,y+26,4,15,'#f2b982');rect(x+13-kick,y+26,4,15,'#f2b982');
- rect(x+4+kick,y+40,8,3,'#fff');rect(x+11-kick,y+40,8,3,'#fff');
+ const frame=running?Math.floor(travel*2.5+seed)%4:0;
+ const stride=[0,5,0,-5][frame],swing=[0,-5,0,5][frame];
+ y+=running&&(frame%2===1)?-2:0;
+ // Profile: hair at the rear, nose and one visible eye point right.
+ rect(x+5,y+1,10,10,'#f2b982');
+ rect(x+4,y,10,4,'#302b37');
+ rect(x+14,y+5,4,3,'#f2b982'); // nose
+ rect(x+13,y+4,2,2,'#1c2131'); // one side-facing eye
+ // Neck, narrow torso and shorts.
+ rect(x+7,y+11,5,3,'#f2b982');
+ rect(x+5,y+14,10,17,shirt);
+ rect(x+5,y+27,10,5,'#27374f');
+ // Rear arm and leading arm alternate visibly along the running axis.
+ rect(x+4-swing,y+17,4,12,'#ca8d64');
+ rect(x+14+swing,y+16,4,11,'#f2b982');
+ // Two long legs, moving forward and back in profile.
+ rect(x+6-stride,y+32,4,12,'#d69a6a');
+ rect(x+11+stride,y+32,4,12,'#f2b982');
+ rect(x+2-stride,y+43,9,4,'#f6f0df');
+ rect(x+10+stride,y+43,9,4,'#f6f0df');
+}
+function frontRunner(x,y,shirt){
+ // Front-facing podium pose: symmetric face, torso and feet.
+ rect(x+5,y,12,11,'#f2b982');
+ rect(x+4,y,14,3,'#302b37');
+ rect(x+7,y+5,2,2,'#1c2131');rect(x+13,y+5,2,2,'#1c2131');
+ rect(x+4,y+12,14,19,shirt);
+ rect(x,y+13,4,19,'#f2b982');rect(x+18,y+13,4,19,'#f2b982');
+ rect(x+5,y+31,5,13,'#f2b982');rect(x+12,y+31,5,13,'#f2b982');
+ rect(x+3,y+43,8,4,'#fff');rect(x+12,y+43,8,4,'#fff');
 }
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
@@ -139,7 +161,7 @@ function drawCeremony(t){
   for(const o of order){const racer=top[o.rank-1];if(!racer)continue;
    rect(o.x,o.y,76,o.h,o.rank===1?'#c39839':o.rank===2?'#91a1b1':'#a26b48');
    rect(o.x,o.y,76,5,'#f7e4a0');txt(String(o.rank),o.x+38,o.y+30,23,'#fff','center');
-   runner(o.x+27,o.y-49,racer.color,t,o.rank,5,'run');
+   frontRunner(o.x+27,o.y-49,racer.color);
    txt(racer.name,o.x+38,o.y-56,11,'#fff','center');
   }
   txt('TOTAL '+ceremonyScores.find(r=>r.name==='YOU').score+' POINTS',192,293,17,'#ffdb65','center');
