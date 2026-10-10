@@ -40,7 +40,7 @@ window.ArySprites = (() => {
       return {key:'jump', frame:p.jumpAge < 5 ? 0 : p.vy < -.8 ? 1 : p.vy <= .8 ? 2 : 3};
     }
     if(p.land > 0) return {key:'jump', frame:4};
-    return {key:'ride', frame:Math.floor(tick / 6) % 6}; // 60Hz simulation / 6 = 10fps
+    return {key:'ride', frame:Math.floor(tick / 5) % 6}; // 60Hz simulation / 5 = 12fps
   }
   let lastPose = {key:'ride',frame:0};
   function draw(ctx, selected, frontX, roadY, scale = .75) {
@@ -53,7 +53,7 @@ window.ArySprites = (() => {
     const anchor = spec.anchors ? spec.anchors[frame] : [spec.width - 9, spec.height - 3];
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(asset.image, frame*spec.width, 0, spec.width, spec.height,
-      Math.round(frontX-anchor[0]*scale), Math.round(roadY-anchor[1]*scale), spec.width*scale, spec.height*scale);
+      Math.round((frontX-anchor[0]*scale)*3)/3, Math.round((roadY-anchor[1]*scale)*3)/3, spec.width*scale, spec.height*scale);
     lastPose = {key,frame};
     return true;
   }

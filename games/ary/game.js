@@ -1,7 +1,8 @@
 'use strict';const c=document.querySelector('#game'),g=c.getContext('2d');g.setTransform(3,0,0,3,0,0);g.imageSmoothingEnabled=false;
 const $=s=>document.querySelector(s);let state='intro',tick=0,score=0,coins=0,clues=0,hits=0,scroll=0,paused=false,items=[],p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0},last=null,acc=0;
+let previous={y:113,scroll:0};
 const T=()=>Math.floor(tick/60),DURATION=115,ground=138;
-function reset(){if(!ArySprites.ready())return;state='play';tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError=''}
+function reset(){if(!ArySprites.ready())return;state='play';tick=0;score=0;coins=0;clues=0;hits=0;scroll=0;items=[];paused=false;p={y:113,vy:0,j:0,slide:0,jumpAge:0,land:0};last=null;acc=0;runtimeError='';previous={y:p.y,scroll}}
 function next(){if(state==='intro'||state==='fail'||state==='result')reset();else if(state==='story')state='result';else if(state==='play')jump()}
 function jump(){if(state!=='play'||paused)return;if(p.j<2){p.vy=-5.3;p.j++;p.slide=0;p.jumpAge=0;p.land=0}}
 function slide(){if(state==='play'&&!paused&&p.j===0&&p.y>=112){p.slide=42;p.vy=0;p.land=0}}
@@ -33,12 +34,12 @@ c.addEventListener('pointerup',e=>{
  if(dy>25&&Math.abs(dy)>Math.abs(dx)*1.1)slide();
  else if(Math.abs(dx)<45&&dy>-35){if(state==='play')jump();else next()}
 });document.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','Escape','Enter'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='Space'||e.code==='ArrowUp')state==='intro'?next():jump();if(e.code==='ArrowDown')slide();if(e.code==='Escape'&&state==='play')paused=!paused;if(e.code==='Enter'&&state!=='play')next()});
-function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)}function txt(s,x,y,size=9,col='#fff'){g.font='bold '+size+'px monospace';g.fillStyle=col;g.fillText(s,x,y)}function box(x,y,w,h){rect(x,y,w,h,'#172a46');rect(x,y,w,2,'#ffdd64');rect(x,y+h-2,w,2,'#ffdd64')}
+function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x*3)/3,Math.round(y*3)/3,w,h)}function txt(s,x,y,size=9,col='#fff'){g.font='bold '+size+'px monospace';g.fillStyle=col;g.fillText(s,x,y)}function box(x,y,w,h){rect(x,y,w,h,'#172a46');rect(x,y,w,2,'#ffdd64');rect(x,y+h-2,w,2,'#ffdd64')}
 function building(x,i,layer){const w=44+(i%3)*8,y=46+(i%3)*9;rect(x,y,w,ground-y,['#dba38d','#b7c4bc','#e8c99e','#aeb8d5'][i%4]);rect(x-2,y-3,w+4,4,'#5c6579');rect(x+5,y+14,w-10,12,'#f9e5b6');rect(x+8,y+32,11,17,'#6e9cad');rect(x+25,y+32,12,17,'#6e9cad');rect(x+2,ground-21,w-4,4,['#b55c6c','#638d9a'][i%2]);if(layer===0){rect(x+4,ground-16,w-8,12,'#e7c9a0');rect(x+7,ground-14,14,9,'#719b9d')}}
-function background(){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');rect(0,27,320,8,'#c4e4ec');for(let i=0;i<8;i++){const x=((i*65-scroll*.25)%460+460)%460-65;rect(x,54+(i%3)*7,45,84,'#9db6ae')}for(let i=0;i<9;i++){const x=((i*54-scroll*.55)%486+486)%486-54;building(x,i,0)}rect(0,138,320,42,'#6e7886');rect(0,136,320,3,'#ead9b4');for(let i=0;i<10;i++){let x=((i*42-scroll*1.8)%420+420)%420;rect(x,161,19,2,'#eee3bb')}}
+function background(viewScroll=scroll){rect(0,0,320,180,'#9bd8ed');rect(0,55,320,85,'#d6e9cf');rect(0,27,320,8,'#c4e4ec');for(let i=0;i<8;i++){const x=((i*65-viewScroll*.25)%460+460)%460-65;rect(x,54+(i%3)*7,45,84,'#9db6ae')}for(let i=0;i<9;i++){const x=((i*54-viewScroll*.55)%486+486)%486-54;building(x,i,0)}rect(0,138,320,42,'#6e7886');rect(0,136,320,3,'#ead9b4');for(let i=0;i<10;i++){let x=((i*42-viewScroll*1.8)%420+420)%420;rect(x,161,19,2,'#eee3bb')}}
 // The PNG renderer is independent of physics and scoring.
-function avatar(){
- const y=Number.isFinite(p.y)?Math.max(35,Math.min(113,p.y)):113;
+function avatar(viewY=p.y){
+ const y=Number.isFinite(viewY)?Math.max(35,Math.min(113,viewY)):113;
  ArySprites.draw(g,ArySprites.pose(p,tick),78,y+25);
 }
 function mysteryCat(){
@@ -60,6 +61,7 @@ function hazardHit(o){
 }
 function update(){
  if(state!=='play'||paused||!ArySprites.ready())return;
+ previous={y:p.y,scroll};
  tick++;scroll+=2.25;
  if(!Number.isFinite(p.y)||!Number.isFinite(p.vy)){p.y=113;p.vy=0;p.j=0}
  if(p.land>0)p.land--;
@@ -70,7 +72,7 @@ function update(){
  if(p.slide>0)p.slide--;
  spawn();
  for(const o of items){
-  o.x-=o.k==='crow'?3:2.25;if(o.done)continue;
+  o.previousX=o.x;o.x-=o.k==='crow'?3:2.25;if(o.done)continue;
   const near=o.x>=43&&o.x<=69;
   if(o.k==='cone'||o.k==='crow'){
    if(hazardHit(o)){o.done=true;hits++;score=Math.max(0,score-500);if(hits>=3){state='fail';break}}
@@ -124,8 +126,9 @@ function drawCrow(x,y){
  }
  rect(x+9,y+11,2,2,'#b6a580');rect(x+15,y+11,2,2,'#b6a580');
 }
-function drawItems(){
- for(const o of items){
+function drawItems(alpha=1){
+ for(const item of items){
+  const o={...item,x:Number.isFinite(item.previousX)?item.previousX+(item.x-item.previousX)*alpha:item.x};
   if(o.k==='coin')hexChip(o.x,o.y);
   else if(o.k==='clue'){rect(o.x,o.y,13,12,'#4d99b8');rect(o.x+2,o.y+2,9,8,'#f7df8b');txt('?',o.x+4,o.y+9,8,'#344e7c')}
   else if(o.k==='cone')drawCone(o.x,o.y);
@@ -149,11 +152,11 @@ function goalProgress(){
  rect(307,2,1,9,'#dce4f5');
  for(let y=0;y<3;y++)for(let x=0;x<3;x++)rect(308+x*2,2+y*2,2,2,(x+y)%2?'#172a46':'#fff3dc');
 }
-function render(){
- drawLayer('background',background);
- drawLayer('items',drawItems);
+function render(alpha=1){
+ drawLayer('background',()=>background(previous.scroll+(scroll-previous.scroll)*alpha));
+ drawLayer('items',()=>drawItems(alpha));
  drawLayer('cat',mysteryCat);
- drawLayer('avatar',avatar);
+ drawLayer('avatar',()=>avatar(previous.y+(p.y-previous.y)*alpha));
 rect(0,0,320,24,'#172a46');txt('?CHIP '+coins+'  MEMO '+clues+'  HIT '+hits+'/3',6,10,8);txt('SCORE '+score+'   '+Math.min(T(),DURATION)+'/'+DURATION+'s',6,20,8);goalProgress();
 if(state==='intro')overlay('KAMEARI / 01',['謎の猫を追って、亀有の街へ！','コーンはジャンプ / カラスは↓' ,'STARTで走行開始']);
 if(state==='story')overlay('取材完了！',['取材メモを '+clues+' 個発見。','アリィ「あの猫、次はどこへ？」','タップでリザルトへ']);
@@ -196,7 +199,7 @@ function loop(now){
   }else acc=0;
  }catch(error){reportError('update',error);paused=true;acc=0}
  // A broken item draw cannot skip the character or stop requestAnimationFrame.
- try{render()}catch(error){reportError('render',error)}
+ try{render(state==='play'&&!paused?Math.min(1,acc/(1000/60)):1)}catch(error){reportError('render',error)}
  if(runtimeError){rect(0,166,320,14,'#8b173b');txt('ERROR '+runtimeError.slice(0,42),4,176,8)}
 }
 // Read-only diagnostics for QA; no cheats or state setters in the shipped game.

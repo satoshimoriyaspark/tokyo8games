@@ -102,6 +102,13 @@ async function main(){
   h.run("reset();p.y=96;p.vy=1;p.j=1;items=[{k:'crow',x:62,y:84}];update()");assert.equal(h.diagnostics().hits,1);
   h.run("reset();items=[{k:'cone',x:160,y:119},{k:'crow',x:255,y:84}];render()");h.capture('06-obstacles');
   h.run("reset();slide();items=[{k:'crow',x:60,y:84}];render()");h.capture('07-crow-slide');
+  // Fractional render frames move smoothly without advancing simulation or collisions.
+  h.run('reset();jump();update();render(0)');const before=h.draws.at(-1).coords[5];
+  const fixedTick=h.diagnostics().tick;
+  h.run('render(.5)');const middle=h.draws.at(-1).coords[5];
+  h.run('render(1)');const after=h.draws.at(-1).coords[5];
+  assert(before>middle&&middle>after,'interpolated jump position at half tick');
+  assert.equal(h.diagnostics().tick,fixedTick,'render does not advance gameplay');
   h.run('reset();paused=true;update()');assert.equal(h.diagnostics().tick,0);
   h.el('#pause').onclick();h.run('update()');assert.equal(h.diagnostics().tick,1);
   h.document.hidden=true;h.documentEvents.visibilitychange();assert(h.diagnostics().paused);
@@ -140,7 +147,7 @@ async function main(){
   failed.recover();failed.el('#retry-assets').onclick();await failed.flush();
   failed.run('reset();slide();render()');assert.equal(failed.diagnostics().pose.key,'slide');
   assert.equal(failed.diagnostics().assets.slide,'ready');assert.equal(failed.timers.size,0);
-  console.log('PASS: PNG load/retry, 6 run frames at 10fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
+  console.log('PASS: PNG load/retry, 6 run frames at 12fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
   console.log('LIMIT: Node Canvas + simulated DOM; not iPhone Safari / Android Chrome / PC browser or real-time endurance.');
   if(captureDir){
     const record=await harness();await record.flush();record.run('reset()');
