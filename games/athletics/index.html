@@ -12,7 +12,7 @@ let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color
 let best={};try{best=JSON.parse(localStorage.getItem('athletics_bests_v1')||'{}')}catch{}
 const message=s=>$('#msg').textContent=s;
 const guides=[
-['AとBを交互に！','A→B→A→Bの順番で連打。速く交互に押すと加速します。','同じボタンを続けて押しても加速しません。','交互連打','交互連打'],
+['AとBを交互に！','A→B→A→Bと交互に連打して、約20秒のレースを走りきろう！','同じボタンを続けて押しても加速しません。','交互連打','交互連打'],
 ['スタミナを残して走ろう！','Aを連打して加速。休むとスタミナが回復します。','スタミナが少なくなると加速しにくくなります。','走る','使わない'],
 ['ハードル直前でジャンプ！','A連打で走り、ハードルの手前でBを押してジャンプ。','黄色の合図が出たらB！早すぎても遅すぎても減速します。','走る','ジャンプ'],
 ['黄色い踏切線でジャンプ！','A連打で助走。踏切線の直前でBを押します。','黄色い線を越えるとファウル。3回挑戦できます。','助走','踏切'],
@@ -23,7 +23,7 @@ function showGuide(){mode='tutorial';guide();$('#tutorial').hidden=false;message
 function begin(){ $('#tutorial').hidden=true;cpuRecords=[];resetRun();attempt=1;records=[];mode='ready';deadline=performance.now()+3000;message('3・2・1・GO！')}
 $('#tutorialGo').onclick=begin;
 const label=(i,v)=>events[i][2]==='time'?v.toFixed(2)+'秒':v.toFixed(2)+'m';
-function points(i,v){return Math.round(lim(i===0?(35-v)/24:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
+function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
 function resetRun(){rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
 function select(i){if(['run','ready'].includes(mode))return;selected=i;cup=false;mode='menu';render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+e[0];b.className=i===selected?'selected':'';b.onclick=()=>select(i);$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
@@ -39,9 +39,9 @@ function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=
 function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);if(improved){best[selected]=v;try{localStorage.setItem('athletics_bests_v1',JSON.stringify(best))}catch{}}let p=points(selected,v);let cpuPts=rivals.map((r,j)=>points(selected,selected<3?+(elapsed*(j===0?.91:j===1?1.03:1.12)).toFixed(2):(cpuRecords[j]||0)));if(selected<3){cpuPts=rivals.map((r,j)=>points(selected,+((j===0?0.94:j===1?1.035:1.10)*elapsed).toFixed(2)))}const thisRank=1+cpuPts.filter(x=>x>p).length;cpuTotal=cpuTotal.map((a,j)=>a+cpuPts[j]);if(cup){results.push({i:selected,v,p});if(results.length===5){mode='finished';let t=results.reduce((s,r)=>s+r.p,0),rank=1+cpuTotal.filter(a=>a>t).length;message('大会終了！ 総合'+rank+'位 / 4人　'+t+'/5000点');$('#start').textContent='もう一度大会'}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人');$('#start').textContent='次の種目へ'}}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人'+(improved?' ★NEW BEST!':''));$('#start').textContent='もう一度'}render()}
 function step(dt,t){if(mode==='ready'){let remain=Math.ceil((deadline-t)/1000);if(remain>0)message('スタートまで '+remain+' 秒');if(t>=deadline){mode='run';message(events[selected][1])}}if(mode==='between'&&t>=deadline){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
 if(selected===4&&bHeld)angle=30+27*Math.sin(elapsed*4.6);
-if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});currentRank=1+rivals.filter(r=>r.dist>pos).length;}
+if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:selected===0?4.65:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});currentRank=1+rivals.filter(r=>r.dist>pos).length;}
 if(selected===1){spd=Math.max(0,spd-(sta<8?2.3:1.35)*dt);sta=lim(sta+(spd<7?10:3)*dt,0,100)}else spd=Math.max(0,spd-1.55*dt);
-let factor=selected===1?1.85:selected>=3?.85:1.1,old=pos;pos+=spd*factor*dt;
+let factor=selected===0?.39:selected===1?1.85:selected>=3?.85:1.1,old=pos;pos+=spd*factor*dt;
 if(selected===2){for(let i=0;i<10;i++){const h=12+10*i;if(old<h&&pos>=h&&!hit.has(i)){hit.add(i);if(elapsed>invuln){spd*=.48;flash('HIT!')}else flash('CLEAR!')}}}
 const goal=selected===1?150:selected===2?110:selected>=3?40:100;
 if(pos>=goal){pos=goal;if(selected>=3)finishAttempt();else finish(elapsed)}
