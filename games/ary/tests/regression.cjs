@@ -138,7 +138,7 @@ async function main(){
   input.pointercancel();input.pointerup({pointerId:4,clientX:100,clientY:100});assert.equal(h.diagnostics().player.j,0);
   h.el('#slide').onpointerdown({button:0,preventDefault(){}});assert.equal(h.diagnostics().player.slide,42,'button reacts on press');
   h.run('update()');h.el('#slide').onclick({detail:1});assert.equal(h.diagnostics().player.slide,41,'click does not retrigger pointer press');
-  h.run('reset();tick=DURATION*60-1;items=[];update()');assert.equal(h.diagnostics().state,'story');
+  h.run('reset();scroll=STAGE.length-1;items=[];update()');assert.equal(h.diagnostics().state,'finish');h.run('for(let i=0;i<90;i++)updateFinish()');assert.equal(h.diagnostics().state,'story');
   const finalScore=h.diagnostics().score;h.run('update();update()');assert.equal(h.diagnostics().score,finalScore,'clear awarded only once');
   h.run('next();render()');h.capture('05-clear');assert.equal(h.diagnostics().state,'result');
   h.run('next()');assert.equal(h.diagnostics().tick,0);
@@ -154,7 +154,7 @@ async function main(){
   assert(h.diagnostics().effects>0);
   h.run("items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().hits,0,'full life is capped');
   h.run("hits=2;items=[{k:'heart',x:62,y:100}];update();update()");assert.equal(h.diagnostics().hits,1,'one recovery per item');
-  h.run("hits=0;tick=DURATION*60-1;items=[];update()");assert.equal(h.diagnostics().score,5000,'healing does not award no-hit bonus');
+  h.run("hits=0;scroll=STAGE.length-1;items=[];update()");assert.equal(h.diagnostics().score,5000,'healing does not award no-hit bonus');
   h.run("reset();paused=true;hits=1;items=[{k:'heart',x:62,y:100}];update()");assert.equal(h.diagnostics().hits,1,'pause freezes pickups');
   h.run("paused=false;items=[{k:'heart',x:62,y:30}];update()");assert.equal(h.diagnostics().hits,1,'must overlap heart');
   h.run('reset();tick=539;items=[];update()');assert(h.run("items.some(o=>o.k==='heart')"),'heart spawns during play');
@@ -180,6 +180,16 @@ async function main(){
   h.run('tick=boostUntil;for(let i=0;i<25;i++){items=[];update()}');
   assert.equal(h.diagnostics().powers.speedFactor,1,'speed eases back to normal');
   h.run('reset()');assert.equal(h.diagnostics().powers.shield,0);assert.equal(h.diagnostics().powers.boost,0);assert.equal(h.diagnostics().effects,0);
+  // Distance-based course, safe arrival, and pause during the finish sequence.
+  h.run('reset();tick=DURATION*60;items=[];update()');assert.equal(h.diagnostics().state,'play','time alone cannot clear');
+  h.run('reset();scroll=STAGE.length*.5;render()');assert.equal(h.diagnostics().stage.zone,'モール周辺');h.capture('09-mall');
+  h.run('scroll=STAGE.length-20;items=[];render()');h.capture('10-goal');
+  h.run('scroll=STAGE.length-1;update();render()');assert.equal(h.diagnostics().stage.progress,1);
+  const award=h.diagnostics().score;
+  h.run('beginFinish();paused=true;updateFinish()');assert.equal(h.diagnostics().score,award);assert.equal(h.diagnostics().stage.finishAge,0);
+  h.run('paused=false;for(let i=0;i<90;i++)updateFinish();render()');assert.equal(h.diagnostics().state,'story');h.capture('11-arrival');
+  h.run('next();next()');assert.equal(h.diagnostics().stage.progress,0);assert.equal(h.diagnostics().life,5);
+  h.run('reset();boostUntil=300;for(let i=0;i<60;i++){items=[];update()}');assert(h.diagnostics().stage.progress>135/h.diagnostics().stage.length,'boost advances distance faster');
   // Render failure is injected only in the VM and must not hide the avatar.
   h.run("var savedDrawItems=drawItems;drawItems=()=>{throw Error('injected item failure')};render()");
   assert(h.diagnostics().runtimeError.includes('injected item failure'));
@@ -187,7 +197,7 @@ async function main(){
   h.run('drawItems=savedDrawItems;reset()');
   // 180 seconds at 60Hz: real collisions, collects, retries, and renders every frame.
   for(let t=0;t<10800;t++){
-    h.run("if(state!=='play')next();if(tick%87===20)jump();if(tick%131===35)slide();update();render()");
+    h.run("if(state==='finish')updateFinish();else if(state!=='play')next();if(tick%87===20)jump();if(tick%131===35)slide();update();render()");
     assert.equal(h.diagnostics().runtimeError,'');
     if(h.diagnostics().state==='play')assert(h.pinkPixels()>200,'avatar remains visibly rendered');
   }
