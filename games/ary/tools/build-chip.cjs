@@ -2,7 +2,7 @@
 const {createCanvas}=require('@napi-rs/canvas');
 const fs=require('node:fs'),path=require('node:path');
 const canvas=createCanvas(64,16),g=canvas.getContext('2d');
-const inset=[5,3,2,1,1,0,0,0,0,0,0,1,1,2,3,5];
+const inset=[4,4,3,3,2,2,1,0,0,1,2,2,3,3,4,4];
 for(let f=0;f<4;f++){
  const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(f*16+x,y,1,1)};
  for(let y=0;y<16;y++)for(let x=inset[y];x<16-inset[y];x++){
