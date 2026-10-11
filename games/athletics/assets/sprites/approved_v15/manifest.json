@@ -1,5 +1,6 @@
 {
-  "version": "approved-source-v1.5-javeball",
+  "version": "approved-source-v1.5.1-edge-cleanup",
+  "cleanup": {"baselineCommit":"0638498e021abb396eb7b50a4b549a7a800b032d","removedPixels":234,"method":"Remove exterior RGB(184,189,200) only; preserve white, other colors, frame dimensions and chest anchors."},
   "source": "wide_transparent_background_pixel_art_sprite_sheet.png",
   "sourceSha256": "0719ea19c79e370eedde12300cc9e4869e19778f0495293fa889935ca616e56d",
   "frameWidth": 48,

@@ -2,14 +2,14 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>8BIT ATHLETICS | 陸上5種競技</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101927;color:#f9f4db;font:700 14px monospace;overscroll-behavior:none}.wrap{max-width:900px;margin:auto;padding:12px}header{text-align:center}h1{font-size:clamp(22px,6vw,40px);color:#ffdb65;text-shadow:3px 3px #9e4e45;margin:8px 0}p{line-height:1.6}canvas{display:block;width:100%;height:auto;aspect-ratio:6/5;image-rendering:pixelated;background:#203344;border:5px solid #e5ddc8}#msg{color:#ffdb65;text-align:center;min-height:42px;padding:12px}.buttons,.events,.pads{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:10px 0}button{font:700 14px monospace;background:#2e527b;color:#fff;border:3px solid #e9e5db;border-radius:3px;padding:10px 13px;touch-action:none;user-select:none;cursor:pointer;box-shadow:0 4px #070d16}button:active,.active{transform:translateY(3px);box-shadow:0 1px #070d16!important}.main{background:#278362}.pads{gap:40px}.pads button{width:min(39vw,190px);height:90px;font-size:34px;background:#3977bf}.pads button:last-child{background:#bb4b47}.events button{font-size:11px;padding:8px}.selected{border-color:#ffdb65;color:#ffdb65}#help{text-align:center;min-height:28px;color:#cbd8e1}#results{max-width:630px;margin:10px auto}table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #405164;text-align:left}td:last-child,th:last-child{text-align:right}.small{font-size:11px;text-align:center;color:#b8c6d0}
-#resultPanel{background:#17283d;border:4px solid #ffdb65;padding:14px;margin:10px auto;max-width:650px;text-align:center;box-shadow:5px 5px #080f1c}#resultPanel[hidden]{display:none}#resultPanel h2{color:#ffdb65;margin:3px 0 8px;font-size:21px}.record{font-size:clamp(26px,8vw,42px);color:#fff;margin:8px}.resultMeta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.resultMeta span{background:#36577d;border:2px solid #e4d8bb;padding:8px 12px}.resultRank{font-size:25px;color:#ffdb65;margin:8px}.rankTable{width:100%;margin:12px 0;border-collapse:collapse}.rankTable tr.you{background:#315c56;color:#ffefad}.rankTable td,.rankTable th{padding:9px;border-bottom:1px solid #607487;text-align:left}.rankTable td:last-child{text-align:right}#resultPanel .hint{color:#b9cbdc;font-size:12px}#tutorial{border:3px solid #ffdb65;background:#192c40;padding:12px;margin:10px 0;text-align:center}#tutorial h2{margin:3px 0;color:#ffdb65;font-size:18px}#tutorial p{margin:7px 0}#tutorial[hidden]{display:none}.pads button span{display:block;font-size:12px;margin-top:3px}.guide{background:#30445c;padding:8px;border:2px solid #879bb0;color:#fff}#help{font-size:15px;font-weight:bold;color:#ffdb65}@media(max-width:500px){.wrap{padding:7px}.pads{gap:16px}.pads button{height:78px}header p{margin:4px}} </style></head><body><div class="wrap"><header><h1>8BIT ATHLETICS</h1><p>陸上5種競技 / WEB BETA / ART 1.5</p></header><canvas id="screen" width="384" height="320"></canvas><section id="tutorial" hidden><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><p id="tutorialHint"></p><button class="main" id="tutorialGo">説明OK！スタート</button></section><section id="resultPanel" hidden aria-live="polite"><h2 id="resultHeading">RESULT</h2><div id="resultRecord" class="record"></div><div id="resultRank" class="resultRank"></div><div id="resultMeta" class="resultMeta"></div><table class="rankTable" id="resultRanking"></table><p class="hint" id="resultHint"></p></section><p id="spriteStatus" class="small" aria-live="polite">キャラクター：画像ロード中</p><div id="msg" aria-live="polite">競技を選んでSTART！</div><div class="buttons"><button class="main" id="start">START</button><button id="cup">5種競技大会</button><button id="reset">タイトルへ</button></div><div id="help"></div><div class="pads"><button id="a">A<span id="aLabel">連打</span></button><button id="b">B<span id="bLabel">ジャンプ</span></button></div><div class="events" id="events"></div><div id="results"></div><p class="small">A/Bキー または画面ボタン。幅跳び・ジャベボールは3回挑戦。自己ベストは端末内に保存。</p></div>
+#resultPanel{background:#17283d;border:4px solid #ffdb65;padding:14px;margin:10px auto;max-width:650px;text-align:center;box-shadow:5px 5px #080f1c}#resultPanel[hidden]{display:none}#resultPanel h2{color:#ffdb65;margin:3px 0 8px;font-size:21px}.record{font-size:clamp(26px,8vw,42px);color:#fff;margin:8px}.resultMeta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.resultMeta span{background:#36577d;border:2px solid #e4d8bb;padding:8px 12px}.resultRank{font-size:25px;color:#ffdb65;margin:8px}.rankTable{width:100%;margin:12px 0;border-collapse:collapse}.rankTable tr.you{background:#315c56;color:#ffefad}.rankTable td,.rankTable th{padding:9px;border-bottom:1px solid #607487;text-align:left}.rankTable td:last-child{text-align:right}#resultPanel .hint{color:#b9cbdc;font-size:12px}#tutorial{border:3px solid #ffdb65;background:#192c40;padding:12px;margin:10px 0;text-align:center}#tutorial h2{margin:3px 0;color:#ffdb65;font-size:18px}#tutorial p{margin:7px 0}#tutorial[hidden]{display:none}.pads button span{display:block;font-size:12px;margin-top:3px}.guide{background:#30445c;padding:8px;border:2px solid #879bb0;color:#fff}#help{font-size:15px;font-weight:bold;color:#ffdb65}@media(max-width:500px){.wrap{padding:7px}.pads{gap:16px}.pads button{height:78px}header p{margin:4px}} </style></head><body><div class="wrap"><header><h1>8BIT ATHLETICS</h1><p>陸上5種競技 / WEB BETA / ART 1.5.1</p></header><canvas id="screen" width="384" height="320"></canvas><section id="tutorial" hidden><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><p id="tutorialHint"></p><button class="main" id="tutorialGo">説明OK！スタート</button></section><section id="resultPanel" hidden aria-live="polite"><h2 id="resultHeading">RESULT</h2><div id="resultRecord" class="record"></div><div id="resultRank" class="resultRank"></div><div id="resultMeta" class="resultMeta"></div><table class="rankTable" id="resultRanking"></table><p class="hint" id="resultHint"></p></section><p id="spriteStatus" class="small" aria-live="polite">キャラクター：画像ロード中</p><div id="msg" aria-live="polite">競技を選んでSTART！</div><div class="buttons"><button class="main" id="start">START</button><button id="cup">5種競技大会</button><button id="reset">タイトルへ</button></div><div id="help"></div><div class="pads"><button id="a">A<span id="aLabel">連打</span></button><button id="b">B<span id="bLabel">ジャンプ</span></button></div><div class="events" id="events"></div><div id="results"></div><p class="small">A/Bキー または画面ボタン。幅跳び・ジャベボールは3回挑戦。自己ベストは端末内に保存。</p></div>
 <script>
 (()=>{'use strict';
 const events=[['100m走','A・Bを交互に連打','time'],['1500m走','A連打。スタミナに注意！','time'],['110mハードル','A連打で走り、Bでジャンプ','time'],['走り幅跳び','A連打→踏切線でB。3回挑戦','length'],['ジャベボール投げ','A連打→B長押しで角度→離して投げる','length']];
 const cv=document.querySelector('#screen'),c=cv.getContext('2d'),$=x=>document.querySelector(x),lim=(v,a,b)=>Math.max(a,Math.min(b,v));c.imageSmoothingEnabled=false;
 let jumpStarted=-10,throwHeldStart=0,throwAge=0,throwOrigin=0;
 let selected=0,mode='menu',cup=false,results=[],attempt=1,records=[],pos=0,spd=0,sta=100,last='',angle=42,bHeld=false,elapsed=0,prev=0,carry=0,deadline=0,invuln=0,hit=new Set(),feedback='',feedbackTime=0,downs=new Set();
-let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1,finishDashTime=0,finishDashRecord=0,finishDashSpeed=0,ceremonyTime=0,ceremonyRank=1,ceremonyTotal=false,ceremonyScores=[],goalBurst=0;
+let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1,finishDashTime=0,finishDashRecord=0,finishDashSpeed=0,ceremonyTime=0,ceremonyRank=1,ceremonyTotal=false,ceremonyScores=[];
 let best={};try{best=JSON.parse(localStorage.getItem('athletics_bests_v1')||'{}')}catch{}
 const message=s=>$('#msg').textContent=s;
 const guides=[
@@ -25,7 +25,7 @@ function begin(){ if(!spriteReady)return;$('#resultPanel').hidden=true;$('#tutor
 $('#tutorialGo').onclick=begin;
 const label=(i,v)=>events[i][2]==='time'?v.toFixed(2)+'秒':v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
-function resetRun(){jumpStarted=-10;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;goalBurst=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
+function resetRun(){jumpStarted=-10;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
 function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';resetRun();$('#resultPanel').hidden=true;$('#tutorial').hidden=true;render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+e[0];b.className=i===selected?'selected':'';b.onclick=()=>select(i);$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
 function start(){showGuide()}
@@ -90,18 +90,19 @@ const goal=selected===1?150:selected===2?110:selected>=3?40:100;
 if(pos>=goal){
  pos=goal;
  if(selected>=3)finishAttempt();
- else {goalBurst=1;finishDashRecord=elapsed;finishDashSpeed=Math.max(7,spd*(selected===0?.39:selected===1?1.85:1.1));finishDashTime=0;mode='finishDash';message('GOAL! 駆け抜けろ！')}
+ else {finishDashRecord=elapsed;finishDashSpeed=Math.max(7,spd*(selected===0?.39:selected===1?1.85:1.1));finishDashTime=0;mode='finishDash';message('GOAL! 駆け抜けろ！')}
 }
 if(elapsed>150){if(selected>=3)finishAttempt();else finish(elapsed)}
 }
 const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},txt=(s,x,y,size=11,col='#fff',align='left')=>{c.font='bold '+size+'px monospace';c.fillStyle=col;c.textAlign=align;c.fillText(s,x,y);c.textAlign='left'};
-// ART 1.5: these frames are cut from the user-approved design sheet.
+// ART 1.5.1: these frames are cut from the user-approved design sheet.
 // No procedural character fallback exists in this build.
 const spriteVariants=[[],[],[],[]];
 let spriteReady=false;
+const FRAME_SIZE=48;
 const SPRITE_COUNTS=[1,3,8,6,3,1,7,2,3,3,2,2];
 const CHEST_ANCHORS=[[28], [35, 35, 29], [29, 28, 29, 29, 28, 27, 27, 27], [26, 25, 27, 26, 30, 26], [29, 28, 29], [29], [24, 26, 28, 24, 25, 20, 25], [23, 29], [25, 21, 24], [35, 27, 28], [22, 25], [0, 0]];
-const ART_VERSION='approved-source-v1.5-javeball';
+const ART_VERSION='approved-source-v1.5.1-edge-cleanup';
 const SHEET_URLS=["./assets/sprites/approved_v15/idle_right.png", "./assets/sprites/approved_v15/start_right.png", "./assets/sprites/approved_v15/sprint_right.png", "./assets/sprites/approved_v15/jog_right.png", "./assets/sprites/approved_v15/victory_front.png", "./assets/sprites/approved_v15/podium_front.png", "./assets/sprites/approved_v15/hurdle_right.png", "./assets/sprites/approved_v15/javeball_prepare_right.png", "./assets/sprites/approved_v15/javeball_release_right.png", "./assets/sprites/approved_v15/long_jump_provisional.png", "./assets/sprites/approved_v15/javeball_follow_right.png", "./assets/sprites/approved_v15/props.png"];
 const spriteDebug={version:ART_VERSION,ready:false,draws:0,last:[],source:'approved_v15',sheets:SHEET_URLS.length};
 window.athleticsSpriteInfo=spriteDebug;
@@ -117,7 +118,7 @@ Promise.all(SHEET_URLS.map((url,row)=>new Promise((resolve,reject)=>{
   for(let j=0;j<3;j++){
    const off=document.createElement('canvas');off.width=img.naturalWidth;off.height=48;
    const ctx=off.getContext('2d',{willReadFrequently:true});if(!ctx)throw Error('Canvas unavailable');
-   ctx.drawImage(img,0,0);const data=ctx.getImageData(0,0,off.width,48),p=data.data;
+   ctx.imageSmoothingEnabled=false;ctx.drawImage(img,0,0);const data=ctx.getImageData(0,0,off.width,48),p=data.data;
    for(let k=0;k<p.length;k+=4){if(!p[k+3])continue;let shade=-1;
     if(p[k]===249&&p[k+1]===191&&p[k+2]===28)shade=0;
     else if(p[k]===255&&p[k+1]===221&&p[k+2]===75)shade=1;
@@ -130,14 +131,16 @@ Promise.all(SHEET_URLS.map((url,row)=>new Promise((resolve,reject)=>{
  }catch(e){reject(e)}};
  img.onerror=()=>reject(Error('PNG load failed: '+row));img.src=url;
 }))).then(()=>{
- spriteReady=true;spriteDebug.ready=true;setSpriteStatus('承認画像のPNG / ART 1.5');
+ spriteReady=true;spriteDebug.ready=true;setSpriteStatus('承認画像のPNG / ART 1.5.1');
  $('#start').disabled=false;$('#cup').disabled=false;$('#tutorialGo').disabled=false;
 }).catch(spriteFailure);
 function blitSprite(x,y,row,frame,cpuIndex=-1,anchorChest=false){
  if(!spriteReady)return;
  const count=SPRITE_COUNTS[row];frame=Math.max(0,Math.min(count-1,frame|0));
- const dx=anchorChest?x+14-CHEST_ANCHORS[row][frame]:x;
- c.drawImage(spriteVariants[cpuIndex+1][row],frame*48,0,48,48,Math.round(dx),Math.round(y),48,48);
+ const dx=Math.round(anchorChest?x+14-CHEST_ANCHORS[row][frame]:x),dy=Math.round(y);
+ // Keep the source cell, chest anchor and foot baseline on integer pixels.
+ c.imageSmoothingEnabled=false;
+ c.drawImage(spriteVariants[cpuIndex+1][row],frame*FRAME_SIZE,0,FRAME_SIZE,FRAME_SIZE,dx,dy,FRAME_SIZE,FRAME_SIZE);
  spriteDebug.draws++;
  spriteDebug.last[cpuIndex+1]={row,frame,dx:Math.round(dx),dy:Math.round(y),chestX:Math.round(dx)+CHEST_ANCHORS[row][frame]};
 }
@@ -175,7 +178,8 @@ function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
 function drawProp(which,x,y){
  if(!spriteReady)return;
  const w=which===0?16:22,h=which===0?11:22;
- c.drawImage(spriteVariants[0][11],which*48,0,w,h,Math.round(x),Math.round(y),w,h);
+ c.imageSmoothingEnabled=false;
+ c.drawImage(spriteVariants[0][11],which*FRAME_SIZE,0,w,h,Math.round(x),Math.round(y),w,h);
 }
 function drawJaveBallFlight(){
  if(selected!==4||mode!=='between'||!spriteReady||throwAge>1.2)return;
@@ -187,8 +191,8 @@ function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){blitSprite(x,y,k
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
 let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1-14:54+(pos-cam)*scale-14;
-if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
-if(selected<3&&mode==='run'&&pos>goal-18&&pos<goal){const lineX=54+(goal-cam)*scale;if(lineX>0&&lineX<384){rect(lineX-3,252,24,3,'#ffecba');rect(lineX+1,250,3,8,'#fff');}}
+if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,Math.min(11,212-z*11),z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
+// The finish stripe is sufficient. The former 24x3 tape looked like track debris.
 if(selected<3){let spacing=selected===1?12.5:selected===2?10:25;for(let d=spacing;d<goal;d+=spacing){let mx=54+(d-cam)*scale;if(mx>15&&mx<370){rect(mx,77,1,211,selected===1?'#e5b97d':'#e8c99b');let meter=selected===1?Math.round(d*10):Math.round(d);if(selected!==1||meter%250===0)txt(meter+'m',mx+3,298,10,'#fff4d3')}}}
 if(selected===2)for(let i=0;i<10;i++){
  const h=54+(12+i*10-cam)*scale;
@@ -204,7 +208,7 @@ if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected
 if(mode!=='run'&&mode!=='finishDash'&&mode!=='ceremony'&&!(selected===4&&mode==='between')){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
 function drawTapeBurst(t){
  const p=finishDashTime;
- if(p>1.1)return;
+ if(selected>=3||mode!=='finishDash'||p<0||p>1.1)return;
  for(let i=0;i<18;i++){
   const angle=i*Math.PI*2/18;
   const radius=9+p*84,xx=192+Math.cos(angle)*radius,yy=172+Math.sin(angle)*radius*.62+p*p*32;
