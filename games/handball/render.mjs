@@ -30,11 +30,11 @@ export function createSprites(images,canvasFactory){
  }return atlases;
 }
 export class Renderer{
- constructor(canvas,sprites){this.canvas=canvas;this.g=canvas.getContext('2d');this.sprites=sprites;this.g.imageSmoothingEnabled=false;}
+ constructor(canvas,sprites,canvasFactory=null){this.background=canvasFactory?.(960,540);this.backgroundKey=null;this.canvas=canvas;this.g=canvas.getContext('2d');this.sprites=sprites;this.g.imageSmoothingEnabled=false;}
  polygon(points,fill,stroke,width=2){const g=this.g;g.beginPath();points.forEach((p,i)=>i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y));g.closePath();if(fill){g.fillStyle=fill;g.fill();}if(stroke){g.strokeStyle=stroke;g.lineWidth=width;g.stroke();}}
  line(points,color,width=2){const g=this.g;g.beginPath();points.forEach((p,i)=>i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y));g.strokeStyle=color;g.lineWidth=width;g.stroke();}
  text(text,x,y,size=16,color='#fff',align='center'){const g=this.g;g.font=`900 ${size}px "Noto Sans JP", sans-serif`;g.textAlign=align;g.fillStyle=color;g.fillText(text,x,y);}
- field(match){const g=this.g;g.fillStyle='#091723';g.fillRect(0,0,960,540);g.fillStyle='#142c3e';g.fillRect(0,55,960,66);
+ field(match){const g=this.g,key=match.teams.map(t=>t.id).join(':');if(this.background&&this.backgroundKey===key){g.drawImage(this.background,0,0);return;}g.fillStyle='#091723';g.fillRect(0,0,960,540);g.fillStyle='#142c3e';g.fillRect(0,55,960,66);
   for(let row=0;row<3;row++)for(let i=0;i<55;i++){const x=i*19+(row%2)*8,y=68+row*17,v=(i*17+row*9)%7;g.fillStyle=['#546378','#394859','#465873','#725955','#4b6980','#485964','#777065'][v];g.fillRect(x,y,7,6);g.fillStyle=i%3===0?match.teams[0].dark:i%3===1?match.teams[1].dark:'#243b50';g.fillRect(x-2,y+6,11,7);}
   g.fillStyle='#203e53';g.fillRect(0,108,960,17);this.text('TOKYO 8 GAMES   /   HIGH SCHOOL HANDBALL',480,120,10,'#a4bdc9');
   this.polygon([project(0,0),project(1000,0),project(1000,500),project(0,500)],'#dba762','#fff0c6',3);
@@ -46,6 +46,7 @@ export class Renderer{
   this.text('熱血',center.x,center.y+4,22,'#ba854a');
   this.goal(0);this.goal(1);
   g.fillStyle='#071624';g.fillRect(0,414,960,126);g.fillStyle='#244358';g.fillRect(0,414,960,2);
+  if(this.background){this.background.getContext('2d').drawImage(this.canvas,0,0);this.backgroundKey=key;}
  }
  goal(side){const g=this.g,x=side?1000:0,p1=project(x,180),p2=project(x,320),depth=side?25:-25;this.polygon([{x:p1.x,y:p1.y-55},{x:p2.x,y:p2.y-55},p2,p1],'#122639aa','#e4f5ec',3);this.polygon([{x:p1.x,y:p1.y-55},{x:p1.x+depth,y:p1.y-61},{x:p2.x+depth,y:p2.y-61},{x:p2.x,y:p2.y-55}],'#d3ddc122','#cce7df',1);for(let t=0;t<=1;t+=.2){const x=p1.x+(p2.x-p1.x)*t,y=p1.y+(p2.y-p1.y)*t;this.line([{x,y:y-54},{x,y}],'#abc5c180',1);}for(let y=10;y<55;y+=11)this.line([{x:p1.x,y:p1.y-y},{x:p2.x,y:p2.y-y}],'#abc5c180',1);for(let y=0;y<55;y+=12){g.fillStyle='#dc424b';g.fillRect(p2.x-2,p2.y-y-6,5,6);}}
  player(p,match,{x,y,scale=1.3,pose,frame,labels=true,face}={}){const g=this.g,point=x===undefined?project(p.x,p.y):{x,y};let animation=pose||p.pose,index=frame??Math.floor((p.poseTime>0?match.t:p.step)*11)%8;const atlas=this.sprites[match.teams[p.side].sprite],sprite=atlas?.[animation]?.[index]??atlas?.idle[0];g.fillStyle='#343b3b40';g.beginPath();g.ellipse(point.x,point.y+2,15*scale,4*scale,0,0,TAU);g.fill();
