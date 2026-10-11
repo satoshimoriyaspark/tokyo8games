@@ -114,73 +114,89 @@ const sprintPoses=[
 ];
 // Anatomical two-link arms and legs: interpolate discrete pixel-art joint poses.
 // Frame cadence follows distance actually travelled, so faster runners swing faster.
+// "Cute track star" design: oversized expressive head, curved pixel outline,
+// colorful sweatband, compact jersey, cheek blush, and clearly articulated limbs.
 function runner(x,y,shirt,t,seed,travel,phase){
  const moving=(phase==='run'||phase==='finishDash')&&travel>0.1;
  const sprint=selected===0, distanceRace=selected===1;
- const cyclesPerUnit=sprint?0.32:distanceRace?0.18:0.26;
+ const cyclesPerUnit=sprint?.32:distanceRace?.18:.26;
  const progression=moving?travel*cyclesPerUnit*8+seed*.9:0;
  const idx=Math.floor(progression)%8, blend=progression-Math.floor(progression);
- const poseA=sprintPoses[idx],poseB=sprintPoses[(idx+1)%8];
- const idle=[9,38,9,47,6,38,6,47,17,24,18,31,4,24,3,31];
- const p=moving?poseA.map((v,i)=>v+(poseB[i]-v)*blend):idle;
- // Sprint: more forward knee drive and larger shoulder rotation.
- // Distance: compact motion to suggest economical cadence and relaxed form.
+ const pa=sprintPoses[idx],pb=sprintPoses[(idx+1)%8];
+ const idle=[9,37,9,45,6,37,6,45,17,25,18,29,4,25,3,29];
+ const p=moving?pa.map((v,i)=>v+(pb[i]-v)*blend):idle;
  if(moving&&distanceRace){
-  const neutral=[10,38,10,44,7,38,7,44,13,21,13,23,7,21,7,23];
+  const neutral=[10,37,10,44,7,37,7,44,13,21,13,23,7,21,7,23];
   for(let i=0;i<p.length;i++)p[i]=neutral[i]+(p[i]-neutral[i])*.72;
  }
- if(moving&&sprint){
-  p[0]=10+(p[0]-10)*1.09;
-  p[4]=8+(p[4]-8)*1.09;
-  p[8]=11+(p[8]-11)*1.08;
-  p[12]=7+(p[12]-7)*1.08;
- }
- const bob=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.7):0;
- y+=bob;
- // Far arm and leg (darker shades), elbows and knees drawn as unmistakable bends.
- pixelLimb(x+8,y+29,x+p[4],y+p[5],'#ad7758',3);
- pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#c18a66',2);
- rect(x+p[4]-1,y+p[5]-1,3,3,'#d69a75');
- rect(x+p[6]-1,y+p[7],7,3,'#d5cec2');
- pixelLimb(x+7,y+17,x+p[12],y+p[13],'#ab7657',3);
- pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#bf8b67',2);
- rect(x+p[12]-1,y+p[13]-1,3,3,'#d49b75');
- // Body tilted to the right, narrow torso and single visible eye.
- // Friendly, slightly larger 3-heads-tall profile: rounded pixel outline without losing rightward gaze.
- // Chest is fuller but does not obscure the independently animated elbows.
- rect(x+7,y+15,9,13,shirt);
- rect(x+6,y+16,2,10,shirt);
- rect(x+6,y+27,9,4,'#29374e');
- rect(x+10,y+13,3,3,'#e0a47a');
- // Head: 11x12 pixels, one eye at the forward edge, cheek and small smile.
- rect(x+4,y+2,10,11,'#edb484');
- rect(x+6,y+1,9,3,'#302b37');
- rect(x+4,y+4,2,6,'#302b37');
- rect(x+6,y+0,5,2,'#302b37'); // soft hair tuft
- rect(x+14,y+7,3,3,'#f2b982'); // nose points to the right
- rect(x+12,y+6,2,2,'#182334'); // single visible eye
- rect(x+12,y+10,2,2,'#da8f6c'); // cheek
- rect(x+13,y+12,2,1,'#ad6d57'); // mouth
- // Near arm bends at elbow; hand is an independent end point.
- pixelLimb(x+14,y+18,x+p[8],y+p[9],'#f2b982',3);
- rect(x+p[8]-1,y+p[9]-1,4,4,'#f6c397');
- pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#f2b982',2);
- rect(x+p[10]-1,y+p[11]-1,3,3,'#efad7e');
- // Near leg: thigh -> knee -> shin -> shoe; each segment rotates distinctly.
- pixelLimb(x+10,y+30,x+p[0],y+p[1],'#f2b982',3);
- rect(x+p[0]-1,y+p[1]-1,4,4,'#f8c99f');
- pixelLimb(x+p[0],y+p[1],x+p[2],y+p[3],'#f2b982',2);
- rect(x+p[2]-1,y+p[3],7,3,'#ffffff');
+ if(moving&&sprint){for(const i of [0,4,8,12])p[i]=(i===0||i===4?10:11)+(p[i]-(i===0||i===4?10:11))*1.09}
+ y+=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.7):0;
+ // The far limbs are shaded and sit behind the jersey.
+ pixelLimb(x+9,y+30,x+p[4],y+p[5],'#ae785e',3);
+ pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#cc9574',2);
+ rect(x+p[6]-1,y+p[7],7,3,'#e4e1d9');
+ pixelLimb(x+7,y+19,x+p[12],y+p[13],'#af785e',3);
+ pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#c99272',2);
+ // The silhouette is genuinely rebalanced, not just face dots added:
+ // a larger rounded 17x16 pixel head over a compact 12x13 jersey.
+ rect(x+7,y+17,12,12,shirt);
+ rect(x+6,y+20,2,6,shirt);
+ rect(x+9,y+20,4,7,'#fff6df');             // cheerful bib on jersey
+ rect(x+10,y+21,2,3,shirt);
+ rect(x+8,y+29,10,4,'#304158');             // shorts
+ rect(x+10,y+15,4,4,'#e1a27e');             // neck
+ // Head silhouette: stepped cheeks and a broad forehead, oriented RIGHT.
+ rect(x+4,y+4,14,10,'#f4bf92');
+ rect(x+6,y+2,12,15,'#f4bf92');
+ rect(x+16,y+7,4,7,'#f4bf92');             // forward cheek
+ rect(x+19,y+9,3,3,'#f4bf92');             // tiny nose pointing right
+ rect(x+15,y+15,4,2,'#e3a47e');            // chin
+ // Soft cropped hair with a little quiff and playful headband.
+ rect(x+5,y+1,13,4,'#302a39');
+ rect(x+4,y+4,3,7,'#302a39');
+ rect(x+6,y,5,2,'#302a39');
+ rect(x+9,y-1,4,2,'#302a39');              // little hair tuft
+ rect(x+10,y+3,9,2,shirt);                 // team-color headband
+ rect(x+16,y+3,3,3,'#302a39');             // swept fringe
+ // Readable one-eye side view and face expression.
+ rect(x+16,y+8,3,4,'#fff8eb');             // eye white
+ rect(x+18,y+9,1,2,'#1d2938');             // pupil looks right
+ rect(x+13,y+11,3,2,'#e78985');            // rosy cheek
+ rect(x+18,y+14,2,1,'#9f6060');            // smile
+ // Near arm and leg stay in front of the character with clear joints.
+ pixelLimb(x+17,y+19,x+p[8],y+p[9],'#efb188',3);
+ rect(x+p[8]-1,y+p[9]-1,4,4,'#f7c7a1');
+ pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#efb188',2);
+ rect(x+p[10]-1,y+p[11]-1,3,3,'#f7c7a1');
+ pixelLimb(x+12,y+32,x+p[0],y+p[1],'#efb188',3);
+ rect(x+p[0]-1,y+p[1]-1,4,4,'#f8cba3');
+ pixelLimb(x+p[0],y+p[1],x+p[2],y+p[3],'#efb188',2);
+ rect(x+p[2]-1,y+p[3],8,4,'#ffffff');
 }
 function frontRunner(x,y,shirt){
- // Front-facing podium pose: symmetric face, torso and feet.
- rect(x+5,y,12,11,'#f2b982');
- rect(x+4,y,14,3,'#302b37');
- rect(x+7,y+5,2,2,'#1c2131');rect(x+13,y+5,2,2,'#1c2131');
- rect(x+4,y+12,14,19,shirt);
- rect(x,y+13,4,19,'#f2b982');rect(x+18,y+13,4,19,'#f2b982');
- rect(x+5,y+31,5,13,'#f2b982');rect(x+12,y+31,5,13,'#f2b982');
- rect(x+3,y+43,8,4,'#fff');rect(x+12,y+43,8,4,'#fff');
+ // Matching cheerful front-facing version for the podium.
+ rect(x+3,y+5,20,13,'#f4bf92');
+ rect(x+5,y+2,16,19,'#f4bf92');
+ rect(x+5,y+1,16,5,'#302a39');
+ rect(x+4,y+4,3,7,'#302a39');
+ rect(x+10,y-1,5,3,'#302a39');
+ rect(x+7,y+4,14,2,shirt);
+ rect(x+8,y+11,3,3,'#fff8eb');
+ rect(x+16,y+11,3,3,'#fff8eb');
+ rect(x+10,y+12,2,2,'#1d2938');
+ rect(x+17,y+12,2,2,'#1d2938');
+ rect(x+6,y+15,3,2,'#e78985');
+ rect(x+19,y+15,3,2,'#e78985');
+ rect(x+13,y+17,4,1,'#a96c5b');
+ rect(x+7,y+21,15,13,shirt);
+ rect(x+12,y+25,6,6,'#fff6df');
+ rect(x+8,y+34,13,4,'#304158');
+ rect(x+2,y+22,5,15,'#efb188');
+ rect(x+23,y+22,5,15,'#efb188');
+ rect(x+9,y+38,5,10,'#efb188');
+ rect(x+17,y+38,5,10,'#efb188');
+ rect(x+7,y+47,9,4,'#fff');
+ rect(x+16,y+47,9,4,'#fff');
 }
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
@@ -212,10 +228,9 @@ function drawCeremony(t){
   txt('FINISH!',192,91,30,'#ffdb65','center');
   // Winner pose: raise arms and bounce once.
   const jump=Math.abs(Math.sin(p*7))*12,x=180,y=175-jump;
-  rect(x+7,y,12,12,'#f2b982');rect(x+5,y,14,3,'#322d33');
-  rect(x+7,y+13,12,24,'#ffcb54');
-  rect(x-1,y-1,5,23,'#f2b982');rect(x+22,y-1,5,23,'#f2b982');
-  rect(x+8,y+38,5,18,'#f2b982');rect(x+16,y+38,5,18,'#f2b982');
+  frontRunner(x-1,y-1,'#ffcb54');
+  rect(x,y+10,5,15,'#f2b982');rect(x+23,y+10,5,15,'#f2b982');
+  rect(x-1,y,6,13,'#f2b982');rect(x+23,y,6,13,'#f2b982');
   txt('ナイスラン！',192,260,15,'#fff','center');
  }else if(p<2.2){
   txt('RESULT',192,104,28,'#ffdb65','center');
