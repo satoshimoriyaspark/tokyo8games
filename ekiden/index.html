@@ -206,7 +206,7 @@ function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[select
  if(active){if(s.elapsed>s.noticeUntil)$('feedback').textContent=mode==='recover'?'指を離して回復中。交互タップで再び巡航！':p.energy<25?'スタミナ残りわずか。タップを遅めにして温存しよう':p.legs>35?'脚に負担がたまっています。下りは温存ペースに':p.drafting?'風よけ中！ 集団で脚を残し、勝負どころを待とう':'風に向かって走行中。力を残して、最後に勝負！';const ahead=s.ai.filter(a=>a.km>p.km).sort((a,b)=>a.km-b.km)[0];$('message').textContent=ahead?'前のランナーまで '+Math.round((ahead.km-p.km)*1000)+'m｜'+(co.id===1?'集団で力をためよう':co.id===5?'上りは無理せず温存':'下りは脚のつかれに注意'):'先頭！ 風を受けながら逃げ切れるか？';}
 }
 function rect(x,y,w,h,color,target=ctx){target.fillStyle=color;target.fillRect(Math.round(x),Math.round(y),w,h);}
-// Approved 8BIT ATHLETICS v1.5 pixels; copied locally, never drawn as a substitute body.
+// Approved 8BIT ATHLETICS v1.5 assets remain the source for the runner and palette.
 const spriteDefs={
  idle:{file:'idle_right',frames:1,chest:[28]},
  jog:{file:'jog_right',frames:6,chest:[26,25,27,26,30,26]},
@@ -244,6 +244,56 @@ function teamSheet(img,team){
  }
  target.putImageData(data,0,0);return sheet;
 }
+// Build an eight-pose running cycle from the approved upper body and palette.
+// Legs articulate at hip/knee/ankle in integer pixels; this is cached once per team.
+const strideSheets={};
+const stridePoses=[
+ {k:[4,38],a:[7,43],flat:true}, // reach and touch down
+ {k:[2,39],a:[3,43],flat:true}, // weight under the body
+ {k:[-1,39],a:[-1,43],flat:false}, // push back from the toes
+ {k:[-4,38],a:[-5,41],flat:false}, // lift the heel
+ {k:[-3,37],a:[-7,34],flat:false}, // fold the trailing knee
+ {k:[1,36],a:[-3,36],flat:false}, // swing through
+ {k:[5,36],a:[2,39],flat:false}, // drive the knee forward
+ {k:[6,37],a:[6,41],flat:true} // extend for the next contact
+];
+function pixelStroke(target,points,width,color){
+ target.fillStyle=color;const half=Math.floor(width/2);
+ for(let i=1;i<points.length;i++){
+  const [ax,ay]=points[i-1],[bx,by]=points[i],steps=Math.max(Math.abs(bx-ax),Math.abs(by-ay));
+  for(let j=0;j<=steps;j++){const t=steps?j/steps:0;target.fillRect(Math.round(ax+(bx-ax)*t)-half,Math.round(ay+(by-ay)*t)-half,width,width);}
+ }
+}
+function strideSheet(source,key,team){
+ const sheet=document.createElement('canvas');sheet.width=48*8;sheet.height=48;
+ const target=sheet.getContext('2d'),hipX=spriteDefs[key].chest[0]-3,sprint=key==='sprint';
+ target.imageSmoothingEnabled=false;
+ const outline='#18170f',nearSkin='#f6c17d',farSkin='#c18a4b',sole='#f5f3e8';
+ for(let f=0;f<8;f++){
+  const bob=[0,1,0,-1,0,1,0,-1][f],ox=f*48;
+  const bodyFrame=key==='jog'?[0,1,2,3,4,5,2,1][f]:f,sourceHip=spriteDefs[key].chest[bodyFrame]-3,bodyX=hipX-sourceHip;
+  function leg(phase,far){
+   const pose=stridePoses[phase],spread=sprint?1.2:1,hip=hipX+(far?-1:1);
+   const knee=[ox+hip+Math.round(pose.k[0]*spread),pose.k[1]-(sprint&&phase>=3?1:0)];
+   const ankle=[ox+hip+Math.round(pose.a[0]*spread),pose.a[1]-(sprint&&phase>=3?2:0)];
+   const points=[[ox+hip,34+bob],knee,ankle];
+   pixelStroke(target,points,5,outline);pixelStroke(target,points,3,far?farSkin:nearSkin);
+   const [x,y]=ankle;
+   // A flat landing and a raised heel give the shoe a readable contact phase.
+   if(pose.flat){
+    rect(x-2,y,7,3,outline,target);rect(x-1,y,5,2,sole,target);rect(x-1,y,3,1,far?team[1]:team[2]||team[1],target);
+   }else{
+    rect(x-2,y-2,5,5,outline,target);rect(x-1,y-1,3,3,sole,target);rect(x-1,y-1,2,2,team[1],target);
+   }
+  }
+  leg((f+4)%8,true);leg(f,false);
+  // Preserve the source face, hair, arms, shirt and sash, with one-pixel body bounce.
+  target.drawImage(source,bodyFrame*48,0,48,33,ox+bodyX,bob,48,33);
+  target.drawImage(source,bodyFrame*48+sourceHip-6,33,11,3,ox+hipX-6,33+bob,11,3);
+ }
+ return sheet;
+}
+
 async function loadSprites(){
  if(spriteLoading)return;spriteLoading=true;spriteReady=false;
  $('start').disabled=true;$('retry').disabled=true;$('assetStatus').hidden=false;
@@ -256,7 +306,7 @@ async function loadSprites(){
    }catch(error){reject(error)}};img.onerror=()=>reject(Error('Sprite load: '+key));
    img.src='./assets/sprites/athletics-v15/'+def.file+'.png';
   })));
-  for(const [key,sheets] of ready)spriteSheets[key]=sheets;
+  for(const [key,sheets] of ready){spriteSheets[key]=sheets;if(key==='jog'||key==='sprint')strideSheets[key]=sheets.map((sheet,i)=>strideSheet(sheet,key,teamColors[i]));}
   spriteReady=true;$('start').disabled=false;$('retry').disabled=false;$('assetStatus').hidden=true;
   $('teamRunner').setAttribute('data-ready','true');draw();drawCharacterCards(performance.now());
  }catch(error){
@@ -267,15 +317,15 @@ async function loadSprites(){
 $('reloadSprites').addEventListener('click',loadSprites);
 function blitRunner(target,x,feet,team,key,phase,scale=1){
  if(!spriteReady)return;
- const def=spriteDefs[key],frame=Math.floor(Math.max(0,phase))%def.frames;
- const sheet=spriteSheets[key][teamColors.indexOf(team)];
+ const def=spriteDefs[key],running=key==='jog'||key==='sprint',frame=Math.floor(Math.max(0,phase))%(running?8:def.frames);
+ const sheet=(running?strideSheets:spriteSheets)[key][teamColors.indexOf(team)],chest=def.chest[running?0:frame];
  target.imageSmoothingEnabled=false;
- target.drawImage(sheet,frame*48,0,48,48,Math.round(x-def.chest[frame]*scale),Math.round(feet-46*scale),48*scale,48*scale);
+ target.drawImage(sheet,frame*48,0,48,48,Math.round(x-chest*scale),Math.round(feet-46*scale),48*scale,48*scale);
 }
 function runner(x,feet,r,player=false,scale=1,walkingPhase=null){
  const key=walkingPhase!==null?'jog':r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
  rect(x-10*scale,feet-1,Math.round(19*scale),2,player?'#d3ba56':'#535c68');
- blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*1.5+(r.index>=0?r.index*.7:0):walkingPhase,scale);
+ blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*(key==='sprint'?1.4:1.7)+(r.index>=0?r.index*.7:0):walkingPhase,scale);
  if(player){const top=feet-52*scale;rect(x-6,top,13,3,'#102137');rect(x-5,top-1,11,3,'#ffe500');rect(x-3,top+2,7,2,'#ffe500');rect(x-1,top+4,3,2,'#ffe500');}
 }
 const reduceCharacterMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -283,7 +333,7 @@ function drawCharacterCards(t){
  if(!spriteReady)return;
  if(!$('setup').hidden&&setupStep===1){
   const card=$('teamRunner').getContext('2d');card.clearRect(0,0,96,96);
-  blitRunner(card,50,92,teamColors[selected],'jog',reduceCharacterMotion?0:t/120,2);
+  blitRunner(card,50,92,teamColors[selected],'jog',reduceCharacterMotion?0:t/72,2);
   $('teamRunner').setAttribute('aria-label',teamColors[selected][0]+'のたすきのランナー');
  }
  if(s&&s.done&&!$('result').hidden){
