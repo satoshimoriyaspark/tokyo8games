@@ -1,27 +1,13 @@
 {
   "redirects": [
-    {
-      "source": "/w",
-      "destination": "/kwb",
-      "permanent": false
-    }
+    { "source": "/w", "destination": "/kwb", "permanent": false }
   ],
   "rewrites": [
-    {
-      "source": "/kks",
-      "destination": "/games/kks/index.html"
-    },
-    {
-      "source": "/kks/",
-      "destination": "/games/kks/index.html"
-    },
-    {
-      "source": "/kwb",
-      "destination": "/games/kwb/index.html"
-    },
-    {
-      "source": "/kwb/",
-      "destination": "/games/kwb/index.html"
-    }
+    { "source": "/kks", "destination": "/games/kks/index.html" },
+    { "source": "/kks/", "destination": "/games/kks/index.html" },
+    { "source": "/kwb", "destination": "/games/kwb/index.html" },
+    { "source": "/kwb/", "destination": "/games/kwb/index.html" },
+    { "source": "/sqz", "destination": "/games/sqz/index.html" },
+    { "source": "/sqz/", "destination": "/games/sqz/index.html" }
   ]
 }
