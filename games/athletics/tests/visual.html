@@ -22,7 +22,7 @@ const names=['待機','スタート','100m 走行','1500m 走行','正面ガッ�
 const samples=[
  ['100m 開始前',{mode:'ready',pos:0,elapsed:0}],
  ['100m スタート1',{pos:.1,elapsed:.1}],['100m スタート2',{pos:.25,elapsed:.2}],['100m スタート3',{pos:.45,elapsed:.3}],
- ...Array.from({length:8},(_,f)=>['100m 走行 '+(f+1),{pos:(266+f+.1)/2.8,elapsed:19}]),
+ ...Array.from({length:8},(_,f)=>['100m 走行 '+(f+1),{pos:(270+f+.1)/2.8,elapsed:19}]),
  ['100m ゴール直前 96m',{pos:96}],['100m 胸部通過直前',{pos:99.99}],
  ['100m 通過直後',{mode:'finishDash',pos:100,dash:0}],['100m 駆け抜け 0.5秒',{mode:'finishDash',pos:103.5,dash:.5}],['100m 演出終了後 1.2秒',{mode:'finishDash',pos:107.6,dash:1.2}],
  ['100m 結果画面',{mode:'result',pos:114}],['100m 再挑戦',{mode:'ready',pos:0,elapsed:0}],
