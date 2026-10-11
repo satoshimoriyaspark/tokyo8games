@@ -96,6 +96,53 @@ const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y
 // Racing sprites face right. Ceremony sprites deliberately face the audience.
 // Six distinct right-facing running poses. Hands, elbows, knees and feet have separate joints.
 // Coordinates describe a slim sprite, not a front-facing stick figure.
+// Pixel-exact 32x48 PNG atlas, six rows: idle/start/sprint/jog/victory/podium.
+const atlasImg=new Image(),spriteVariants=[null,null,null,null];
+let spriteReady=false;
+atlasImg.onload=()=>{
+ spriteVariants[0]=atlasImg;
+ const palettes=[
+  [[63,165,234],[116,204,245],[33,107,185]],
+  [[223,74,77],[251,132,118],[155,51,61]],
+  [[48,174,111],[126,220,155],[22,111,70]]
+ ];
+ for(let j=0;j<3;j++){
+  const off=document.createElement('canvas');off.width=atlasImg.naturalWidth;off.height=atlasImg.naturalHeight;
+  const context=off.getContext('2d',{willReadFrequently:true});context.drawImage(atlasImg,0,0);
+  const data=context.getImageData(0,0,off.width,off.height);
+  const pix=data.data;
+  for(let k=0;k<pix.length;k+=4){
+   if(pix[k+3]<1)continue;
+   let shade=-1;
+   if(pix[k]===249&&pix[k+1]===191&&pix[k+2]===28)shade=0;
+   else if(pix[k]===255&&pix[k+1]===221&&pix[k+2]===75)shade=1;
+   else if(pix[k]===219&&pix[k+1]===160&&pix[k+2]===28)shade=2;
+   if(shade>=0){const rgb=palettes[j][shade];pix[k]=rgb[0];pix[k+1]=rgb[1];pix[k+2]=rgb[2]}
+  }
+  context.putImageData(data,0,0);spriteVariants[j+1]=off;
+ }
+ spriteReady=true;
+};
+atlasImg.onerror=()=>{spriteReady=false;console.warn('Sprite atlas missing; using programmatic fallback')};
+atlasImg.src='./assets/sprites/player/runner_atlas.png';
+function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
+ if(!spriteReady)return false;
+ const isRun=phase==='run'||phase==='finishDash';
+ let row=0,frame=0;
+ if(isRun){
+  if(travel<0.5){row=1;frame=Math.min(2,Math.floor(travel*5))}
+  else {const jog=selected===1;row=jog?3:2;frame=Math.floor(travel*(jog?1.2:2.8)+seed*.5)%(jog?6:8)}
+ }
+ const img=spriteVariants[cpuIndex+1]||atlasImg;
+ c.drawImage(img,frame*32,row*48,32,48,Math.round(x-2),Math.round(y),32,48);
+ return true;
+}
+function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){
+ if(!spriteReady)return false;
+ const row=kind==='victory'?4:5,idx=kind==='victory'?Math.min(2,frame):0;
+ c.drawImage(spriteVariants[cpuIndex+1]||atlasImg,idx*32,row*48,32,48,Math.round(x),Math.round(y),32,48);
+ return true;
+}
 function pixelLimb(x1,y1,x2,y2,color,weight=2){
  const dx=x2-x1,dy=y2-y1,steps=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))));
  for(let i=0;i<=steps;i++){const f=i/steps;rect(x1+dx*f,y1+dy*f,weight,weight,color)}
@@ -201,12 +248,12 @@ function frontRunner(x,y,shirt){
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
 let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1:54+(pos-cam)*scale-14;
-if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){runner(rx,82+j*53,r.color,t,j,r.dist,mode);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
+if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){if(!drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j+1))runner(rx,82+j*53,r.color,t,j,r.dist,mode);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
 if(selected<3&&mode==='run'&&pos>goal-18&&pos<goal){const lineX=54+(goal-cam)*scale;if(lineX>0&&lineX<384){rect(lineX-3,252,24,3,'#ffecba');rect(lineX+1,250,3,8,'#fff');}}
 if(selected<3){let spacing=selected===1?12.5:selected===2?10:25;for(let d=spacing;d<goal;d+=spacing){let mx=54+(d-cam)*scale;if(mx>15&&mx<370){rect(mx,77,1,211,selected===1?'#e5b97d':'#e8c99b');let meter=selected===1?Math.round(d*10):Math.round(d);if(selected!==1||meter%250===0)txt(meter+'m',mx+3,298,10,'#fff4d3')}}}
 if(selected===2)for(let i=0;i<10;i++){let h=54+(12+i*10-cam)*scale;if(h>-10&&h<390){rect(h,242,4,44,'#f7eedf');rect(h-4,239,21,5,'#ffdc64');if(h>35&&h<150&&mode==='run')txt('B!',h,229,12,'#ffdb65','center')}}
 if(selected>=3){rect(326,77,4,212,'#ffde65');if(selected===3){rect(299,265,27,8,'#72db91');rect(330,190,54,99,'#d9b474');txt('Bで踏切!',290,177,12,'#ffdb65','center')}else txt('B長押し→離す',192,177,12,'#ffdb65','center')}
-let y=selected<3?241:241;if(selected===2&&elapsed<invuln)y-=17;runner(x,y,'#ffcb54',t,4,pos,mode);if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
+let y=selected<3?241:241;if(selected===2&&elapsed<invuln)y-=17;if(!drawRunnerSprite(x,y,pos,mode,4))runner(x,y,'#ffcb54',t,4,pos,mode);if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
 if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('LAP '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',290,69,12,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',266,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),192,66,18,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,192,68,17,'#ffdb65','center');
 if(mode!=='run'&&mode!=='finishDash'&&mode!=='ceremony'){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
 function drawTapeBurst(t){
@@ -228,9 +275,8 @@ function drawCeremony(t){
   txt('FINISH!',192,91,30,'#ffdb65','center');
   // Winner pose: raise arms and bounce once.
   const jump=Math.abs(Math.sin(p*7))*12,x=180,y=175-jump;
-  frontRunner(x-1,y-1,'#ffcb54');
-  rect(x,y+10,5,15,'#f2b982');rect(x+23,y+10,5,15,'#f2b982');
-  rect(x-1,y,6,13,'#f2b982');rect(x+23,y,6,13,'#f2b982');
+  if(!drawFrontSprite(x-3,y-1,'victory',Math.floor(p*5)%3))frontRunner(x-1,y-1,'#ffcb54');
+  if(!spriteReady){rect(x,y+10,5,15,'#f2b982');rect(x+23,y+10,5,15,'#f2b982');rect(x-1,y,6,13,'#f2b982');rect(x+23,y,6,13,'#f2b982')}
   txt('ナイスラン！',192,260,15,'#fff','center');
  }else if(p<2.2){
   txt('RESULT',192,104,28,'#ffdb65','center');
@@ -243,7 +289,7 @@ function drawCeremony(t){
   for(const o of order){const racer=top[o.rank-1];if(!racer)continue;
    rect(o.x,o.y,76,o.h,o.rank===1?'#c39839':o.rank===2?'#91a1b1':'#a26b48');
    rect(o.x,o.y,76,5,'#f7e4a0');txt(String(o.rank),o.x+38,o.y+30,23,'#fff','center');
-   frontRunner(o.x+27,o.y-49,racer.color);
+   if(!drawFrontSprite(o.x+24,o.y-49,'podium',0,racer.name==='YOU'?-1:Number(racer.name.slice(-1))))frontRunner(o.x+27,o.y-49,racer.color);
    txt(racer.name,o.x+38,o.y-56,11,'#fff','center');
   }
   txt('TOTAL '+ceremonyScores.find(r=>r.name==='YOU').score+' POINTS',192,293,17,'#ffdb65','center');
