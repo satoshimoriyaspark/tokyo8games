@@ -1,4 +1,5 @@
 import {clamp} from './engine.mjs';
+import {formation,worldPoint} from './settled.mjs';
 export const project=(x,y)=>({x:80+x*.8+(y-250)*.105,y:116+y*.565});
 const TAU=Math.PI*2;
 // Every frame is a complete, unchanged 48×48 crop from the supplied PNG.
@@ -54,6 +55,14 @@ export class Renderer{
  draw(match,input={x:0,y:0}){this.field(match);const g=this.g,p=match.controlled;
   if(match.owner===p&&!match.scene&&!match.restartTimer){const target=match.passTarget(p,input);if(target){g.setLineDash([6,7]);this.line([project(p.x,p.y),project(target.x,target.y)],'#fffaaba0',2);g.setLineDash([]);}}
   if(match.orb){const v=project(match.orb.x,match.orb.y),pulse=1+Math.sin(match.t*6)*.15;g.save();g.shadowColor='#89ffec';g.shadowBlur=22;g.fillStyle='#9affed';g.beginPath();g.arc(v.x,v.y-17,10*pulse,0,TAU);g.fill();g.restore();g.strokeStyle='#fff9b9';g.lineWidth=2;g.beginPath();g.arc(v.x,v.y-17,17*pulse,0,TAU);g.stroke();this.text('連携玉',v.x,v.y-40,12,'#dcfff1');}
+  if(!match.scene&&!match.restartTimer&&match.attack.phase==='settled'){
+   const side=match.possession,spots=formation(match.attack),defenders=match.field(1-side).sort((a,b)=>a.y-b.y);
+   this.line(defenders.map(q=>project(q.x,q.y)),'#f1f5c84d',2);
+   for(const q of match.field(side)){const target=worldPoint(spots[q.slot],side),v=project(q.x,q.y),best=Math.max(...match.courseOptions(q).map(c=>c.bonuses.opening));
+    if(match.attack.play){g.setLineDash([3,5]);this.line([v,project(target.x,target.y)],'#b3fbea75',1);g.setLineDash([]);}
+    if(side===0&&best>.065){g.strokeStyle='#99f5d5';g.lineWidth=2;g.beginPath();g.ellipse(v.x,v.y+3,24,9,0,0,TAU);g.stroke();this.text('CHANCE',v.x,v.y-63,10,'#bdffe5');}
+   }
+  }
   for(const q of [...match.players].sort((a,b)=>a.y-b.y))this.player(q,match);
   // Dribble and wind-up frames already include the ball in the source image.
   if((match.ball.mode==='pass'&&match.ball.elapsed>=match.ball.windup)||match.ball.mode==='loose')this.ball(match.ball.x,match.ball.y,match.ball.z);

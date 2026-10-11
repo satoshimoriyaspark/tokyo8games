@@ -12,14 +12,14 @@ export function shotPosition(p){
   const distance=p.side===0?975-p.x:p.x-25;
   // Left/right is always viewed by the attacker looking toward the opposing goal.
   const lateral=(p.y-250)*(p.side===0?1:-1);
-  const type=Math.abs(lateral)>112&&distance<450?'side':distance<=290&&Math.abs(lateral)<=112?'post':'long';
+  const type=Math.abs(lateral)>112&&distance<450?'side':distance<=230&&Math.abs(lateral)<=112?'post':'long';
   return {type,distance,lateral,wing:lateral<0?'左':'右',label:type==='side'?(lateral<0?'左':'右')+'サイドシュート':type==='post'?'ポストシュート':'ロングシュート'};
 }
-export function shotCourses({player,passes=0,defenders=[],keeper,chain=false,counter=false,special=false,difficulty='easy'}){
+export function shotCourses({player,passes=0,defenders=[],keeper,chain=false,counter=false,special=false,difficulty='easy',openings=[]}){
   const position=shotPosition(player),hand=player.hand||'R',natural=hand==='R'?-1:1;
   const passBonus=Math.min(5,passes)*.05,chainBonus=chain?.16:0,counterBonus=counter?.14:0,specialBonus=special?.18:0;
   const openHand=position.type==='side'&&((position.lateral<0&&hand==='R')||(position.lateral>0&&hand==='L'));
-  return COURSES.map(course=>{
+  return COURSES.map((course,index)=>{
     const near=position.type==='side'&&course.col===Math.sign(position.lateral);
     const far=position.type==='side'&&course.col===-Math.sign(position.lateral);
     let zone=position.type==='long'?.34:position.type==='side'?.40:.56;
@@ -29,13 +29,14 @@ export function shotCourses({player,passes=0,defenders=[],keeper,chain=false,cou
     let handBonus=course.col===natural?.045:course.col===0?0:-.025;
     if(position.type==='side')handBonus+=(openHand?.06:-.055)+(far&&openHand?.025:0);
     const pressure=defenders.filter(q=>Math.abs(q.x-player.x)<155&&Math.abs(q.y-player.y)<65).length*.045;
+    const opening=openings[index]??0;
     const keeperCost=((keeper?.stats?.[4]||3)-3)*.012;
-    let goal=clamp(zone+(player.stats[2]-3)*.025+courseBonus+handBonus+passBonus+chainBonus+counterBonus+specialBonus-pressure-keeperCost,.12,.94);
+    let goal=clamp(zone+(player.stats[2]-3)*.025+courseBonus+handBonus+passBonus+chainBonus+counterBonus+specialBonus+opening-pressure-keeperCost,.12,.94);
     if(player.side===1)goal=clamp(goal*DIFFICULTIES[difficulty].shotScale,.1,.9);
     goal=Math.round(goal*100)/100;
     const catchChance=(1-goal)*.58;
     const route=position.type==='long'?(course.row===0?'強打':'バウンド'):position.type==='post'?(course.col===0&&course.row===1?'股下':course.row===0?'浮かせる':'足元'):far?(course.row===0?'ファー上':'ファーバウンド'):near?'ニア狙い':'中央抜き';
-    return {...course,route,near,far,goal,catch:catchChance,parry:1-goal-catchChance,position,bonuses:{passes:passBonus,hand:handBonus,chain:chainBonus,counter:counterBonus,special:specialBonus,pressure:-pressure}};
+    return {...course,route,near,far,goal,catch:catchChance,parry:1-goal-catchChance,position,bonuses:{passes:passBonus,hand:handBonus,chain:chainBonus,counter:counterBonus,special:specialBonus,opening,pressure:-pressure}};
   });
 }
 export function keeperProbabilities(shot,chosen,mode,ability=4){
