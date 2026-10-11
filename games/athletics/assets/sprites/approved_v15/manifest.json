@@ -1,0 +1,22 @@
+{
+  "version": "approved-source-v1.5-javeball",
+  "source": "wide_transparent_background_pixel_art_sprite_sheet.png",
+  "sourceSha256": "0719ea19c79e370eedde12300cc9e4869e19778f0495293fa889935ca616e56d",
+  "frameWidth": 48,
+  "frameHeight": 48,
+  "note": "Transparent frame container widened to preserve extended limbs; original approved character proportions retained. PNG sheets are required; no procedural character fallback.",
+  "sheets": [
+    {"row":0,"file":"idle_right.png","frames":1,"chestX":[28]},
+    {"row":1,"file":"start_right.png","frames":3,"chestX":[35,35,29]},
+    {"row":2,"file":"sprint_right.png","frames":8,"chestX":[29,28,29,29,28,27,27,27]},
+    {"row":3,"file":"jog_right.png","frames":6,"chestX":[26,25,27,26,30,26]},
+    {"row":4,"file":"victory_front.png","frames":3,"chestX":[29,28,29]},
+    {"row":5,"file":"podium_front.png","frames":1,"chestX":[29]},
+    {"row":6,"file":"hurdle_right.png","frames":7,"chestX":[24,26,28,24,25,20,25]},
+    {"row":7,"file":"javeball_prepare_right.png","frames":2,"chestX":[23,29]},
+    {"row":8,"file":"javeball_release_right.png","frames":3,"chestX":[25,21,24]},
+    {"row":9,"file":"long_jump_provisional.png","frames":3,"chestX":[35,27,28],"status":"Existing approved poses provisionally reused; dedicated long-jump motion not completed."},
+    {"row":10,"file":"javeball_follow_right.png","frames":2,"chestX":[22,25]},
+    {"row":11,"file":"props.png","frames":2,"objects":[{"name":"javeball","x":0,"y":0,"width":16,"height":11},{"name":"hurdle","x":48,"y":0,"width":22,"height":22}]}
+  ]
+}

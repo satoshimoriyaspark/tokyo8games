@@ -2,40 +2,41 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>8BIT ATHLETICS | 陸上5種競技</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101927;color:#f9f4db;font:700 14px monospace;overscroll-behavior:none}.wrap{max-width:900px;margin:auto;padding:12px}header{text-align:center}h1{font-size:clamp(22px,6vw,40px);color:#ffdb65;text-shadow:3px 3px #9e4e45;margin:8px 0}p{line-height:1.6}canvas{display:block;width:100%;height:auto;aspect-ratio:6/5;image-rendering:pixelated;background:#203344;border:5px solid #e5ddc8}#msg{color:#ffdb65;text-align:center;min-height:42px;padding:12px}.buttons,.events,.pads{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:10px 0}button{font:700 14px monospace;background:#2e527b;color:#fff;border:3px solid #e9e5db;border-radius:3px;padding:10px 13px;touch-action:none;user-select:none;cursor:pointer;box-shadow:0 4px #070d16}button:active,.active{transform:translateY(3px);box-shadow:0 1px #070d16!important}.main{background:#278362}.pads{gap:40px}.pads button{width:min(39vw,190px);height:90px;font-size:34px;background:#3977bf}.pads button:last-child{background:#bb4b47}.events button{font-size:11px;padding:8px}.selected{border-color:#ffdb65;color:#ffdb65}#help{text-align:center;min-height:28px;color:#cbd8e1}#results{max-width:630px;margin:10px auto}table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #405164;text-align:left}td:last-child,th:last-child{text-align:right}.small{font-size:11px;text-align:center;color:#b8c6d0}
-#resultPanel{background:#17283d;border:4px solid #ffdb65;padding:14px;margin:10px auto;max-width:650px;text-align:center;box-shadow:5px 5px #080f1c}#resultPanel[hidden]{display:none}#resultPanel h2{color:#ffdb65;margin:3px 0 8px;font-size:21px}.record{font-size:clamp(26px,8vw,42px);color:#fff;margin:8px}.resultMeta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.resultMeta span{background:#36577d;border:2px solid #e4d8bb;padding:8px 12px}.resultRank{font-size:25px;color:#ffdb65;margin:8px}.rankTable{width:100%;margin:12px 0;border-collapse:collapse}.rankTable tr.you{background:#315c56;color:#ffefad}.rankTable td,.rankTable th{padding:9px;border-bottom:1px solid #607487;text-align:left}.rankTable td:last-child{text-align:right}#resultPanel .hint{color:#b9cbdc;font-size:12px}#tutorial{border:3px solid #ffdb65;background:#192c40;padding:12px;margin:10px 0;text-align:center}#tutorial h2{margin:3px 0;color:#ffdb65;font-size:18px}#tutorial p{margin:7px 0}#tutorial[hidden]{display:none}.pads button span{display:block;font-size:12px;margin-top:3px}.guide{background:#30445c;padding:8px;border:2px solid #879bb0;color:#fff}#help{font-size:15px;font-weight:bold;color:#ffdb65}@media(max-width:500px){.wrap{padding:7px}.pads{gap:16px}.pads button{height:78px}header p{margin:4px}} </style></head><body><div class="wrap"><header><h1>8BIT ATHLETICS</h1><p>陸上5種競技 / WEB BETA / 開発版</p></header><canvas id="screen" width="384" height="320"></canvas><section id="tutorial" hidden><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><p id="tutorialHint"></p><button class="main" id="tutorialGo">説明OK！スタート</button></section><section id="resultPanel" hidden aria-live="polite"><h2 id="resultHeading">RESULT</h2><div id="resultRecord" class="record"></div><div id="resultRank" class="resultRank"></div><div id="resultMeta" class="resultMeta"></div><table class="rankTable" id="resultRanking"></table><p class="hint" id="resultHint"></p></section><p id="spriteStatus" class="small" aria-live="polite">キャラクター：画像ロード中</p><div id="msg" aria-live="polite">競技を選んでSTART！</div><div class="buttons"><button class="main" id="start">START</button><button id="cup">5種競技大会</button><button id="reset">タイトルへ</button></div><div id="help"></div><div class="pads"><button id="a">A<span id="aLabel">連打</span></button><button id="b">B<span id="bLabel">ジャンプ</span></button></div><div class="events" id="events"></div><div id="results"></div><p class="small">A/Bキー または画面ボタン。幅跳び・ジャベボールは3回挑戦。自己ベストは端末内に保存。</p></div>
+#resultPanel{background:#17283d;border:4px solid #ffdb65;padding:14px;margin:10px auto;max-width:650px;text-align:center;box-shadow:5px 5px #080f1c}#resultPanel[hidden]{display:none}#resultPanel h2{color:#ffdb65;margin:3px 0 8px;font-size:21px}.record{font-size:clamp(26px,8vw,42px);color:#fff;margin:8px}.resultMeta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.resultMeta span{background:#36577d;border:2px solid #e4d8bb;padding:8px 12px}.resultRank{font-size:25px;color:#ffdb65;margin:8px}.rankTable{width:100%;margin:12px 0;border-collapse:collapse}.rankTable tr.you{background:#315c56;color:#ffefad}.rankTable td,.rankTable th{padding:9px;border-bottom:1px solid #607487;text-align:left}.rankTable td:last-child{text-align:right}#resultPanel .hint{color:#b9cbdc;font-size:12px}#tutorial{border:3px solid #ffdb65;background:#192c40;padding:12px;margin:10px 0;text-align:center}#tutorial h2{margin:3px 0;color:#ffdb65;font-size:18px}#tutorial p{margin:7px 0}#tutorial[hidden]{display:none}.pads button span{display:block;font-size:12px;margin-top:3px}.guide{background:#30445c;padding:8px;border:2px solid #879bb0;color:#fff}#help{font-size:15px;font-weight:bold;color:#ffdb65}@media(max-width:500px){.wrap{padding:7px}.pads{gap:16px}.pads button{height:78px}header p{margin:4px}} </style></head><body><div class="wrap"><header><h1>8BIT ATHLETICS</h1><p>陸上5種競技 / WEB BETA / ART 1.5</p></header><canvas id="screen" width="384" height="320"></canvas><section id="tutorial" hidden><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><p id="tutorialHint"></p><button class="main" id="tutorialGo">説明OK！スタート</button></section><section id="resultPanel" hidden aria-live="polite"><h2 id="resultHeading">RESULT</h2><div id="resultRecord" class="record"></div><div id="resultRank" class="resultRank"></div><div id="resultMeta" class="resultMeta"></div><table class="rankTable" id="resultRanking"></table><p class="hint" id="resultHint"></p></section><p id="spriteStatus" class="small" aria-live="polite">キャラクター：画像ロード中</p><div id="msg" aria-live="polite">競技を選んでSTART！</div><div class="buttons"><button class="main" id="start">START</button><button id="cup">5種競技大会</button><button id="reset">タイトルへ</button></div><div id="help"></div><div class="pads"><button id="a">A<span id="aLabel">連打</span></button><button id="b">B<span id="bLabel">ジャンプ</span></button></div><div class="events" id="events"></div><div id="results"></div><p class="small">A/Bキー または画面ボタン。幅跳び・ジャベボールは3回挑戦。自己ベストは端末内に保存。</p></div>
 <script>
 (()=>{'use strict';
 const events=[['100m走','A・Bを交互に連打','time'],['1500m走','A連打。スタミナに注意！','time'],['110mハードル','A連打で走り、Bでジャンプ','time'],['走り幅跳び','A連打→踏切線でB。3回挑戦','length'],['ジャベボール投げ','A連打→B長押しで角度→離して投げる','length']];
 const cv=document.querySelector('#screen'),c=cv.getContext('2d'),$=x=>document.querySelector(x),lim=(v,a,b)=>Math.max(a,Math.min(b,v));c.imageSmoothingEnabled=false;
+let jumpStarted=-10,throwHeldStart=0,throwAge=0,throwOrigin=0;
 let selected=0,mode='menu',cup=false,results=[],attempt=1,records=[],pos=0,spd=0,sta=100,last='',angle=42,bHeld=false,elapsed=0,prev=0,carry=0,deadline=0,invuln=0,hit=new Set(),feedback='',feedbackTime=0,downs=new Set();
 let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1,finishDashTime=0,finishDashRecord=0,finishDashSpeed=0,ceremonyTime=0,ceremonyRank=1,ceremonyTotal=false,ceremonyScores=[],goalBurst=0;
 let best={};try{best=JSON.parse(localStorage.getItem('athletics_bests_v1')||'{}')}catch{}
 const message=s=>$('#msg').textContent=s;
 const guides=[
 ['AとBを交互に！','A→B→A→Bと交互に連打して、約20秒のレースを走りきろう！','同じボタンを続けて押しても加速しません。','交互連打','交互連打'],
-['4周のペース配分！','Aを連打して加速。4周（1500m）を走る長距離レースです。休むとスタミナが回復します。','スタミナが少なくなると加速しにくくなります。','走る','使わない'],
+['ペース配分を考えよう！','Aを連打して加速。ゲーム内1500mを走ります。休むとスタミナが回復します。','スタミナが少なくなると加速しにくくなります。','走る','使わない'],
 ['ハードル直前でジャンプ！','A連打で走り、ハードルの手前でBを押してジャンプ。','黄色の合図が出たらB！早すぎても遅すぎても減速します。','走る','ジャンプ'],
 ['黄色い踏切線でジャンプ！','A連打で助走。踏切線の直前でBを押します。','黄色い線を越えるとファウル。3回挑戦できます。','助走','踏切'],
 ['角度を決めて投げよう！','A連打で助走。Bを押し続けて角度を調整し、離して投げます。','角度42°付近が狙い目。3回挑戦できます。','助走','長押し→離す']
 ];
 function guide(){const g=guides[selected];$('#help').textContent='操作：A＝'+g[3]+' ／ B＝'+g[4];$('#aLabel').textContent=g[3];$('#bLabel').textContent=g[4];$('#tutorialTitle').textContent=events[selected][0]+' の遊び方';$('#tutorialText').textContent=g[1];$('#tutorialHint').textContent=g[2]}
 function showGuide(){$('#resultPanel').hidden=true;ceremonyTime=0;mode='tutorial';guide();$('#tutorial').hidden=false;message('操作説明を確認してください');$('#start').textContent='START'}
-function begin(){ $('#resultPanel').hidden=true;$('#tutorial').hidden=true;cpuRecords=[];resetRun();attempt=1;records=[];mode='ready';deadline=performance.now()+3000;message('3・2・1・GO！')}
+function begin(){ if(!spriteReady)return;$('#resultPanel').hidden=true;$('#tutorial').hidden=true;cpuRecords=[];resetRun();attempt=1;records=[];mode='ready';deadline=performance.now()+3000;message('3・2・1・GO！')}
 $('#tutorialGo').onclick=begin;
 const label=(i,v)=>events[i][2]==='time'?v.toFixed(2)+'秒':v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
-function resetRun(){ceremonyTime=0;goalBurst=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
-function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';render();message(events[i][0]+' を選択しました')}
+function resetRun(){jumpStarted=-10;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;goalBurst=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
+function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';resetRun();$('#resultPanel').hidden=true;$('#tutorial').hidden=true;render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+e[0];b.className=i===selected?'selected':'';b.onclick=()=>select(i);$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
 function start(){showGuide()}
-function input(k){if(mode!=='run')return;if(selected===4&&k==='B'){bHeld=true;return}
+function input(k){if(mode!=='run')return;if(selected===4&&k==='B'){if(!bHeld)throwHeldStart=elapsed;bHeld=true;return}
 if(selected===0){if(k!==last){spd=lim(spd+1.6,0,13.5);last=k;flash('SPEED UP!')}else spd=Math.max(0,spd-.5);return}
 if(k==='A'){if(selected===1){spd=lim(spd+(sta>8?1.15:.12),0,11.5);sta=lim(sta-2.9,0,100)}else spd=lim(spd+1.3,0,12.5);return}
-if(selected===2&&k==='B'){let next=12+Math.ceil(Math.max(0,pos-12)/10)*10,delta=next-pos;if(delta>=0&&delta<4.6){invuln=elapsed+.44;flash(delta<2?'PERFECT!':'GOOD!')}else flash('TOO EARLY!')}
+if(selected===2&&k==='B'){let next=12+Math.ceil(Math.max(0,pos-12)/10)*10,delta=next-pos;if(delta>=0&&delta<4.6){jumpStarted=elapsed;invuln=elapsed+.44;flash(delta<2?'PERFECT!':'GOOD!')}else flash('TOO EARLY!')}
 if(selected===3&&k==='B')finishAttempt()}
 function release(k){if(k==='B'&&bHeld){bHeld=false;if(mode==='run'&&selected===4)finishAttempt()}}
 function flash(s){feedback=s;feedbackTime=elapsed+.75}
-function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(attempt+'回目：'+(v?label(selected,v):'ファウル'))}
+function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);if(selected===4){throwAge=0;throwOrigin=pos;bHeld=false;}rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(attempt+'回目：'+(v?label(selected,v):'ファウル'))}
 function cpuRaceTime(j,i){
  const r=rivals[j],goal=i===1?150:i===2?110:100;
  let dist=0,sec=0,dt=1/60;
@@ -68,6 +69,7 @@ $('#resultRanking').replaceChildren();
 [{name:'YOU',score:t,you:true},...cpuTotal.map((score,j)=>({name:'CPU '+(j+1),score,you:false}))].sort((a,b)=>b.score-a.score).forEach((r,i)=>{const tr=document.createElement('tr');if(r.you)tr.className='you';[(i+1)+'位',r.name,r.score+'点'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});$('#resultRanking').appendChild(tr)});
 $('#resultHint').textContent='大会終了！ もう一度挑戦できます。';$('#start').textContent='もう一度大会'}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人');$('#start').textContent='次の種目へ'}}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人'+(improved?' ★NEW BEST!':''));$('#start').textContent='もう一度'}render();ceremonyTime=0;mode='ceremony';$('#start').disabled=true;$('#cup').disabled=true;}
 function step(dt,t){
+if(mode==='between'&&selected===4)throwAge+=dt;
 if(mode==='ceremony'){ceremonyTime+=dt;if(ceremonyTime>=3.7){mode=ceremonyTotal?'finished':'result';$('#resultPanel').hidden=false;$('#start').disabled=false;$('#cup').disabled=false;}return;}
 if(mode==='finishDash'){
  finishDashTime+=dt;
@@ -93,202 +95,116 @@ if(pos>=goal){
 if(elapsed>150){if(selected>=3)finishAttempt();else finish(elapsed)}
 }
 const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},txt=(s,x,y,size=11,col='#fff',align='left')=>{c.font='bold '+size+'px monospace';c.fillStyle=col;c.textAlign=align;c.fillText(s,x,y);c.textAlign='left'};
-// Racing sprites face right. Ceremony sprites deliberately face the audience.
-// Six distinct right-facing running poses. Hands, elbows, knees and feet have separate joints.
-// Coordinates describe a slim sprite, not a front-facing stick figure.
-// Pixel-exact 32x48 PNG atlas, six rows: idle/start/sprint/jog/victory/podium.
-const atlasImg=new Image(),spriteVariants=[null,null,null,null];
-let spriteStatus='画像ロード中';
-function setSpriteStatus(value){spriteStatus=value;const el=document.getElementById('spriteStatus');if(el)el.textContent='キャラクター：'+value;}
+// ART 1.5: these frames are cut from the user-approved design sheet.
+// No procedural character fallback exists in this build.
+const spriteVariants=[[],[],[],[]];
 let spriteReady=false;
-atlasImg.onload=()=>{
- try {
-  if(atlasImg.naturalWidth!==256||atlasImg.naturalHeight!==528)
-   throw new Error('アトラスの寸法不一致 '+atlasImg.naturalWidth+'x'+atlasImg.naturalHeight);
-  // Activate the player's image immediately. CPU color conversion may fail independently.
-  spriteVariants[0]=atlasImg;
-  spriteReady=true;
-  setSpriteStatus('PNGスプライト使用中');
-  const palettes=[
-   [[63,165,234],[116,204,245],[33,107,185]],
-   [[223,74,77],[251,132,118],[155,51,61]],
-   [[48,174,111],[126,220,155],[22,111,70]]
-  ];
+const SPRITE_COUNTS=[1,3,8,6,3,1,7,2,3,3,2,2];
+const CHEST_ANCHORS=[[28], [35, 35, 29], [29, 28, 29, 29, 28, 27, 27, 27], [26, 25, 27, 26, 30, 26], [29, 28, 29], [29], [24, 26, 28, 24, 25, 20, 25], [23, 29], [25, 21, 24], [35, 27, 28], [22, 25], [0, 0]];
+const ART_VERSION='approved-source-v1.5-javeball';
+const SHEET_URLS=["./assets/sprites/approved_v15/idle_right.png", "./assets/sprites/approved_v15/start_right.png", "./assets/sprites/approved_v15/sprint_right.png", "./assets/sprites/approved_v15/jog_right.png", "./assets/sprites/approved_v15/victory_front.png", "./assets/sprites/approved_v15/podium_front.png", "./assets/sprites/approved_v15/hurdle_right.png", "./assets/sprites/approved_v15/javeball_prepare_right.png", "./assets/sprites/approved_v15/javeball_release_right.png", "./assets/sprites/approved_v15/long_jump_provisional.png", "./assets/sprites/approved_v15/javeball_follow_right.png", "./assets/sprites/approved_v15/props.png"];
+const spriteDebug={version:ART_VERSION,ready:false,draws:0,last:[],source:'approved_v15',sheets:SHEET_URLS.length};
+window.athleticsSpriteInfo=spriteDebug;
+function setSpriteStatus(value){$('#spriteStatus').textContent='キャラクター：'+value;}
+function spriteFailure(reason){spriteReady=false;spriteDebug.ready=false;spriteDebug.error=String(reason);setSpriteStatus('承認画像の読込に失敗しました。再読込してください。');$('#start').disabled=true;$('#cup').disabled=true;$('#tutorialGo').disabled=true;}
+$('#start').disabled=true;$('#cup').disabled=true;$('#tutorialGo').disabled=true;
+Promise.all(SHEET_URLS.map((url,row)=>new Promise((resolve,reject)=>{
+ const img=new Image();
+ img.onload=()=>{try{
+  if(img.naturalWidth!==SPRITE_COUNTS[row]*48||img.naturalHeight!==48)throw Error('Invalid sprite sheet dimensions: '+row);
+  const palette=[[[63,165,234],[116,204,245],[33,107,185]],[[223,74,77],[251,132,118],[155,51,61]],[[48,174,111],[126,220,155],[22,111,70]]];
+  spriteVariants[0][row]=img;
   for(let j=0;j<3;j++){
-   try {
-    const off=document.createElement('canvas');
-    off.width=atlasImg.naturalWidth;off.height=atlasImg.naturalHeight;
-    const ctx=off.getContext('2d',{willReadFrequently:true});
-    if(!ctx)throw new Error('canvas不可');
-    ctx.drawImage(atlasImg,0,0);
-    const data=ctx.getImageData(0,0,off.width,off.height),pix=data.data;
-    for(let k=0;k<pix.length;k+=4){
-     if(!pix[k+3])continue;
-     let shade=-1;
-     if(pix[k]===249&&pix[k+1]===191&&pix[k+2]===28)shade=0;
-     else if(pix[k]===255&&pix[k+1]===221&&pix[k+2]===75)shade=1;
-     else if(pix[k]===219&&pix[k+1]===160&&pix[k+2]===28)shade=2;
-     if(shade>=0){const col=palettes[j][shade];pix[k]=col[0];pix[k+1]=col[1];pix[k+2]=col[2]}
-    }
-    ctx.putImageData(data,0,0);
-    spriteVariants[j+1]=off;
-   }catch(e){console.error('CPU palette error',j,e);spriteVariants[j+1]=atlasImg}
+   const off=document.createElement('canvas');off.width=img.naturalWidth;off.height=48;
+   const ctx=off.getContext('2d',{willReadFrequently:true});if(!ctx)throw Error('Canvas unavailable');
+   ctx.drawImage(img,0,0);const data=ctx.getImageData(0,0,off.width,48),p=data.data;
+   for(let k=0;k<p.length;k+=4){if(!p[k+3])continue;let shade=-1;
+    if(p[k]===249&&p[k+1]===191&&p[k+2]===28)shade=0;
+    else if(p[k]===255&&p[k+1]===221&&p[k+2]===75)shade=1;
+    else if(p[k]===219&&p[k+1]===160&&p[k+2]===28)shade=2;
+    if(shade>=0){const col=palette[j][shade];p[k]=col[0];p[k+1]=col[1];p[k+2]=col[2]}
+   }
+   ctx.putImageData(data,0,0);spriteVariants[j+1][row]=off;
   }
- }catch(e){spriteReady=false;setSpriteStatus('画像検証失敗：'+e.message);console.error(e)}
-};
-atlasImg.onerror=()=>{
- spriteReady=false;
- setSpriteStatus('PNG読み込み失敗（URLを確認してください）');
- console.error('Sprite PNG unavailable',atlasImg.src);
-};
-// Absolute route avoids relative URL confusion on Vercel rewrites and slash variants.
-atlasImg.src='/games/athletics/assets/sprites/player/athletics_atlas_v2.png?v=3';
+  resolve();
+ }catch(e){reject(e)}};
+ img.onerror=()=>reject(Error('PNG load failed: '+row));img.src=url;
+}))).then(()=>{
+ spriteReady=true;spriteDebug.ready=true;setSpriteStatus('承認画像のPNG / ART 1.5');
+ $('#start').disabled=false;$('#cup').disabled=false;$('#tutorialGo').disabled=false;
+}).catch(spriteFailure);
+function blitSprite(x,y,row,frame,cpuIndex=-1,anchorChest=false){
+ if(!spriteReady)return;
+ const count=SPRITE_COUNTS[row];frame=Math.max(0,Math.min(count-1,frame|0));
+ const dx=anchorChest?x+14-CHEST_ANCHORS[row][frame]:x;
+ c.drawImage(spriteVariants[cpuIndex+1][row],frame*48,0,48,48,Math.round(dx),Math.round(y),48,48);
+ spriteDebug.draws++;
+ spriteDebug.last[cpuIndex+1]={row,frame,dx:Math.round(dx),dy:Math.round(y),chestX:Math.round(dx)+CHEST_ANCHORS[row][frame]};
+}
 function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
- if(!spriteReady)return false;
- const isRun=phase==='run'||phase==='finishDash';
- let row=0,frame=0;
- if(selected===2&&isRun&&elapsed<invuln){
-  // hurdle-right: row 6 is 7 frames from launch through landing.
-  row=6;frame=Math.min(6,Math.floor(Math.max(0,invuln-elapsed)/.44*7));
+ const isRun=phase==='run'||phase==='finishDash';let row=0,frame=0,lift=0;
+ let age=-1;
+ if(selected===2&&isRun){
+  if(cpuIndex<0)age=elapsed-jumpStarted;
+  else{
+   const pace=6.8*rivals[cpuIndex].skill;
+   const nearest=12+Math.round((travel-12)/10)*10;
+   if(nearest>=12&&nearest<=102)age=.34+(travel-nearest)/pace;
+  }
+ }
+ if(selected===2&&isRun&&age>=0&&age<.68){
+  row=6;frame=Math.min(6,Math.floor(age/.68*7));lift=[0,4,14,19,17,7,0][frame];
  }else if(selected===4&&bHeld&&isRun){
-  // javelin wind-up: row 7, two right-facing frames.
-  row=7;frame=Math.floor(elapsed*4)%2;
+  const held=elapsed-throwHeldStart;
+  if(held<.16){row=7;frame=1;}
+  else{row=8;frame=held<.38?0:1;}
  }else if(selected===4&&phase==='between'){
-  // release + follow-through, split across rows 8 and 10.
-  const age=Math.max(0,1.2-(deadline-performance.now())/1000);
-  if(age<.45){row=8;frame=Math.min(2,Math.floor(age/.15))}
-  else{row=10;frame=Math.min(1,Math.floor((age-.45)/.25))}
- }else if(isRun){
-  if(travel<.5){row=1;frame=Math.min(2,Math.floor(travel*5))}
-  else {const jog=selected===1;row=jog?3:2;frame=Math.floor(travel*(jog?1.2:2.8)+seed*.5)%(jog?6:8)}
+  if(throwAge<.22){row=8;frame=2;}
+  else{row=10;frame=throwAge<.76?0:1;}
+ }else if(selected===4&&isRun){
+  row=7;frame=spd>.1?1:0;
+ }else if(selected===4){row=7;frame=0;
+ }else if(selected===3&&phase==='between'){
+  row=9;frame=Math.min(2,Math.floor(Math.max(0,1.2-(deadline-performance.now())/1000)/.4));
+ }else if(isRun&&travel>.01){
+  if(travel<.5){row=1;frame=Math.min(2,Math.floor(travel*5));}
+  else{const jog=selected===1;row=jog?3:2;frame=Math.floor(travel*(jog?1.2:2.8)+seed*.5)%(jog?6:8);}
  }
- const img=spriteVariants[cpuIndex+1]||atlasImg;
- c.drawImage(img,frame*32,row*48,32,48,Math.round(x-2),Math.round(y),32,48);
- return true;
+ blitSprite(x,y-lift,row,frame,cpuIndex,true);
 }
-function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){
- if(!spriteReady)return false;
- const row=kind==='victory'?4:5,idx=kind==='victory'?Math.min(2,frame):0;
- c.drawImage(spriteVariants[cpuIndex+1]||atlasImg,idx*32,row*48,32,48,Math.round(x),Math.round(y),32,48);
- return true;
+function drawProp(which,x,y){
+ if(!spriteReady)return;
+ const w=which===0?16:22,h=which===0?11:22;
+ c.drawImage(spriteVariants[0][11],which*48,0,w,h,Math.round(x),Math.round(y),w,h);
 }
-function pixelLimb(x1,y1,x2,y2,color,weight=2){
- const dx=x2-x1,dy=y2-y1,steps=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))));
- for(let i=0;i<=steps;i++){const f=i/steps;rect(x1+dx*f,y1+dy*f,weight,weight,color)}
+function drawJaveBallFlight(){
+ if(selected!==4||mode!=='between'||!spriteReady||throwAge>1.2)return;
+ const u=Math.min(1,throwAge/1.2), launchX=32+throwOrigin*7.1+12;
+ const flightX=launchX+u*135,flightY=252-Math.sin(u*Math.PI)*68+u*20;
+ drawProp(0,flightX,flightY);
 }
-// Explicit two-segment joints. 8 frames exaggerate elbow and knee flexion for readability.
-// Each pose: near knee, near ankle, far knee, far ankle, near elbow, near hand, far elbow, far hand.
-const sprintPoses=[
- [19,35,28,43,  2,39,-3,47,  19,15,12,11,  1,22, 6,28],
- [22,32,30,39,  4,36,-5,43,  20,17,12,11,  2,24, 9,30],
- [20,34,22,45,  8,37,-2,42,  18,20, 9,15,  5,18, 0,12],
- [14,37, 9,47, 17,33,27,40,  11,23, 2,17, 16,18,23,13],
- [ 5,34,-4,41, 21,33,28,44,   4,21, 0,14, 19,18,12,12],
- [ 2,33,-6,39, 20,36,22,46,   5,17,12,12, 18,21,10,16],
- [ 6,36, 0,46, 16,37,10,47,   9,17,16,12, 16,23,22,18],
- [14,38,22,46,  8,35,-1,42,  17,17,10,12,  6,23, 0,17]
-];
-// Anatomical two-link arms and legs: interpolate discrete pixel-art joint poses.
-// Frame cadence follows distance actually travelled, so faster runners swing faster.
-// "Cute track star" design: oversized expressive head, curved pixel outline,
-// colorful sweatband, compact jersey, cheek blush, and clearly articulated limbs.
-function runner(x,y,shirt,t,seed,travel,phase){
- const moving=(phase==='run'||phase==='finishDash')&&travel>0.1;
- const sprint=selected===0, distanceRace=selected===1;
- const cyclesPerUnit=sprint?.32:distanceRace?.18:.26;
- const progression=moving?travel*cyclesPerUnit*8+seed*.9:0;
- const idx=Math.floor(progression)%8, blend=progression-Math.floor(progression);
- const pa=sprintPoses[idx],pb=sprintPoses[(idx+1)%8];
- const idle=[9,37,9,45,6,37,6,45,17,25,18,29,4,25,3,29];
- const p=moving?pa.map((v,i)=>v+(pb[i]-v)*blend):idle;
- if(moving&&distanceRace){
-  const neutral=[10,37,10,44,7,37,7,44,13,21,13,23,7,21,7,23];
-  for(let i=0;i<p.length;i++)p[i]=neutral[i]+(p[i]-neutral[i])*.72;
- }
- if(moving&&sprint){for(const i of [0,4,8,12])p[i]=(i===0||i===4?10:11)+(p[i]-(i===0||i===4?10:11))*1.09}
- y+=moving?-Math.round((1-Math.cos(progression*Math.PI/2))*.7):0;
- // The far limbs are shaded and sit behind the jersey.
- pixelLimb(x+9,y+30,x+p[4],y+p[5],'#ae785e',3);
- pixelLimb(x+p[4],y+p[5],x+p[6],y+p[7],'#cc9574',2);
- rect(x+p[6]-1,y+p[7],7,3,'#e4e1d9');
- pixelLimb(x+7,y+19,x+p[12],y+p[13],'#af785e',3);
- pixelLimb(x+p[12],y+p[13],x+p[14],y+p[15],'#c99272',2);
- // The silhouette is genuinely rebalanced, not just face dots added:
- // a larger rounded 17x16 pixel head over a compact 12x13 jersey.
- rect(x+7,y+17,12,12,shirt);
- rect(x+6,y+20,2,6,shirt);
- rect(x+9,y+20,4,7,'#fff6df');             // cheerful bib on jersey
- rect(x+10,y+21,2,3,shirt);
- rect(x+8,y+29,10,4,'#304158');             // shorts
- rect(x+10,y+15,4,4,'#e1a27e');             // neck
- // Head silhouette: stepped cheeks and a broad forehead, oriented RIGHT.
- rect(x+4,y+4,14,10,'#f4bf92');
- rect(x+6,y+2,12,15,'#f4bf92');
- rect(x+16,y+7,4,7,'#f4bf92');             // forward cheek
- rect(x+19,y+9,3,3,'#f4bf92');             // tiny nose pointing right
- rect(x+15,y+15,4,2,'#e3a47e');            // chin
- // Soft cropped hair with a little quiff and playful headband.
- rect(x+5,y+1,13,4,'#302a39');
- rect(x+4,y+4,3,7,'#302a39');
- rect(x+6,y,5,2,'#302a39');
- rect(x+9,y-1,4,2,'#302a39');              // little hair tuft
- rect(x+10,y+3,9,2,shirt);                 // team-color headband
- rect(x+16,y+3,3,3,'#302a39');             // swept fringe
- // Readable one-eye side view and face expression.
- rect(x+16,y+8,3,4,'#fff8eb');             // eye white
- rect(x+18,y+9,1,2,'#1d2938');             // pupil looks right
- rect(x+13,y+11,3,2,'#e78985');            // rosy cheek
- rect(x+18,y+14,2,1,'#9f6060');            // smile
- // Near arm and leg stay in front of the character with clear joints.
- pixelLimb(x+17,y+19,x+p[8],y+p[9],'#efb188',3);
- rect(x+p[8]-1,y+p[9]-1,4,4,'#f7c7a1');
- pixelLimb(x+p[8],y+p[9],x+p[10],y+p[11],'#efb188',2);
- rect(x+p[10]-1,y+p[11]-1,3,3,'#f7c7a1');
- pixelLimb(x+12,y+32,x+p[0],y+p[1],'#efb188',3);
- rect(x+p[0]-1,y+p[1]-1,4,4,'#f8cba3');
- pixelLimb(x+p[0],y+p[1],x+p[2],y+p[3],'#efb188',2);
- rect(x+p[2]-1,y+p[3],8,4,'#ffffff');
-}
-function frontRunner(x,y,shirt){
- // Matching cheerful front-facing version for the podium.
- rect(x+3,y+5,20,13,'#f4bf92');
- rect(x+5,y+2,16,19,'#f4bf92');
- rect(x+5,y+1,16,5,'#302a39');
- rect(x+4,y+4,3,7,'#302a39');
- rect(x+10,y-1,5,3,'#302a39');
- rect(x+7,y+4,14,2,shirt);
- rect(x+8,y+11,3,3,'#fff8eb');
- rect(x+16,y+11,3,3,'#fff8eb');
- rect(x+10,y+12,2,2,'#1d2938');
- rect(x+17,y+12,2,2,'#1d2938');
- rect(x+6,y+15,3,2,'#e78985');
- rect(x+19,y+15,3,2,'#e78985');
- rect(x+13,y+17,4,1,'#a96c5b');
- rect(x+7,y+21,15,13,shirt);
- rect(x+12,y+25,6,6,'#fff6df');
- rect(x+8,y+34,13,4,'#304158');
- rect(x+2,y+22,5,15,'#efb188');
- rect(x+23,y+22,5,15,'#efb188');
- rect(x+9,y+38,5,10,'#efb188');
- rect(x+17,y+38,5,10,'#efb188');
- rect(x+7,y+47,9,4,'#fff');
- rect(x+16,y+47,9,4,'#fff');
-}
+function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){blitSprite(x,y,kind==='victory'?4:5,kind==='victory'?frame:0,cpuIndex,false);}
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
-let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1:54+(pos-cam)*scale-14;
-if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){if(!drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j))runner(rx,82+j*53,r.color,t,j,r.dist,mode);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
+let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1-14:54+(pos-cam)*scale-14;
+if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
 if(selected<3&&mode==='run'&&pos>goal-18&&pos<goal){const lineX=54+(goal-cam)*scale;if(lineX>0&&lineX<384){rect(lineX-3,252,24,3,'#ffecba');rect(lineX+1,250,3,8,'#fff');}}
 if(selected<3){let spacing=selected===1?12.5:selected===2?10:25;for(let d=spacing;d<goal;d+=spacing){let mx=54+(d-cam)*scale;if(mx>15&&mx<370){rect(mx,77,1,211,selected===1?'#e5b97d':'#e8c99b');let meter=selected===1?Math.round(d*10):Math.round(d);if(selected!==1||meter%250===0)txt(meter+'m',mx+3,298,10,'#fff4d3')}}}
-if(selected===2)for(let i=0;i<10;i++){let h=54+(12+i*10-cam)*scale;if(h>-10&&h<390){rect(h,242,4,44,'#f7eedf');rect(h-4,239,21,5,'#ffdc64');if(h>35&&h<150&&mode==='run')txt('B!',h,229,12,'#ffdb65','center')}}
+if(selected===2)for(let i=0;i<10;i++){
+ const h=54+(12+i*10-cam)*scale;
+ if(h>-24&&h<400){
+  for(let lane=0;lane<4;lane++)drawProp(1,h-7,105+lane*53);
+  const delta=12+i*10-pos;
+  if(mode==='run'&&delta>=0&&delta<4.6)txt('B!',h,230,12,'#ffdb65','center');
+ }
+}
 if(selected>=3){rect(326,77,4,212,'#ffde65');if(selected===3){rect(299,265,27,8,'#72db91');rect(330,190,54,99,'#d9b474');txt('Bで踏切!',290,177,12,'#ffdb65','center')}else txt('B長押し→離す',192,177,12,'#ffdb65','center')}
-let y=selected<3?241:241;if(selected===2&&elapsed<invuln)y-=17;if(!drawRunnerSprite(x,y,pos,mode,4))runner(x,y,'#ffcb54',t,4,pos,mode);if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
-if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('LAP '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',290,69,12,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',266,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),192,66,18,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,192,68,17,'#ffdb65','center');
-if(mode!=='run'&&mode!=='finishDash'&&mode!=='ceremony'){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
+let y=241;drawRunnerSprite(x,y,pos,mode,4);drawJaveBallFlight();if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
+if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('SECTION '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',8,69,10,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',8,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),186,66,14,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,8,68,10,'#ffdb65','left');
+if(mode!=='run'&&mode!=='finishDash'&&mode!=='ceremony'&&!(selected===4&&mode==='between')){rect(78,134,232,61,'#0d1420');rect(82,138,224,53,'#3c5776');txt(mode==='menu'?'SELECT & START':mode==='tutorial'?'HOW TO PLAY':mode==='ready'?'READY ...':mode==='between'?'NEXT ATTEMPT':mode==='finished'?'TOURNAMENT END':'FINISH!',192,164,16,'#ffdb65','center');txt(mode==='finished'?results.reduce((s,r)=>s+r.p,0)+'/5000':mode==='ready'?'選手は GO で走り出す':mode==='menu'?'A / B BUTTONS':'8BIT ATHLETICS',192,184,10,'#fff','center')}}
 function drawTapeBurst(t){
  const p=finishDashTime;
  if(p>1.1)return;
- // Ribbons fly outward from the finish-line impact, then fall.
  for(let i=0;i<18;i++){
   const angle=i*Math.PI*2/18;
   const radius=9+p*84,xx=192+Math.cos(angle)*radius,yy=172+Math.sin(angle)*radius*.62+p*p*32;
@@ -302,11 +218,9 @@ function drawCeremony(t){
  for(let i=0;i<35;i++){const y=(i*29+Math.floor(p*22))%270+39;rect((i*73)%384,y,3,5,['#eec65c','#f9f2d8','#81d7f3'][i%3])}
  if(p<1.25){
   txt('FINISH!',192,91,30,'#ffdb65','center');
-  // Winner pose: raise arms and bounce once.
   const jump=Math.abs(Math.sin(p*7))*12,x=180,y=175-jump;
-  if(!drawFrontSprite(x-3,y-1,'victory',Math.floor(p*5)%3))frontRunner(x-1,y-1,'#ffcb54');
-  if(!spriteReady){rect(x,y+10,5,15,'#f2b982');rect(x+23,y+10,5,15,'#f2b982');rect(x-1,y,6,13,'#f2b982');rect(x+23,y,6,13,'#f2b982')}
-  txt('ナイスラン！',192,260,15,'#fff','center');
+  drawFrontSprite(x-3,y-1,'victory',Math.floor(p*5)%3);
+  txt((selected<3?'ナイスラン！':'ナイストライ！'),192,260,15,'#fff','center');
  }else if(p<2.2){
   txt('RESULT',192,104,28,'#ffdb65','center');
   txt('YOU',192,151,18,'#fff','center');
@@ -318,24 +232,24 @@ function drawCeremony(t){
   for(const o of order){const racer=top[o.rank-1];if(!racer)continue;
    rect(o.x,o.y,76,o.h,o.rank===1?'#c39839':o.rank===2?'#91a1b1':'#a26b48');
    rect(o.x,o.y,76,5,'#f7e4a0');txt(String(o.rank),o.x+38,o.y+30,23,'#fff','center');
-   if(!drawFrontSprite(o.x+24,o.y-49,'podium',0,racer.name==='YOU'?-1:Number(racer.name.slice(-1))-1))frontRunner(o.x+27,o.y-49,racer.color);
+   drawFrontSprite(o.x+24,o.y-49,'podium',0,racer.name==='YOU'?-1:Number(racer.name.slice(-1))-1);
    txt(racer.name,o.x+38,o.y-56,11,'#fff','center');
   }
   txt('TOTAL '+ceremonyScores.find(r=>r.name==='YOU').score+' POINTS',192,293,17,'#ffdb65','center');
  }else{
   txt('EVENT RESULT',192,94,23,'#ffdb65','center');
-  txt(ceremonyRank===1?'1st PLACE!':ceremonyRank+'th PLACE',192,167,28,'#fff','center');
+  txt(['','1st PLACE!','2nd PLACE','3rd PLACE','4th PLACE'][ceremonyRank],192,167,28,'#fff','center');
   txt('記録と順位を確認しよう',192,242,14,'#ffdb65','center');
  }
 }
 function loop(t){const dt=Math.min((t-prev||16)/1000,.05);prev=t;carry+=dt;let n=0;while(carry>=1/60&&n++<4){step(1/60,t);carry-=1/60}draw(t);if(mode==='finishDash')drawTapeBurst(t);if(mode==='ceremony')drawCeremony(t);requestAnimationFrame(loop)}
-$('#start').onclick=()=>{if(mode==='finishDash'||mode==='ceremony')return;if(cup&&mode==='result'&&results.length<5){selected=results.length;render();start()}else if(cup&&mode==='finished'){results=[];cpuTotal=[0,0,0];selected=0;render();start()}else start()};
-$('#cup').onclick=()=>{if(mode==='finishDash'||mode==='ceremony')return;cup=true;selected=0;results=[];cpuTotal=[0,0,0];$('#start').textContent='次の種目へ';render();start()};
-$('#reset').onclick=()=>{$('#start').disabled=false;$('#cup').disabled=false;$('#resultPanel').hidden=true;$('#tutorial').hidden=true;cup=false;results=[];cpuTotal=[0,0,0];mode='menu';resetRun();$('#start').textContent='START';render();message('競技を選んでSTART！')};
+$('#start').onclick=()=>{if(!spriteReady||mode==='finishDash'||mode==='ceremony')return;if(cup&&mode==='result'&&results.length<5){selected=results.length;render();start()}else if(cup&&mode==='finished'){results=[];cpuTotal=[0,0,0];selected=0;render();start()}else start()};
+$('#cup').onclick=()=>{if(!spriteReady||mode==='finishDash'||mode==='ceremony')return;cup=true;selected=0;results=[];cpuTotal=[0,0,0];$('#start').textContent='次の種目へ';render();start()};
+$('#reset').onclick=()=>{$('#start').disabled=!spriteReady;$('#cup').disabled=!spriteReady;$('#resultPanel').hidden=true;$('#tutorial').hidden=true;cup=false;results=[];cpuTotal=[0,0,0];mode='menu';resetRun();$('#start').textContent='START';render();message('競技を選んでSTART！')};
 for(const k of ['a','b']){const el=$('#'+k),K=k.toUpperCase();el.addEventListener('pointerdown',e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch{}el.classList.add('active');input(K)});for(const event of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(event,e=>{e.preventDefault();el.classList.remove('active');release(K)})}
 document.addEventListener('keydown',e=>{let k=e.key.toUpperCase();if(!['A','B'].includes(k))return;e.preventDefault();if(downs.has(k))return;downs.add(k);$('#'+k.toLowerCase()).classList.add('active');input(k)});
 document.addEventListener('keyup',e=>{let k=e.key.toUpperCase();if(!['A','B'].includes(k))return;downs.delete(k);$('#'+k.toLowerCase()).classList.remove('active');release(k)});
-window.addEventListener('blur',()=>{downs.clear();if(bHeld)release('B');for(const e of document.querySelectorAll('.pads button'))e.classList.remove('active')});
+window.addEventListener('blur',()=>{downs.clear();bHeld=false;for(const e of document.querySelectorAll('.pads button'))e.classList.remove('active')});
 render();requestAnimationFrame(loop);
 })();
 </script></body></html>
