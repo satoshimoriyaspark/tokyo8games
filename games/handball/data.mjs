@@ -11,3 +11,6 @@ export const TEAMS = [
  player('れん','CB','天才司令塔',[4,5,4,2,3]),player('いつき','LB','変化球',[3,4,4,2,3]),player('せいや','RB','精密シュート',[3,4,5,2,3]),player('みなと','LW','フェイント',[4,4,3,2,3]),player('とうま','RW','ノールックパス',[3,5,3,2,4]),player('かずき','PV','スクリーン',[2,4,3,4,4]),player('しおん','GK','コース読み',[3,4,2,2,5])]}
 ];
 export const SHOTS = ['ジャンプ','ステップ','ループ','サイド'];
+
+// Handedness was not specified in v1; these are visible, provisional game settings.
+for (const t of TEAMS) t.players.forEach((p,i)=>{p.hand=(i===2||i===4||(t.id==='shirasagi'&&i===0))?'L':'R';});
