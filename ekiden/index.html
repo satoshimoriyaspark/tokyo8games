@@ -11,6 +11,25 @@
 @media(max-height:500px) and (orientation:landscape){body.racing main{max-width:960px}#raceArea{display:grid;grid-template-columns:1.05fr 1fr;column-gap:18px}.race-head,.hud,#game,#profile{grid-column:1}.race-head{grid-row:1}.hud{grid-row:2}#game{grid-row:3/7}#profile{grid-row:7}.meters{grid-column:2;grid-row:1}.tactics{grid-column:2;grid-row:2}#feedback{grid-column:2;grid-row:3}.rhythm-row{grid-column:2;grid-row:4}.controls{grid-column:2;grid-row:5}#message{grid-column:2;grid-row:6}#paused{grid-column:1/-1}.controls button{min-height:68px}}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
 #teamRunner,#resultRunner{width:96px;height:96px;aspect-ratio:1;border:0;flex-shrink:0}#resultRunner{margin:8px auto 0}.team-preview{gap:12px}.team-preview .swatch{width:20px;height:32px}.result-rank{font-size:58px;line-height:1.1}#assetStatus{margin:0 0 10px}#reloadSprites{margin:0 0 14px}@media(max-width:360px){.team-preview{gap:8px}#selectedName{font-size:17px}}
+.opening .configure{margin-top:12px;width:100%;background:#d9f7ff;font-size:13px;min-height:44px}
+#titleSelection{font-size:11px;margin-top:13px;line-height:1.8;font-weight:800}
+.story-screen{position:relative;min-height:calc(100svh - 75px);padding:22px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,transparent 0 27px,#ffffff0c 27px 30px),linear-gradient(160deg,#0566b0,#00a4cc);border:3px solid var(--ink);border-radius:6px;box-shadow:6px 7px 0 var(--ink);color:white;overflow:hidden}
+.story-heading{text-align:center;font-size:13px;letter-spacing:.12em;color:#ffe500;margin:18px 0 8px}
+#storyBack{position:absolute;right:10px;top:10px;z-index:2;background:white;color:var(--ink);font-size:11px;min-height:38px}
+.story-box{position:relative;width:min(100%,620px);height:60vh;height:60svh;max-height:600px;overflow:hidden;border-top:2px solid #ffe500;border-bottom:2px solid #ffe500;background:#102137dd;box-shadow:0 0 0 6px #ffffff0b}
+.story-roll{position:absolute;top:100%;left:0;width:100%;padding:0 14px;text-align:center;font-size:20px;line-height:1.8;font-weight:800;text-shadow:1px 2px #08172a}
+.story-roll p{margin:0 0 1.55em}.story-roll strong{font-size:clamp(24px,6vw,35px);color:#ffe500}.story-roll .story-route{font-size:13px;color:#a6efff;margin-bottom:2em}.story-roll.rolling{animation:storyScroll 23s linear forwards}
+@keyframes storyScroll{from{top:100%;transform:translateY(0)}to{top:0;transform:translateY(-100%)}}
+#storySkip{margin-top:18px;max-width:320px;min-height:48px;font-size:15px}.story-screen>small{color:#e2f7ff;margin-top:10px;font-size:11px}
+.race-stage{position:relative}.start-countdown{position:absolute;inset:3px;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#10213770;pointer-events:none;color:white;text-align:center}
+#countNumber{font-size:clamp(70px,20vw,128px);font-weight:1000;line-height:1;color:#ffe500;text-shadow:4px 5px 0 #102137,-2px -2px 0 #102137;white-space:nowrap}
+.start-countdown.go{background:#10213725}.start-countdown.go #countNumber{font-size:clamp(32px,9vw,60px)}
+#countHint{padding:6px 12px;background:#102137e6;border:2px solid #fff;font-size:clamp(11px,3vw,15px);font-weight:900}
+.count-pop{animation:countPop .65s ease-out both}@keyframes countPop{from{transform:scale(1.35);opacity:.3}35%,to{transform:scale(1);opacity:1}}
+@media(max-width:420px){.story-screen{padding:16px 10px}.story-heading{margin-top:34px}.story-roll{font-size:16px;line-height:1.75;padding:0 8px}.story-roll .story-route{font-size:11px}.story-box{height:57svh}.story-screen>small{font-size:10px}}
+@media(max-height:500px) and (orientation:landscape){#raceStage{grid-column:1;grid-row:3/7}.story-screen{min-height:90svh;padding:10px 20px}.story-heading{margin-top:0}.story-box{height:48svh}.story-roll{font-size:16px}.story-screen>small{display:none}#storySkip{margin-top:10px;min-height:40px}}
+@media(prefers-reduced-motion:reduce){.story-box{overflow:auto}.story-roll,.story-roll.rolling{position:static;transform:none;animation:none;padding:18px 10px}.count-pop{animation:none}}
+
 </style>
 </head>
 
@@ -21,7 +40,18 @@
 <h1 class="logo"><img id="gameLogo" src="./assets/ekiden-logo.png" width="1774" height="887" alt="目指せ！駅伝王" fetchpriority="high"></h1>
 <p class="hero-copy">リズムをきざめ。風をよめ。<br>さいごの一歩で、ぬけだそう！</p>
 
-<div class="hero-bottom"><button id="enter" class="primary">はじめる ▶</button><p class="sub">20チーム ／ 3つのコース ／ 1レース 約2〜4分</p></div>
+<div class="hero-bottom"><button id="enter" class="primary">はじめる ▶</button><button id="configure" class="quiet configure">コース・たすき・難易度をえらぶ</button><p id="titleSelection"></p><p class="sub">20チーム ／ 3つのコース ／ 1レース 約2〜4分</p></div>
+</section>
+<section id="story" class="story-screen" hidden aria-label="プロローグ">
+<button id="storyBack" class="quiet">タイトルへ</button><h2 class="story-heading">PROLOGUE — 20のたすき</h2>
+<div class="story-box" tabindex="0" aria-label="駅伝の物語"><div id="storyRoll" class="story-roll">
+<p class="story-route" id="storyCourse"></p>
+<p>冬の朝、スタートラインに<br>20色のたすきが集まった。</p>
+<p>街をぬけ、坂をこえ、<br>仲間の想いをゴールへつなぐ。</p>
+<p>先頭で風に立ち向かうか。<br>集団で力をためるか。</p>
+<p>勝負を決めるのは、<br>最後まであきらめない一歩。</p>
+<p>さあ、きみの番だ。</p><p><strong>目指せ！駅伝王</strong></p>
+</div></div><button id="storySkip" class="primary">スキップしてスタート ▶</button><small>物語のあとに「3・2・1」でスタート。画面タップでもスキップできます。</small>
 </section>
 <div id="setup" hidden>
 <div class="setup-top"><nav class="steps" aria-label="スタートまでの手順"><span id="stepMark0">1 コース</span><span id="stepMark1">2 たすき</span><span id="stepMark2">3 準備</span></nav><button id="toTitle" class="quiet">タイトルへ</button></div>
@@ -35,13 +65,13 @@
 <li><b>前の人を風よけに！</b>近づくと自動で体力を温存。指を休めると、ゆっくり走って回復。</li>
 <li><b>最後はスパート！</b>ボタンを押すと10秒加速。その間も交互タップ！ 残り2kmがねらい目。</li>
 </ol><details><summary>もっとくわしいコツを見る</summary><p>少し遅いタップ（1秒に約2回）は温存ペース。速すぎる連打はスタミナを多く使います。先頭やひとりで走ると、向かい風で進みにくくなります。</p><p>スパートは体力30以上で使え、10秒で約40を消費。終了後は12秒の休みが必要です。もう一度押すと中止できます。</p><p>1区：集団で脚を残し、六郷橋の先で勝負。5区：上りは無理せず、最高点の先で切り替えよう。6区：下りのスパートは脚に負担。最後の平地に力を残そう。</p><p>PCでは A / L または ← / → で交互タップ、スペースでスパート、Escで一時停止。</p></details></section><p id="selectionSummary" class="selection-summary"></p></div>
-<div class="setup-nav"><button id="previous" class="quiet">← もどる</button><button id="next" class="primary">たすきをえらぶ →</button><button id="start" class="primary" hidden disabled>いざ、スタート！ ▶</button></div>
+<div class="setup-nav"><button id="previous" class="quiet">← もどる</button><button id="next" class="primary">たすきをえらぶ →</button><button id="start" class="primary" hidden disabled>この設定で決定 ✓</button></div>
 </section></div>
 <div id="raceArea" hidden tabindex="-1">
 <div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden>一時停止</button><button id="back" class="quiet" hidden>えらび直す</button></div></div>
 <div id="paused" class="paused" hidden>ひと休み中。再開ボタンで走り出そう！</div>
 <div class="hud"><span id="place">大手町</span><span id="rank">—位 / 20</span><span id="distance">あと 21.3km</span></div>
-<canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。横スクロール駅伝レース"></canvas>
+<div id="raceStage" class="race-stage"><canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。横スクロール駅伝レース"></canvas><div id="startCountdown" class="start-countdown" hidden role="status" aria-live="assertive" aria-atomic="true"><b id="countNumber">3</b><span id="countHint">左足から、リズムよく！</span></div></div>
 <canvas id="profile" width="320" height="40" aria-label="区間の高低差と現在位置の概略図"></canvas>
 <div class="meters"><div><div class="meter-label"><span>スタミナ</span><b id="energy">100%</b></div><div class="bar"><i id="bar"></i></div></div><div><div class="meter-label"><span>脚のつかれ</span><b id="legs">0%</b></div><div class="bar"><i id="legBar"></i></div></div></div>
 <div class="tactics"><span id="shelter">風よけ —</span><span id="pace">ペース 待機中</span><span id="wind">向かい風</span><span id="terrain">平地</span></div>
@@ -76,9 +106,49 @@ const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 let selected=1,courseIndex=0,s=null,last=performance.now(),hudAt=0;
 const course=()=>s?s.course:courses[courseIndex];
 let setupStep=0;
+let storyPlaying=false,readyAfterStory=false;
+function showStory(){
+ if(storyPlaying)return;
+ s=null;storyPlaying=true;$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;
+ $('story').hidden=false;$('storyCourse').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route;
+ $('storyRoll').classList.remove('rolling');void $('storyRoll').offsetWidth;
+ $('storyRoll').classList.add('rolling');$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';
+ document.body.classList.remove('racing');$('storySkip').focus({preventScroll:true});$('story').scrollIntoView({block:'start'});
+}
+function stopStory(){storyPlaying=false;$('story').hidden=true;$('storyRoll').classList.remove('rolling');}
+function finishStory(){
+ if(!storyPlaying)return;stopStory();
+ if(spriteReady)reset();else{readyAfterStory=true;$('setup').hidden=false;showStep(2);$('start').textContent='準備できたらスタート！ ▶';}
+}
+function updateTitleSelection(){
+ $('titleSelection').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+' ／ '+difficulties[difficultyIndex].label;
+}
+$('configure').addEventListener('click',()=>{$('opening').hidden=true;$('setup').hidden=false;showStep(0)});
+$('storySkip').addEventListener('click',finishStory);
+$('storyBack').addEventListener('click',opening);
+$('story').addEventListener('click',e=>{if(!e.target.closest('button'))finishStory()});
+$('storyRoll').addEventListener('animationend',e=>{if(e.target===$('storyRoll')&&e.animationName==='storyScroll')finishStory()});
+document.addEventListener('keydown',e=>{if(!storyPlaying||e.repeat)return;if(e.key==='Escape'){e.preventDefault();opening()}else if((e.key===' '||e.key==='Enter')&&e.target.tagName!=='BUTTON'){e.preventDefault();finishStory()}});
+function countdownView(value,go=false){
+ const panel=$('startCountdown'),number=$('countNumber');
+ panel.hidden=false;panel.classList.toggle('go',go);
+ if(number.textContent!==value){number.textContent=value;number.classList.remove('count-pop');void number.offsetWidth;number.classList.add('count-pop');}
+ $('countHint').textContent=go?'左 → 右、交互にタップ！':'左足から、リズムよく！';
+}
+function advanceCountdown(t){
+ if(!s)return;
+ if(s.counting&&!s.paused&&!document.hidden){
+  const remaining=3-(t-s.countdownStartedAt)/1000;
+  if(remaining>0){countdownView(String(Math.ceil(remaining)));return;}
+  s.counting=false;s.active=true;s.goUntil=t+750;s.lastTap=-999;s.lastInput='';
+  s.notice='スタート！ 左 → 右を1秒に3〜4回';s.noticeUntil=3;
+  last=t;$('feedback').textContent=s.notice;countdownView('スタート！',true);renderHUD();
+ }else if(!s.counting&&s.goUntil&&t>=s.goUntil){$('startCountdown').hidden=true;s.goUntil=0;}
+}
+
 function showStep(i,focus=true){setupStep=i;for(let j=0;j<3;j++){$('step'+j).hidden=j!==i;$('stepMark'+j).classList.toggle('current',j===i);$('stepMark'+j).setAttribute('aria-current',j===i?'step':'false')}$('next').hidden=i===2;$('start').hidden=i!==2;$('next').textContent=i===0?'たすきをえらぶ →':'走る準備へ →';$('previous').textContent=i===0?'← タイトル':'← もどる';$('selectionSummary').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+'チーム';if(focus)$('heading'+i).focus({preventScroll:true});$('setup').scrollIntoView({block:'start'});drawCharacterCards(performance.now());}
-function opening(){s=null;$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
-$('enter').addEventListener('click',()=>{$('opening').hidden=true;$('setup').hidden=false;showStep(0)});
+function opening(){stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定で決定 ✓';updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
+$('enter').addEventListener('click',showStory);
 $('toTitle').addEventListener('click',opening);
 $('next').addEventListener('click',()=>showStep(Math.min(2,setupStep+1)));
 $('previous').addEventListener('click',()=>setupStep===0?opening():showStep(setupStep-1));
@@ -90,18 +160,18 @@ function chooseDifficulty(i){if(s&&s.active)return;difficultyIndex=i;Array.from(
 function chooseCourse(i){if(s&&s.active)return;courseIndex=i;s=null;Array.from($('courses').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('courseRoute').textContent=courses[i].route+'｜'+courses[i].km+'km';$('courseTip').textContent=courses[i].tip;renderHUD();draw();}
 function terrainAt(km,co=course()){let seg=co.profile.length-2;for(let i=0;i<co.profile.length-1;i++)if(km<co.profile[i+1][0]){seg=i;break}const [x,a]=co.profile[seg],[y,b]=co.profile[seg+1];return {height:a+(b-a)*clamp((km-x)/(y-x),0,1),grade:(b-a)/((y-x)*1000)};}
 function makeRunner(team,index=-1){return {team,index,km:0,speed:.7,energy:100,legs:0,finishTime:null,effort:1,sprint:0,cooldown:0,drafting:false,wind:0,grade:0,phase:0};}
-function reset(){if(!spriteReady)return;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:true,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'スタート！ 左 → 右を1秒に3〜4回',noticeUntil:3,finalCalled:false};$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;last=performance.now();renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
-function menu(){s=null;$('opening').hidden=true;$('setup').hidden=false;$('raceArea').hidden=true;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=true;$('back').hidden=true;$('paused').hidden=true;document.body.classList.remove('racing');chooseCourse(courseIndex);showStep(0);}
+function reset(){if(!spriteReady||(s&&(s.active||s.counting)))return;stopStory();readyAfterStory=false;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:false,counting:true,countdownStartedAt:performance.now(),goUntil:0,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'位置について！ カウントダウンのあと、左足からタップ',noticeUntil:3,finalCalled:false};$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;$('message').textContent='合図が出るまで、ひと呼吸。左足から走り出そう！';last=performance.now();countdownView('3');renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
+function menu(){stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('opening').hidden=true;$('setup').hidden=false;$('raceArea').hidden=true;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=true;$('back').hidden=true;$('paused').hidden=true;document.body.classList.remove('racing');chooseCourse(courseIndex);showStep(0);}
 function notice(text,seconds=1.1){s.notice=text;s.noticeUntil=s.elapsed+seconds;$('feedback').textContent=text;}
 function tap(side){if(!s||!s.active||s.paused)return;const now=performance.now()/1000,delta=now-s.lastTap,next=side==='left'?'右':'左';if(s.lastInput===side){s.mode='stumble';s.player.energy=clamp(s.player.energy-.35,0,100);notice('同じ足が続いています。次は'+next+'足');}else if(!s.lastInput||delta>1){s.mode='cruise';notice('次は'+next+'足！ 一定のリズムで');}else if(delta<s.difficulty.minBeat){s.mode='rush';notice('速すぎ！ スタミナを使います。少しゆっくり');}else if(delta<s.difficulty.maxBeat){s.mode='cruise';notice('いいリズム！ 次は'+next+'足');}else{s.mode='save';notice('温存ペース。次は'+next+'足');}s.lastInput=side;s.lastTap=now;renderHUD();}
 function startSprint(r){if(r.sprint>0||r.cooldown>0||r.energy<30)return false;r.sprint=10;return true;}
 function dash(){if(!s||!s.active||s.paused)return;const p=s.player;if(p.sprint>0){p.sprint=0;p.cooldown=12;notice('スパート中止。12秒間、脚を整えよう',2);}else if(startSprint(p)){s.sprints++;notice('スパート！ 左右のタップを続けよう',2);}renderHUD();}
-function pause(){if(!s||!s.active)return;s.paused=!s.paused;s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
+function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
 ['left','right'].forEach(id=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();tap(id)});b.addEventListener('click',e=>{if(e.detail===0)tap(id)});b.addEventListener('contextmenu',e=>e.preventDefault());});
-$('sprint').addEventListener('click',dash);$('start').addEventListener('click',reset);$('retry').addEventListener('click',reset);$('back').addEventListener('click',menu);$('selectAgain').addEventListener('click',menu);$('pause').addEventListener('click',pause);
-document.addEventListener('keydown',e=>{if(e.repeat||!s||!s.active)return;const keys=['ArrowLeft','a','A','ArrowRight','l','L',' ','Escape'];if(!keys.includes(e.key))return;if(e.key===' '&&e.target&&e.target.tagName==='BUTTON')return;e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))tap('left');else if(['ArrowRight','l','L'].includes(e.key))tap('right');else if(e.key===' ')dash();else pause();});
+$('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():opening()});$('retry').addEventListener('click',reset);$('back').addEventListener('click',menu);$('selectAgain').addEventListener('click',menu);$('pause').addEventListener('click',pause);
+document.addEventListener('keydown',e=>{if(e.repeat||!s||(!s.active&&!s.counting))return;const keys=['ArrowLeft','a','A','ArrowRight','l','L',' ','Escape'];if(!keys.includes(e.key))return;if(e.key===' '&&e.target&&e.target.tagName==='BUTTON')return;e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))tap('left');else if(['ArrowRight','l','L'].includes(e.key))tap('right');else if(e.key===' ')dash();else pause();});
 document.addEventListener('keydown',e=>{if($('result').hidden)return;if(e.key==='Tab'){e.preventDefault();if(document.activeElement===$('retry'))$('selectAgain').focus();else $('retry').focus()}else if(e.key==='Escape')menu()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&s&&s.active&&!s.paused)pause()});
+document.addEventListener('visibilitychange',()=>{if(storyPlaying)$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';if(document.hidden&&s&&(s.active||s.counting)&&!s.paused)pause()});
 function aiEffort(r){const remaining=s.course.km-r.km,style=r.index%3;let effort=style===0?(r.km<5?1.08:.96):style===1?.98:.96;effort+=(r.index%5-2)*.007;if(remaining<3)effort=1.035;if(r.energy<27)effort=.80;if(r.grade>.035&&r.energy<55)effort=Math.min(effort,.86);if(r.grade<-.025&&r.legs>20)effort=Math.min(effort,.88);const attack=remaining<(style===2?2.1:style===1?1.55:1.1)*s.difficulty.attack||(s.difficulty.earlyAttack&&style===0&&r.km>2&&r.km<2.4);if(attack&&r.energy>42&&r.legs<45)startSprint(r);return effort-.025;}
 function moveRunner(r,dt,effort,t0){if(r.finishTime!==null)return;const grade=r.grade,up=Math.max(0,grade),down=Math.max(0,-grade),recover=effort<.7,saving=effort<.93;const bursting=r.sprint>0&&r.energy>0&&!recover;const fatigue=.57+.43*clamp(r.energy/40,0,1),legPenalty=1-clamp((r.legs-20)*.004,0,.32);const terrain=clamp(1-up*4.5+down*3.4,.62,1.23);const drag=r.wind*(r.drafting?.24:1);const target=(effort+(bursting?.40:0))*terrain*(1-drag)*fatigue*legPenalty*(r.index>=0?s.difficulty.aiSpeed:1);r.speed+=(target-r.speed)*Math.min(1,dt*3);const drain=recover?-4:saving?-1.15:-.04+up*6+(effort>1.07?1.2:0)+(r.drafting?-.13:.15)+r.wind*(r.drafting?.2:1);const adjustedDrain=drain<0&&r.index<0?drain*s.difficulty.recovery:drain;r.energy=clamp(r.energy-(adjustedDrain+(bursting?4:0))*dt,0,100);const strain=down>.025?(bursting?2.4:effort>1.07?.85:saving?-.12:.06):-.16;r.legs=clamp(r.legs+strain*dt,0,100);r.cooldown=Math.max(0,r.cooldown-dt);if(r.sprint>0){r.sprint=Math.max(0,r.sprint-dt);if(r.sprint===0||r.energy===0){r.sprint=0;r.cooldown=12;}}const step=r.speed*dt*.16;if(r.km+step>=s.course.km)r.finishTime=t0+dt*(s.course.km-r.km)/step;r.km=Math.min(s.course.km,r.km+step);r.phase+=r.speed*dt*9;}
 function tick(dt){if(!s||!s.active||s.paused)return;const all=[s.player,...s.ai],t0=s.elapsed;
@@ -114,7 +184,7 @@ function tick(dt){if(!s||!s.active||s.paused)return;const all=[s.player,...s.ai]
 function rank(){const p=s.player;return 1+s.ai.filter(a=>s.done?a.finishTime!==null&&a.finishTime<p.finishTime:a.km>p.km).length;}
 function clock(t){return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');}
 function currentPlace(){let name=course().marks[0][1];if(s)for(const [km,n] of s.course.marks)if(s.player.km>=km)name=n;return name;}
-function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label;$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中！ 体力を温存':s?'ひとり・先頭は風に注意':'風よけは近くの前走者から';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+(co.id===1?'街道':'山道');const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent=s&&s.paused?'再開':'一時停止';const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
+function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label;$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s&&!s.counting?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中！ 体力を温存':s?'ひとり・先頭は風に注意':'風よけは近くの前走者から';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+(co.id===1?'街道':'山道');const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':s.counting?'スタート待ち':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent=s&&s.paused?'再開':'一時停止';const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
  if(active){if(s.elapsed>s.noticeUntil)$('feedback').textContent=mode==='recover'?'指を離して回復中。交互タップで再び巡航！':p.energy<25?'スタミナ残りわずか。タップを遅めにして温存しよう':p.legs>35?'脚に負担がたまっています。下りは温存ペースに':p.drafting?'風よけ中！ 集団で脚を残し、勝負どころを待とう':'風に向かって走行中。力を残して、最後に勝負！';const ahead=s.ai.filter(a=>a.km>p.km).sort((a,b)=>a.km-b.km)[0];$('message').textContent=ahead?'前のランナーまで '+Math.round((ahead.km-p.km)*1000)+'m｜'+(co.id===1?'集団で力をためよう':co.id===5?'上りは無理せず温存':'下りは脚のつかれに注意'):'先頭！ 風を受けながら逃げ切れるか？';}
 }
 function rect(x,y,w,h,color,target=ctx){target.fillStyle=color;target.fillRect(Math.round(x),Math.round(y),w,h);}
@@ -210,8 +280,8 @@ function draw(){const co=course(),p=s?s.player:null,scroll=p?p.km*260:0,grade=te
  else {runner(180,136,makeRunner(teamColors[0]));runner(235,153,makeRunner(teamColors[3]));runner(73,153,makeRunner(teamColors[4]));runner(116,174,makeRunner(teamColors[selected]),true);}
  rect(0,176,320,4,'#253b59');rect(0,176,320*(p?p.km/co.km:0),4,'#f5cf44');rect(0,0,320,40,'#162c46',pc);const maxH=co.id===1?60:950;for(let x=4;x<316;x+=2){const h=terrainAt((x-4)/312*co.km).height/maxH*23;rect(x,33-h,2,h+1,'#4f827b',pc);}if(s){for(const a of s.ai)rect(4+a.km/co.km*310,34,2,3,a.team[1],pc);rect(3+p.km/co.km*310,9,3,30,'#ffe28a',pc);}pc.font='8px monospace';pc.fillStyle='#e0edf7';pc.fillText('高低差（概略）',8,10);pc.fillText(co.km+'km',270,10);
 }
-function frame(t){const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
-chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);loadSprites();requestAnimationFrame(frame);
+function frame(t){advanceCountdown(t);const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
+chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);updateTitleSelection();loadSprites();requestAnimationFrame(frame);
 })();
 </script>
 </body></html>
