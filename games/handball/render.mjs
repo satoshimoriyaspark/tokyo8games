@@ -1,6 +1,6 @@
 import {clamp} from './engine.mjs';
-import {formation,worldPoint} from './settled.mjs';
-export const project=(x,y)=>({x:80+x*.8+(y-250)*.105,y:116+y*.565});
+import {COURSES} from './commands.mjs';
+export const project=(x,y)=>({x:80+x*.8+(y-250)*.105,y:158+y*.455});
 const TAU=Math.PI*2;
 // Every frame is a complete, unchanged 48×48 crop from the supplied PNG.
 export function createSprites(images,canvasFactory,manifest){
@@ -52,27 +52,27 @@ export class Renderer{
   if(labels){const label=(p.slot===3?'GK ':p.roster===0?'★':'')+p.name,w=Math.max(44,label.length*10+10);g.fillStyle=p.side?'#102d4ecc':'#54252dcc';g.fillRect(point.x-w/2,point.y+8,w,15);this.text(label,point.x,point.y+20,11,p.id===match.selected?'#fff29e':'#fff');}
  }
  ball(x,y,z=22,effect=null,size=7){const g=this.g,p=project(x,y);g.fillStyle='#1f26394a';g.beginPath();g.ellipse(p.x,p.y,6,2,0,0,TAU);g.fill();g.fillStyle=effect||'#ffcf66';g.strokeStyle='#63332c';g.lineWidth=2;g.beginPath();g.arc(p.x,p.y-z,size,0,TAU);g.fill();g.stroke();this.line([{x:p.x-size+1,y:p.y-z},{x:p.x+size-1,y:p.y-z}],'#9d5730',1);this.line([{x:p.x,y:p.y-z-size+1},{x:p.x,y:p.y-z+size-1}],'#9d5730',1);}
- draw(match,input={x:0,y:0}){this.field(match);const g=this.g,p=match.controlled;
-  if(match.owner===p&&!match.scene&&!match.restartTimer){const target=match.passTarget(p,input);if(target){g.setLineDash([6,7]);this.line([project(p.x,p.y),project(target.x,target.y)],'#fffaaba0',2);g.setLineDash([]);}}
-  if(match.orb){const v=project(match.orb.x,match.orb.y),pulse=1+Math.sin(match.t*6)*.15;g.save();g.shadowColor='#89ffec';g.shadowBlur=22;g.fillStyle='#9affed';g.beginPath();g.arc(v.x,v.y-17,10*pulse,0,TAU);g.fill();g.restore();g.strokeStyle='#fff9b9';g.lineWidth=2;g.beginPath();g.arc(v.x,v.y-17,17*pulse,0,TAU);g.stroke();this.text('連携玉',v.x,v.y-40,12,'#dcfff1');}
-  if(!match.scene&&!match.restartTimer&&match.attack.phase==='settled'){
-   const side=match.possession,spots=formation(match.attack),defenders=match.field(1-side).sort((a,b)=>a.y-b.y);
-   this.line(defenders.map(q=>project(q.x,q.y)),'#f1f5c84d',2);
-   for(const q of match.field(side)){const target=worldPoint(spots[q.slot],side),v=project(q.x,q.y),best=Math.max(...match.courseOptions(q).map(c=>c.bonuses.opening));
-    if(match.attack.play){g.setLineDash([3,5]);this.line([v,project(target.x,target.y)],'#b3fbea75',1);g.setLineDash([]);}
-    if(side===0&&best>.065){g.strokeStyle='#99f5d5';g.lineWidth=2;g.beginPath();g.ellipse(v.x,v.y+3,24,9,0,0,TAU);g.stroke();this.text('CHANCE',v.x,v.y-63,10,'#bdffe5');}
-   }
-  }
-  for(const q of [...match.players].sort((a,b)=>a.y-b.y))this.player(q,match);
-  // Dribble and wind-up frames already include the ball in the source image.
-  if((match.ball.mode==='pass'&&match.ball.elapsed>=match.ball.windup)||match.ball.mode==='loose')this.ball(match.ball.x,match.ball.y,match.ball.z);
-  if(match.scene?.kind==='shot')this.shotScene(match);
-  if(match.scene?.kind==='link'){
-   const s=match.scene,points=s.path.map(id=>project(match.players[id].x,match.players[id].y));g.save();g.shadowColor='#77fff3';g.shadowBlur=18;this.line([...points,points[0]],'#8cffee',4);g.restore();
-   g.fillStyle='#09263dde';g.fillRect(218,88,524,57);this.text('トライアングル・ラッシュ！',480,114,24,'#bdfff1');this.text('特殊連携 → 次のシュート成功率 +16ポイント',480,136,13,'#ffed9e');
-  }
-  if(match.restartTimer>0){g.fillStyle='#0a132877';g.fillRect(0,140,960,174);this.text('GOAL!',480,260,76,'#fff1a5');this.text(match.message,480,299,22,'#fff');}
+ draw(match){
+  this.field(match);const g=this.g;
+  const defenders=match.field(1-match.possession).sort((a,b)=>a.y-b.y);
+  this.line(defenders.map(q=>project(q.x,q.y)),'#b9e0ef99',3);
+  if(match.owner&&!match.scene&&!match.choice&&match.attacking){const target=match.passTarget();if(target){g.setLineDash([5,6]);this.line([project(match.owner.x,match.owner.y),project(target.x,target.y)],'#fff0a488',2);g.setLineDash([]);}}
+  if(match.orb){const q=match.players[match.orb.side*4+match.orb.slot],v=project(q.x,q.y),pulse=1+Math.sin(match.t*6)*.12;g.save();g.shadowColor='#89ffec';g.shadowBlur=22;g.fillStyle='#9affed';g.beginPath();g.arc(v.x+29,v.y-22,9*pulse,0,TAU);g.fill();g.restore();this.text('連携玉',v.x+28,v.y-42,10,'#dcfff1');}
+  for(const q of [...match.players].sort((a,b)=>a.y-b.y))this.player(q,match,{scale:1.15});
+  if(match.ball.mode==='pass'&&match.ball.elapsed>=match.ball.windup)this.ball(match.ball.x,match.ball.y,match.ball.z);
+  const s=match.scene;
+  if(s?.kind==='shot'){this.shotScene(match);return;}
+  if(s?.kind==='link'){
+   const points=s.path.map(id=>project(match.players[id].x,match.players[id].y));g.save();g.shadowColor='#77fff3';g.shadowBlur=18;this.line([...points,points[0]],'#8cffee',4);g.restore();
+   this.banner('トライアングル・ラッシュ！','特殊連携で、次の一撃を強化','#b4fff0');
+  }else if(s?.kind==='rush'){
+   for(const q of match.field(match.possession)){const v=project(q.x,q.y),dir=match.possession?-1:1;this.line([{x:v.x-dir*90,y:v.y-18},{x:v.x-dir*28,y:v.y-18}],'#fff0a699',3);}
+   this.banner('速攻！','相手が戻る前にシュートチャンス！','#ffe49a');
+  }else if(s?.kind==='stop')this.banner(s.stopType==='cut'?'CUT！ パスを奪った！':'BLOCK！ シュートを止めた！','タイミング一致 → 攻守交代','#b1edff');
+  else if(s?.kind==='set')this.banner('遅攻','センターから。守備陣形を整えて勝負！','#ffe7aa');
+  else if(s?.kind==='stay')this.banner('STAY！ 攻撃継続','センターから組み直し、次の一撃を強化','#b7f8e2');
  }
+ banner(title,detail,color){const g=this.g;g.fillStyle='#071c36df';g.fillRect(170,222,620,72);this.text(title,480,252,26,color);this.text(detail,480,278,14,'#e7f2f8');}
  shotScene(match){const g=this.g,s=match.scene,k=match.players[s.keeper],p=match.players[s.shooter],progress=clamp(s.t/s.duration,0,1),color=match.teams[s.side].color;
   g.fillStyle='#071422';g.fillRect(0,74,960,340);
   for(let i=0;i<23;i++){const y=90+i*14,x=((i*147-progress*760)%1100+1100)%1100;this.line([{x:x-240,y:y+45},{x,y}],s.special?color+'80':'#38617f',i%3?2:4);}
@@ -81,7 +81,7 @@ export class Renderer{
   this.player(p,match,{x:236,y:334-jump,scale:2.6,pose:progress<.48?'shoot':'idle',frame:progress<.48?Math.min(7,Math.floor(windup*8)):0,labels:false,face:1});
   const gy=340,top=179;g.fillStyle='#bce5f712';g.fillRect(778,top,106,gy-top);for(let x=778;x<890;x+=18)this.line([{x,y:top},{x,y:gy}],'#c2dce355',1);for(let y=top;y<gy;y+=16)this.line([{x:778,y},{x:884,y}],'#c2dce355',1);g.strokeStyle='#f9f5dd';g.lineWidth=8;g.strokeRect(778,top,106,gy-top);
   for(let y=top;y<gy;y+=28){g.fillStyle='#f3525b';g.fillRect(774,y,8,13);}
-  const keeperCol=s.keeperChoice?.startsWith('left')?-1:s.keeperChoice?.startsWith('right')?1:s.keeperChoice?0:s.col,chosen=s.keeperChoice?.includes('high')?0:s.keeperChoice?.includes('low')?1:s.row,keeperY=340-(chosen===0?58:8)*Math.sin(flight*Math.PI/2),failed=s.outcome==='goal'&&flight>.75;
+  const keeperCol=COURSES.find(c=>c.id===s.keeperChoice)?.col??s.col,chosen=s.keeperChoice==='nutmeg'?1:0,keeperY=340-(chosen===0?58:8)*Math.sin(flight*Math.PI/2),failed=s.outcome==='goal'&&flight>.75;
   this.player(k,match,{x:738+flight*(keeperCol*23-13),y:keeperY,scale:2.7,pose:failed?'down':flight>.1?'save':'idle',frame:Math.floor(flight*3),labels:false,face:-1});
   if(progress>=.48){
    const endX=s.outcome==='goal'?820+s.col*15:725,endY=s.row===0?205:306;
@@ -96,7 +96,7 @@ export class Renderer{
     if(s.special&&match.teams[s.side].effect==='fire')this.polygon([{x:bx-9,y:by-11},{x:bx-47,y:by-24},{x:bx-34,y:by-4},{x:bx-62,y:by+10},{x:bx-8,y:by+12}],'#ff733e');
    }
   }
-  const course=(s.col===-1?'左':s.col===1?'右':'中央')+(s.row===0?'上':'下');
-  this.text(progress>.88?({goal:'GOAL！',catch:'キャッチ！ 速攻！',parry:'弾いた！ こぼれ球へ！'}[s.outcome]):course+'へ！'+(s.counter?' 速攻ボーナス':s.chain?' 特殊連携ボーナス':''),480,390,19,'#ffe3a0');
+  const course=COURSES.find(c=>c.id===s.courseId)?.label||'';
+  this.text(progress>.88?({goal:'GOAL！',catch:'キャッチ！ 速攻！',parry:'ストップ！ 攻守交代！'}[s.outcome]):course+'へ！'+(s.counter?' 速攻ボーナス':s.chain?' 特殊連携ボーナス':''),480,390,19,'#ffe3a0');
  }
 }
