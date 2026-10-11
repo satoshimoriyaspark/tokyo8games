@@ -32,6 +32,8 @@
 
 .race-progress{background:#162c46;color:#e0edf7;border:3px solid var(--ink);border-top:0}.progress-caption{display:flex;justify-content:space-between;gap:8px;padding:6px 9px 0;font-size:10px;font-weight:700}.progress-caption b{color:#ffe500}body.racing #raceProgress #profile{aspect-ratio:320/88;max-height:none;border:0}
 @media(max-height:500px) and (orientation:landscape){#raceProgress{grid-column:1;grid-row:7}}
+/* Keep the gathering runners visible underneath the start cue. */
+.start-countdown{justify-content:flex-start;padding-top:5px;gap:2px;background:none}.start-countdown.go{background:none}#countNumber{font-size:clamp(34px,8vw,52px)}.start-countdown.lineup #countNumber{font-size:clamp(20px,4.5vw,32px)}.start-countdown.go #countNumber{font-size:clamp(26px,6vw,42px)}#countHint{padding:3px 7px;font-size:clamp(10px,2.7vw,12px);border-width:1px}
 </style>
 </head>
 
@@ -73,7 +75,7 @@
 <div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden>一時停止</button><button id="back" class="quiet" hidden>えらび直す</button></div></div>
 <div id="paused" class="paused" hidden>ひと休み中。再開ボタンで走り出そう！</div>
 <div class="hud"><span id="place">大手町</span><span id="rank">—位 / 20</span><span id="distance">あと 21.3km</span></div>
-<div id="raceStage" class="race-stage"><canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。横スクロール駅伝レース"></canvas><div id="startCountdown" class="start-countdown" hidden role="status" aria-live="assertive" aria-atomic="true"><b id="countNumber">3</b><span id="countHint">左足から、リズムよく！</span></div></div>
+<div id="raceStage" class="race-stage"><canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。20人が集まるスタートから、横スクロール駅伝レース"></canvas><div id="startCountdown" class="start-countdown" hidden role="status" aria-live="assertive" aria-atomic="true"><b id="countNumber">3</b><span id="countHint">左足から、リズムよく！</span></div></div>
 <div id="raceProgress" class="race-progress"><div class="progress-caption"><strong>20チームの位置</strong><span><b aria-hidden="true">▼</b> きみのたすき</span></div><canvas id="profile" width="320" height="88" role="img" aria-label="20チームの進捗と区間の高低差。四角はたすき色、黄色い印はあなた。集団は重ならないよう上下に並べて表示します。"></canvas></div>
 <div class="meters"><div><div class="meter-label"><span>スタミナ</span><b id="energy">100%</b></div><div class="bar"><i id="bar"></i></div></div><div><div class="meter-label"><span>脚のつかれ</span><b id="legs">0%</b></div><div class="bar"><i id="legBar"></i></div></div></div>
 <div class="tactics"><span id="shelter">風よけ —</span><span id="pace">ペース 待機中</span><span id="wind">向かい風</span><span id="terrain">平地</span></div>
@@ -133,14 +135,16 @@ $('storyRoll').addEventListener('animationend',e=>{if(e.target===$('storyRoll')&
 document.addEventListener('keydown',e=>{if(!storyPlaying||e.repeat)return;if(e.key==='Escape'){e.preventDefault();opening()}else if((e.key===' '||e.key==='Enter')&&e.target.tagName!=='BUTTON'){e.preventDefault();finishStory()}});
 function countdownView(value,go=false){
  const panel=$('startCountdown'),number=$('countNumber');
- panel.hidden=false;panel.classList.toggle('go',go);
+ panel.hidden=false;panel.classList.toggle('go',go);panel.classList.toggle('lineup',value==='位置について！');
  if(number.textContent!==value){number.textContent=value;number.classList.remove('count-pop');void number.offsetWidth;number.classList.add('count-pop');}
- $('countHint').textContent=go?'左 → 右、交互にタップ！':'左足から、リズムよく！';
+ $('countHint').textContent=go?'左 → 右、交互にタップ！':value==='位置について！'?'20チーム、スタートラインへ':'左足から、リズムよく！';
 }
 function advanceCountdown(t){
  if(!s)return;
  if(s.counting&&!s.paused&&!document.hidden){
+  s.lineupElapsed=Math.min(2,Math.max(0,(t-s.countdownStartedAt+2000)/1000));
   const remaining=3-(t-s.countdownStartedAt)/1000;
+  if(remaining>3){countdownView('位置について！');return;}
   if(remaining>0){countdownView(String(Math.ceil(remaining)));return;}
   s.counting=false;s.active=true;s.goUntil=t+750;s.lastTap=-999;s.lastInput='';
   s.notice='スタート！ 左 → 右を1秒に3〜4回';s.noticeUntil=3;
@@ -161,25 +165,37 @@ difficulties.forEach((item,i)=>{const b=document.createElement('button');b.type=
 function chooseDifficulty(i){if(s&&s.active)return;difficultyIndex=i;Array.from($('difficulties').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('difficultyTip').textContent=difficulties[i].tip;renderHUD();}
 function chooseCourse(i){if(s&&s.active)return;courseIndex=i;s=null;Array.from($('courses').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('courseRoute').textContent=courses[i].route+'｜'+courses[i].km+'km';$('courseTip').textContent=courses[i].tip;renderHUD();draw();}
 function terrainAt(km,co=course()){let seg=co.profile.length-2;for(let i=0;i<co.profile.length-1;i++)if(km<co.profile[i+1][0]){seg=i;break}const [x,a]=co.profile[seg],[y,b]=co.profile[seg+1];return {height:a+(b-a)*clamp((km-x)/(y-x),0,1),grade:(b-a)/((y-x)*1000)};}
-function makeRunner(team,index=-1){return {team,index,km:0,speed:.7,energy:100,legs:0,finishTime:null,effort:1,sprint:0,cooldown:0,drafting:false,wind:0,grade:0,phase:0};}
-function reset(){if(!spriteReady||(s&&(s.active||s.counting)))return;stopStory();readyAfterStory=false;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:false,counting:true,countdownStartedAt:performance.now(),goUntil:0,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'位置について！ カウントダウンのあと、左足からタップ',noticeUntil:3,finalCalled:false};$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;$('message').textContent='合図が出るまで、ひと呼吸。左足から走り出そう！';last=performance.now();countdownView('3');renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
+function makeRunner(team,index=-1){return {team,index,paceFactor:index<0?1:.90+((index*7+4)%19)/18*.20,km:0,speed:.7,energy:100,legs:0,finishTime:null,effort:1,sprint:0,cooldown:0,drafting:false,wind:0,grade:0,phase:0};}
+function reset(){if(!spriteReady||(s&&(s.active||s.counting)))return;stopStory();readyAfterStory=false;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:false,counting:true,countdownStartedAt:performance.now()+2000,lineupElapsed:0,goUntil:0,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'位置について！ カウントダウンのあと、左足からタップ',noticeUntil:3,finalCalled:false};$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;$('message').textContent='合図が出るまで、ひと呼吸。左足から走り出そう！';last=performance.now();countdownView('位置について！');renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
 function menu(){stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('opening').hidden=true;$('setup').hidden=false;$('raceArea').hidden=true;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=true;$('back').hidden=true;$('paused').hidden=true;document.body.classList.remove('racing');chooseCourse(courseIndex);showStep(0);}
 function notice(text,seconds=1.1){s.notice=text;s.noticeUntil=s.elapsed+seconds;$('feedback').textContent=text;}
 function tap(side){if(!s||!s.active||s.paused)return;const now=performance.now()/1000,delta=now-s.lastTap,next=side==='left'?'右':'左';if(s.lastInput===side){s.mode='stumble';s.player.energy=clamp(s.player.energy-.35,0,100);notice('同じ足が続いています。次は'+next+'足');}else if(!s.lastInput||delta>1){s.mode='cruise';notice('次は'+next+'足！ 一定のリズムで');}else if(delta<s.difficulty.minBeat){s.mode='rush';notice('速すぎ！ スタミナを使います。少しゆっくり');}else if(delta<s.difficulty.maxBeat){s.mode='cruise';notice('いいリズム！ 次は'+next+'足');}else{s.mode='save';notice('温存ペース。次は'+next+'足');}s.lastInput=side;s.lastTap=now;renderHUD();}
 function startSprint(r){if(r.sprint>0||r.cooldown>0||r.energy<30)return false;r.sprint=10;return true;}
 function dash(){if(!s||!s.active||s.paused)return;const p=s.player;if(p.sprint>0){p.sprint=0;p.cooldown=12;notice('スパート中止。12秒間、脚を整えよう',2);}else if(startSprint(p)){s.sprints++;notice('スパート！ 左右のタップを続けよう',2);}renderHUD();}
-function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
+function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();s.lineupElapsed=2;countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
 ['left','right'].forEach(id=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();tap(id)});b.addEventListener('click',e=>{if(e.detail===0)tap(id)});b.addEventListener('contextmenu',e=>e.preventDefault());});
 $('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():opening()});$('retry').addEventListener('click',reset);$('back').addEventListener('click',menu);$('selectAgain').addEventListener('click',menu);$('pause').addEventListener('click',pause);
 document.addEventListener('keydown',e=>{if(e.repeat||!s||(!s.active&&!s.counting))return;const keys=['ArrowLeft','a','A','ArrowRight','l','L',' ','Escape'];if(!keys.includes(e.key))return;if(e.key===' '&&e.target&&e.target.tagName==='BUTTON')return;e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))tap('left');else if(['ArrowRight','l','L'].includes(e.key))tap('right');else if(e.key===' ')dash();else pause();});
 document.addEventListener('keydown',e=>{if($('result').hidden)return;if(e.key==='Tab'){e.preventDefault();if(document.activeElement===$('retry'))$('selectAgain').focus();else $('retry').focus()}else if(e.key==='Escape')menu()});
 document.addEventListener('visibilitychange',()=>{if(storyPlaying)$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';if(document.hidden&&s&&(s.active||s.counting)&&!s.paused)pause()});
-function aiEffort(r){const remaining=s.course.km-r.km,style=r.index%3;let effort=style===0?(r.km<5?1.08:.96):style===1?.98:.96;effort+=(r.index%5-2)*.007;if(remaining<3)effort=1.035;if(r.energy<27)effort=.80;if(r.grade>.035&&r.energy<55)effort=Math.min(effort,.86);if(r.grade<-.025&&r.legs>20)effort=Math.min(effort,.88);const attack=remaining<(style===2?2.1:style===1?1.55:1.1)*s.difficulty.attack||(s.difficulty.earlyAttack&&style===0&&r.km>2&&r.km<2.4);if(attack&&r.energy>42&&r.legs<45)startSprint(r);return effort-.025;}
-function moveRunner(r,dt,effort,t0){if(r.finishTime!==null)return;const grade=r.grade,up=Math.max(0,grade),down=Math.max(0,-grade),recover=effort<.7,saving=effort<.93;const bursting=r.sprint>0&&r.energy>0&&!recover;const fatigue=.57+.43*clamp(r.energy/40,0,1),legPenalty=1-clamp((r.legs-20)*.004,0,.32);const terrain=clamp(1-up*4.5+down*3.4,.62,1.23);const drag=r.wind*(r.drafting?.24:1);const target=(effort+(bursting?.40:0))*terrain*(1-drag)*fatigue*legPenalty*(r.index>=0?s.difficulty.aiSpeed:1);r.speed+=(target-r.speed)*Math.min(1,dt*3);const drain=recover?-4:saving?-1.15:-.04+up*6+(effort>1.07?1.2:0)+(r.drafting?-.13:.15)+r.wind*(r.drafting?.2:1);const adjustedDrain=drain<0&&r.index<0?drain*s.difficulty.recovery:drain;r.energy=clamp(r.energy-(adjustedDrain+(bursting?4:0))*dt,0,100);const strain=down>.025?(bursting?2.4:effort>1.07?.85:saving?-.12:.06):-.16;r.legs=clamp(r.legs+strain*dt,0,100);r.cooldown=Math.max(0,r.cooldown-dt);if(r.sprint>0){r.sprint=Math.max(0,r.sprint-dt);if(r.sprint===0||r.energy===0){r.sprint=0;r.cooldown=12;}}const step=r.speed*dt*.16;if(r.km+step>=s.course.km)r.finishTime=t0+dt*(s.course.km-r.km)/step;r.km=Math.min(s.course.km,r.km+step);r.phase+=r.speed*dt*9;}
+function aiEffort(r){
+ const remaining=s.course.km-r.km,progress=r.km/s.course.km,style=r.index%4;
+ // Early leader, steady cruiser, late mover, and a runner who alternates tempo.
+ let effort=style===0?(progress<.25?1.065:.95):style===1?.985:style===2?(progress<.65?.945:1.025):.975+.035*Math.sin(s.elapsed/(3+r.index%4)+r.index*1.7);
+ effort+=(r.index%5-2)*.006;
+ if(remaining<3)effort+=style===2?.035:.025;
+ if(r.energy<27)effort=.80;
+ if(r.grade>.035&&r.energy<55)effort=Math.min(effort,.86);
+ if(r.grade<-.025&&r.legs>20)effort=Math.min(effort,.88);
+ const attack=remaining<(style===2?2.3:style===1?1.65:style===3?1.4:1.05)*s.difficulty.attack||(s.difficulty.earlyAttack&&style===0&&r.km>2&&r.km<2.4);
+ if(attack&&r.energy>42&&r.legs<45)startSprint(r);
+ return effort-.025;
+}
+function moveRunner(r,dt,effort,t0){if(r.finishTime!==null)return;const grade=r.grade,up=Math.max(0,grade),down=Math.max(0,-grade),recover=effort<.7,saving=effort<.93;const bursting=r.sprint>0&&r.energy>0&&!recover;const fatigue=.57+.43*clamp(r.energy/40,0,1),legPenalty=1-clamp((r.legs-20)*.004,0,.32);const terrain=clamp(1-up*4.5+down*3.4,.62,1.23);const drag=r.wind*(r.drafting?.24:1);const target=(effort+(bursting?.40:0))*terrain*(1-drag)*fatigue*legPenalty*(r.index>=0?s.difficulty.aiSpeed*r.paceFactor:1);r.speed+=(target-r.speed)*Math.min(1,dt*3);const drain=recover?-4:saving?-1.15:-.04+up*6+(effort>1.07?1.2:0)+(r.drafting?-.13:.15)+r.wind*(r.drafting?.2:1);const adjustedDrain=drain<0&&r.index<0?drain*s.difficulty.recovery:drain;r.energy=clamp(r.energy-(adjustedDrain+(bursting?4:0))*dt,0,100);const strain=down>.025?(bursting?2.4:effort>1.07?.85:saving?-.12:.06):-.16;r.legs=clamp(r.legs+strain*dt,0,100);r.cooldown=Math.max(0,r.cooldown-dt);if(r.sprint>0){r.sprint=Math.max(0,r.sprint-dt);if(r.sprint===0||r.energy===0){r.sprint=0;r.cooldown=12;}}const step=r.speed*dt*.16;if(r.km+step>=s.course.km)r.finishTime=t0+dt*(s.course.km-r.km)/step;r.km=Math.min(s.course.km,r.km+step);r.phase+=r.speed*dt*9;}
 function tick(dt){if(!s||!s.active||s.paused)return;const all=[s.player,...s.ai],t0=s.elapsed;
  // Read everyone at the same instant so iteration order cannot grant a drafting advantage.
  for(const r of all){r.grade=terrainAt(r.km).grade;r.wind=s.course.wind+(s.course.id===1&&r.km>=17&&r.km<18.2?.07:0);r.drafting=all.some(a=>a!==r&&a.finishTime===null&&a.km-r.km>.004&&a.km-r.km<.13);}
- const mode=performance.now()/1000-s.lastTap>.8?'recover':s.mode;const effort={recover:.54,save:.86,cruise:1.055,rush:1.10,stumble:.72}[mode];s.player.effort=effort;s.currentMode=mode;moveRunner(s.player,dt,effort,t0);for(const a of s.ai)moveRunner(a,dt,aiEffort(a),t0);s.elapsed+=dt;if(s.player.drafting)s.draftSeconds+=dt;
+ const mode=performance.now()/1000-s.lastTap>.8?'recover':s.mode;const effort={recover:.54,save:.86,cruise:1.055,rush:1.10,stumble:.72}[mode];s.player.effort=effort;s.currentMode=mode;moveRunner(s.player,dt,effort,t0);for(const a of s.ai){a.effort=aiEffort(a);moveRunner(a,dt,a.effort,t0);}s.elapsed+=dt;if(s.player.drafting)s.draftSeconds+=dt;
  if(s.course.km-s.player.km<=2&&!s.finalCalled){s.finalCalled=true;notice('残り2km！ 体力と脚を見て、勝負のスパート',3);}
  if(s.player.finishTime!==null){s.active=false;s.done=true;s.elapsed=s.player.finishTime;$('pause').hidden=true;$('result').hidden=false;$('resultRank').textContent=rank()+'位';$('resultTitle').textContent=rank()===1?'やったね！ 区間1位！':rank()<=3?'すごい！ 表彰台だ！':'完走！ ナイスラン！';$('raceArea').inert=true;$('retry').focus({preventScroll:true});$('resultDetails').textContent=s.difficulty.label+'｜'+s.course.goal+'に到着。記録 '+clock(s.elapsed)+'｜風よけ '+Math.round(s.draftSeconds)+'秒｜スパート '+s.sprints+'回。スタミナ '+Math.round(s.player.energy)+'%・脚への負担 '+Math.round(s.player.legs)+'%。';$('message').textContent=teamColors[selected][0]+'のたすきをつないだ！';$('feedback').textContent='ゴール！ ペース配分を変えて、もう一度挑戦しよう。';renderHUD();}
 }
@@ -256,11 +272,11 @@ function blitRunner(target,x,feet,team,key,phase,scale=1){
  target.imageSmoothingEnabled=false;
  target.drawImage(sheet,frame*48,0,48,48,Math.round(x-def.chest[frame]*scale),Math.round(feet-46*scale),48*scale,48*scale);
 }
-function runner(x,feet,r,player=false){
- const key=r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
- rect(x-10,feet-1,19,2,player?'#d3ba56':'#535c68');
- blitRunner(ctx,x,feet,r.team,key,r.phase*1.5+(r.index>=0?r.index*.7:0));
- if(player){rect(x-7,feet-51,15,3,'#102137');rect(x-6,feet-52,13,3,'#ffe500');rect(x-3,feet-49,7,2,'#ffe500');rect(x-1,feet-47,3,2,'#ffe500');}
+function runner(x,feet,r,player=false,scale=1,walkingPhase=null){
+ const key=walkingPhase!==null?'jog':r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
+ rect(x-10*scale,feet-1,Math.round(19*scale),2,player?'#d3ba56':'#535c68');
+ blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*1.5+(r.index>=0?r.index*.7:0):walkingPhase,scale);
+ if(player){const top=feet-52*scale;rect(x-6,top,13,3,'#102137');rect(x-5,top-1,11,3,'#ffe500');rect(x-3,top+2,7,2,'#ffe500');rect(x-1,top+4,3,2,'#ffe500');}
 }
 const reduceCharacterMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 function drawCharacterCards(t){
@@ -276,10 +292,46 @@ function drawCharacterCards(t){
  }
 }
 
-function draw(){const co=course(),p=s?s.player:null,scroll=p?p.km*260:0,grade=terrainAt(p?p.km:0).grade;rect(0,0,320,180,'#9bdaf0');rect(24,26,34,5,'#e7f9ff');rect(229,34,49,6,'#e7f9ff');rect(0,88,320,92,'#80bd77');if(co.id===1){for(let i=-1;i<13;i++){const x=i*38-scroll%38;rect(x,48,23,49,i%3?'#d5dce5':'#f1d2a7');for(let j=0;j<3;j++)rect(x+5,54+j*13,5,7,'#638ba9');}}else{for(let x=0;x<320;x+=4){const h=22+26*Math.sin(x/69)+15*Math.sin(x/27);rect(x,78-h,4,34+h,'#5c998f');}for(let i=-1;i<13;i++){const x=i*32-scroll%32;rect(x+6,78,4,27,'#725942');rect(x,76,16,14,'#39795e');rect(x+3,69,10,10,'#39795e');}}
- const roadY=x=>112-clamp(grade*2,-.11,.11)*(x-116);for(let x=0;x<320;x+=4){const y=roadY(x);rect(x,y,4,180-y,'#777b83');rect(x,y,4,3,'#ece6c9');}for(let i=0;i<12;i++){const x=i*34-scroll%34;rect(x,roadY(x)+48,18,2,'#e7e2ce');}rect(6,6,153,19,'#1c3658');ctx.fillStyle='white';ctx.font='10px monospace';ctx.fillText(currentPlace(),12,19);rect(235,6,78,19,'#1c3658');ctx.fillStyle='#e4f5ff';ctx.fillText(p&&p.drafting?'風よけ中':'← 向かい風',241,19);
- if(p){const visible=s.ai.filter(a=>Math.abs(a.km-p.km)<1.2).sort((a,b)=>Math.abs(a.km-p.km)-Math.abs(b.km-p.km)).slice(0,6).map((a,i)=>({a,x:116+(a.km-p.km)*165+[-34,34][i%2],y:[136,153][i%2]})).filter((v,i,all)=>!all.slice(0,i).some(other=>other.y===v.y&&Math.abs(other.x-v.x)<34)).sort((a,b)=>a.y-b.y);if(co.km-p.km<.9){const x=116+(co.km-p.km)*165;rect(x,roadY(x),3,65,'#fff');for(let j=0;j<9;j++)rect(x,roadY(x)+j*7,3,3,'#23324b');}for(const v of visible)runner(v.x,v.y+(roadY(v.x)-112),v.a);if(p.drafting){rect(90,155,14,2,'#8aefdb');rect(84,161,16,2,'#8aefdb');}if(p.sprint>0){rect(85,158,16,2,'#ffe28a');rect(78,164,24,2,'#ffe28a');}runner(116,174,p,true);}
- else {runner(180,136,makeRunner(teamColors[0]));runner(235,153,makeRunner(teamColors[3]));runner(73,153,makeRunner(teamColors[4]));runner(116,174,makeRunner(teamColors[selected]),true);}
+function raceField(){
+ if(!s)return null;
+ const blend=1-Math.pow(1-clamp(s.elapsed/5,0,1),2),playerX=226-110*blend;
+ const entries=[...s.ai,s.player].map((r,slot)=>{
+  const lane=Math.floor(slot/5),column=slot%5,startX=30+column*44+(lane%2?20:0),delay=column*.11+lane*.08;
+  const settle=reduceCharacterMotion?1:clamp((s.lineupElapsed-delay)/.85,0,1),ease=1-Math.pow(1-settle,3);
+  return {runner:r,lane,x:playerX+(r.km-s.player.km)*165+(startX-226)*(1-blend)-14*(1-ease),y:91+lane*26+3*(1-ease),walking:s.counting&&settle>0&&settle<1?(s.lineupElapsed-delay)*9:null};
+ });
+ // Pack nearby runners into stable rows instead of dropping overlapping athletes.
+ // The formation offset fades after the gun; distance differences drive the field.
+ for(let lane=0;lane<4;lane++){
+  const row=entries.filter(e=>e.lane===lane&&e.x>-50&&e.x<370).sort((a,b)=>a.x-b.x||a.runner.index-b.runner.index);
+  let displacement=0;
+  for(let i=0;i<row.length;i++){row[i].idealX=row[i].x;row[i].x=Math.max(row[i].x,i?row[i-1].x+30:row[i].x);displacement+=row[i].idealX-row[i].x;}
+  const own=row.find(e=>e.runner===s.player),shift=own?own.idealX-own.x:displacement/Math.max(1,row.length);
+  for(const e of row)e.x+=shift;
+ }
+ return {playerX,entries:entries.sort((a,b)=>a.lane-b.lane||a.x-b.x)};
+}
+function draw(){
+ const co=course(),p=s?s.player:null,field=raceField(),playerX=field?field.playerX:116,scroll=p?p.km*260:0,grade=terrainAt(p?p.km:0).grade;
+ rect(0,0,320,180,'#9bdaf0');rect(24,26,34,5,'#e7f9ff');rect(229,34,49,6,'#e7f9ff');rect(0,72,320,108,'#80bd77');
+ if(co.id===1){for(let i=-1;i<13;i++){const x=i*38-scroll%38;rect(x,40,23,49,i%3?'#d5dce5':'#f1d2a7');for(let j=0;j<3;j++)rect(x+5,46+j*13,5,7,'#638ba9');}}
+ else{for(let x=0;x<320;x+=4){const h=22+26*Math.sin(x/69)+15*Math.sin(x/27);rect(x,72-h,4,34+h,'#5c998f');}for(let i=-1;i<13;i++){const x=i*32-scroll%32;rect(x+6,65,4,24,'#725942');rect(x,63,16,14,'#39795e');rect(x+3,56,10,10,'#39795e');}}
+ const roadY=x=>78-clamp(grade*2,-.09,.09)*(x-playerX);
+ for(let x=0;x<320;x+=4){const y=roadY(x);rect(x,y,4,180-y,'#777b83');rect(x,y,4,3,'#ece6c9');}
+ for(let i=0;i<12;i++){const x=i*34-scroll%34;rect(x,roadY(x)+76,18,2,'#e7e2ce');}
+ rect(6,6,153,19,'#1c3658');ctx.fillStyle='white';ctx.font='10px monospace';ctx.fillText(currentPlace(),12,19);rect(235,6,78,19,'#1c3658');ctx.fillStyle='#e4f5ff';ctx.fillText(s&&s.counting?'20チーム':p&&p.drafting?'風よけ中':'← 向かい風',241,19);
+ if(p){
+  const startX=playerX+28-p.km*165;
+  if(startX>-12&&startX<332){rect(startX,roadY(startX),3,98,'#fff');for(let y=0;y<96;y+=8)rect(startX,roadY(startX)+y,3,4,'#00bee7');rect(startX-17,47,40,15,'#102137');ctx.fillStyle='#ffe500';ctx.font='9px monospace';ctx.fillText('START',startX-13,58);}
+  if(co.km-p.km<1.25){const x=playerX+(co.km-p.km)*165;rect(x,roadY(x),3,98,'#fff');for(let y=0;y<96;y+=8)rect(x,roadY(x)+y,3,4,'#23324b');}
+  for(const v of field.entries){
+   if(v.x< -24||v.x>344)continue;
+   const feet=clamp(v.y+roadY(v.x)-78,84,172),you=v.runner===p;
+   if(you&&p.drafting){rect(v.x-24,feet-12,11,2,'#8aefdb');rect(v.x-29,feet-7,12,2,'#8aefdb');}
+   if(you&&p.sprint>0){rect(v.x-24,feet-12,13,2,'#ffe28a');rect(v.x-30,feet-7,18,2,'#ffe28a');}
+   runner(v.x,feet,v.runner,you,.75,v.walking);
+  }
+ }else{runner(180,105,makeRunner(teamColors[0]),false,.75);runner(235,136,makeRunner(teamColors[3]),false,.75);runner(73,136,makeRunner(teamColors[4]),false,.75);runner(116,169,makeRunner(teamColors[selected]),true,.75);}
  rect(0,176,320,4,'#253b59');rect(0,176,320*(p?p.km/co.km:0),4,'#f5cf44');drawProgress();
 }
 // Stable team lanes keep all 20 squares visible. Lines point to exact course positions.
