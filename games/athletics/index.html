@@ -100,6 +100,7 @@ const rect=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y
 const atlasImg=new Image(),spriteVariants=[null,null,null,null];
 let spriteReady=false;
 atlasImg.onload=()=>{
+ if(atlasImg.naturalWidth!==256||atlasImg.naturalHeight!==528){spriteReady=false;console.warn('Sprite atlas unexpected dimensions');return;}
  spriteVariants[0]=atlasImg;
  const palettes=[
   [[63,165,234],[116,204,245],[33,107,185]],
@@ -124,13 +125,24 @@ atlasImg.onload=()=>{
  spriteReady=true;
 };
 atlasImg.onerror=()=>{spriteReady=false;console.warn('Sprite atlas missing; using programmatic fallback')};
-atlasImg.src='./assets/sprites/player/runner_atlas.png';
+atlasImg.src='./assets/sprites/player/athletics_atlas_v2.png';
 function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
  if(!spriteReady)return false;
  const isRun=phase==='run'||phase==='finishDash';
  let row=0,frame=0;
- if(isRun){
-  if(travel<0.5){row=1;frame=Math.min(2,Math.floor(travel*5))}
+ if(selected===2&&isRun&&elapsed<invuln){
+  // hurdle-right: row 6 is 7 frames from launch through landing.
+  row=6;frame=Math.min(6,Math.floor(Math.max(0,invuln-elapsed)/.44*7));
+ }else if(selected===4&&bHeld&&isRun){
+  // javelin wind-up: row 7, two right-facing frames.
+  row=7;frame=Math.floor(elapsed*4)%2;
+ }else if(selected===4&&phase==='between'){
+  // release + follow-through, split across rows 8 and 10.
+  const age=Math.max(0,1.2-(deadline-performance.now())/1000);
+  if(age<.45){row=8;frame=Math.min(2,Math.floor(age/.15))}
+  else{row=10;frame=Math.min(1,Math.floor((age-.45)/.25))}
+ }else if(isRun){
+  if(travel<.5){row=1;frame=Math.min(2,Math.floor(travel*5))}
   else {const jog=selected===1;row=jog?3:2;frame=Math.floor(travel*(jog?1.2:2.8)+seed*.5)%(jog?6:8)}
  }
  const img=spriteVariants[cpuIndex+1]||atlasImg;
