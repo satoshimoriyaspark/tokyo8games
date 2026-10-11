@@ -22,6 +22,14 @@
     {
       "source": "/kwb/",
       "destination": "/games/kwb/index.html"
+    },
+    {
+      "source": "/handball",
+      "destination": "/games/handball/index.html"
+    },
+    {
+      "source": "/handball/",
+      "destination": "/games/handball/index.html"
     }
   ]
 }

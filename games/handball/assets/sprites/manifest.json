@@ -1,0 +1,178 @@
+{
+  "ryuji": {
+    "file": "ryuji.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "columns": 8,
+    "animations": {
+      "idle": {
+        "start": 0,
+        "count": 4,
+        "fps": 7
+      },
+      "run": {
+        "start": 4,
+        "count": 8,
+        "fps": 9
+      },
+      "dribble": {
+        "start": 12,
+        "count": 6,
+        "fps": 9
+      },
+      "pass": {
+        "start": 18,
+        "count": 5,
+        "fps": 7
+      },
+      "shoot": {
+        "start": 23,
+        "count": 8,
+        "fps": 7
+      },
+      "down": {
+        "start": 31,
+        "count": 4,
+        "fps": 7
+      },
+      "celebrate": {
+        "start": 35,
+        "count": 4,
+        "fps": 7
+      }
+    },
+    "uniform": "#d93a43"
+  },
+  "hayato": {
+    "file": "hayato.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "columns": 8,
+    "animations": {
+      "idle": {
+        "start": 0,
+        "count": 4,
+        "fps": 7
+      },
+      "run": {
+        "start": 4,
+        "count": 8,
+        "fps": 9
+      },
+      "dribble": {
+        "start": 12,
+        "count": 6,
+        "fps": 9
+      },
+      "pass": {
+        "start": 18,
+        "count": 5,
+        "fps": 7
+      },
+      "shoot": {
+        "start": 23,
+        "count": 8,
+        "fps": 7
+      },
+      "down": {
+        "start": 31,
+        "count": 4,
+        "fps": 7
+      },
+      "celebrate": {
+        "start": 35,
+        "count": 4,
+        "fps": 7
+      }
+    },
+    "uniform": "#287cda"
+  },
+  "gouta": {
+    "file": "gouta.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "columns": 8,
+    "animations": {
+      "idle": {
+        "start": 0,
+        "count": 4,
+        "fps": 7
+      },
+      "run": {
+        "start": 4,
+        "count": 8,
+        "fps": 9
+      },
+      "dribble": {
+        "start": 12,
+        "count": 6,
+        "fps": 9
+      },
+      "pass": {
+        "start": 18,
+        "count": 5,
+        "fps": 7
+      },
+      "shoot": {
+        "start": 23,
+        "count": 8,
+        "fps": 7
+      },
+      "down": {
+        "start": 31,
+        "count": 4,
+        "fps": 7
+      },
+      "celebrate": {
+        "start": 35,
+        "count": 4,
+        "fps": 7
+      }
+    },
+    "uniform": "#289557"
+  },
+  "ren": {
+    "file": "ren.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "columns": 8,
+    "animations": {
+      "idle": {
+        "start": 0,
+        "count": 4,
+        "fps": 7
+      },
+      "run": {
+        "start": 4,
+        "count": 8,
+        "fps": 9
+      },
+      "dribble": {
+        "start": 12,
+        "count": 6,
+        "fps": 9
+      },
+      "pass": {
+        "start": 18,
+        "count": 5,
+        "fps": 7
+      },
+      "shoot": {
+        "start": 23,
+        "count": 8,
+        "fps": 7
+      },
+      "down": {
+        "start": 31,
+        "count": 4,
+        "fps": 7
+      },
+      "celebrate": {
+        "start": 35,
+        "count": 4,
+        "fps": 7
+      }
+    },
+    "uniform": "#a77cda"
+  }
+}
