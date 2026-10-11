@@ -15,7 +15,7 @@
 .feedback{scroll-margin-top:12px}
 </style>
 </head>
-<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.4</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main><footer class="footer"><button id="sources">出典・素材について</button>｜<a href="/">ゲーム一覧</a><br>非公式のサッカークイズゲームです。</footer></div>
+<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.5</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main><footer class="footer"><button id="sources">出典・素材について</button>｜<a href="/">ゲーム一覧</a><br>非公式のサッカークイズゲームです。</footer></div>
 <div id="overlay" class="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="card"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button id="dialogOK" class="primary">OK</button></div></div>
 <script>
 'use strict';
@@ -49,7 +49,73 @@ awards.forEach(([season,a,club,l],i)=>add(`pl-player-${season.slice(0,4)}`,'play
 jpqs.forEach(([y,t,a,l],i)=>add(`jp-${y}-${i}`,'players',l,`${y}年、${t}`,a,rotate(jp,i+2),`決めたのは${a}。${y}年大会での日本代表のゴールだよ。`,jfa(y),y));
 ec.forEach((a,i)=>{const y=2011+i,pool=[...new Set(ec)];add(`ec-${y}`,'clubs',y>=2019?1:y>=2015?2:3,`${y}年度の天皇杯サッカーで優勝したクラブは？`,a,rotate(pool,i%pool.length),`${y}年度の優勝は${a}。天皇杯は、リーグ戦とは別の大会だよ。`,'https://www.jleague.jp/emperorscup/2025/history.html',`${y}年度`);});
 flags.forEach(([iso,a,l],i)=>{const emoji=[...iso].map(c=>String.fromCodePoint(0x1f1e6+c.charCodeAt(0)-65)).join('');add(`flag-${iso}`,'flags',l,'この国旗の国はどこ？',a,rotate(flags.map(r=>r[1]),i+3),`${a}の国旗だよ。色や模様を見比べて覚えよう。`,'https://www.mofa.go.jp/mofaj/kids/kokki/list.html','国旗（2026-10-11確認）',emoji);});
-if(Q.length!==114||new Set(Q.map(q=>q.id)).size!==114)throw Error('Question bank validation failed');
+// Expansion checked 2026-10-12 (JST). Keep the original IDs and choices for saved games.
+const extraStart=Q.length;
+const jleagueHistory='https://www.jleague.jp/corporate/about_competitions/tournament_history/';
+const womenHistory='https://www.jfa.jp/about_jfa/fwwc2023/history.html';
+const women2023='https://www.uefa.com/news-media/news/027a-166817b8be17-9e0082e122cd-1000--spain-win-2023-women-s-world-cup-all-the-results/';
+const j1Champions=['ガンバ大阪','浦和レッズ','鹿島アントラーズ','鹿島アントラーズ','鹿島アントラーズ','名古屋グランパス','柏レイソル','サンフレッチェ広島','サンフレッチェ広島','ガンバ大阪','サンフレッチェ広島','鹿島アントラーズ','川崎フロンターレ','川崎フロンターレ','横浜F・マリノス','川崎フロンターレ','川崎フロンターレ','横浜F・マリノス','ヴィッセル神戸','ヴィッセル神戸'];
+const j1Pool=[...new Set(j1Champions)];
+j1Champions.forEach((a,i)=>{
+ const y=2005+i,l=y>=2017?1:y>=2010?2:3;
+ add(`j1-champion-${y}`,'clubs',l,`${y}年のJ1リーグで年間優勝したクラブは？`,a,rotate(j1Pool,i%j1Pool.length),`${y}年の年間王者は${a}。リーグカップや天皇杯とは別のタイトルだよ。`,jleagueHistory,y);
+});
+const j1Mvp=[
+ [2005,'アラウージョ','ガンバ大阪',3],[2006,'田中マルクス闘莉王','浦和レッズ',3],[2007,'ポンテ','浦和レッズ',3],[2008,'マルキーニョス','鹿島アントラーズ',3],[2009,'小笠原満男','鹿島アントラーズ',2],
+ [2010,'楢﨑正剛','名古屋グランパス',2],[2011,'レアンドロ・ドミンゲス','柏レイソル',3],[2012,'佐藤寿人','サンフレッチェ広島',2],[2013,'中村俊輔','横浜F・マリノス',1],[2014,'遠藤保仁','ガンバ大阪',1],
+ [2015,'青山敏弘','サンフレッチェ広島',2],[2016,'中村憲剛','川崎フロンターレ',1],[2017,'小林悠','川崎フロンターレ',2],[2018,'家長昭博','川崎フロンターレ',2],[2019,'仲川輝人','横浜F・マリノス',2],
+ [2020,'オルンガ','柏レイソル',2],[2021,'レアンドロ・ダミアン','川崎フロンターレ',2],[2022,'岩田智輝','横浜F・マリノス',2],[2023,'大迫勇也','ヴィッセル神戸',1],[2024,'武藤嘉紀','ヴィッセル神戸',1]
+];
+j1Mvp.forEach(([y,a,club,l],i)=>add(`j1-mvp-${y}`,'players',l,`${y}年のJリーグ最優秀選手賞（J1のMVP）を受賞した、${club}の選手は？`,a,rotate(j1Mvp.map(r=>r[1]),(i+3)%j1Mvp.length),`${a}が${y}年のMVPに選ばれたよ。所属クラブは受賞当時のものだよ。`,jleagueHistory,y));
+const womensCups=[
+ [1991,'中国','アメリカ',3],[1995,'スウェーデン','ノルウェー',3],[1999,'アメリカ','アメリカ',2],[2003,'アメリカ','ドイツ',2],[2007,'中国','ドイツ',2],
+ [2011,'ドイツ','日本',1],[2015,'カナダ','アメリカ',1],[2019,'フランス','アメリカ',1],[2023,'オーストラリアとニュージーランド','スペイン',1]
+];
+const womenNations=['日本','アメリカ','ドイツ','ノルウェー','スペイン','スウェーデン','中国','フランス','イングランド','ブラジル'];
+const womenHosts=[...new Set(womensCups.map(r=>r[1]))];
+womensCups.forEach(([y,host,win,l],i)=>{
+ const source=y===2023?women2023:womenHistory;
+ add(`wwc-${y}-winner`,'world',l,`${y}年の女子ワールドカップで優勝したチームは？`,win,rotate(womenNations,i),`${y}年大会の優勝は${win}。男子大会と女子大会は、それぞれ別に開催されているよ。`,source,y);
+ add(`wwc-${y}-host`,'world',Math.min(3,l+1),`${y}年の女子ワールドカップが実際に開催された国は？`,host,rotate(womenHosts,i%womenHosts.length),`${y}年大会の開催地は${host}。`+(y===2003?'当初の予定から変更され、アメリカで開催されたよ。':y===2023?'2つの国が共同で開催したよ。':'各国の代表チームが集まって戦ったよ。'),source,y);
+});
+const japanOpponents=[
+ ['wwc-1995-first-win',1995,2,'女子ワールドカップで、日本が本大会初勝利を挙げた相手は？','ブラジル','日本は2対1で勝利したよ。',womenHistory],
+ ['wwc-2011-quarter',2011,2,'女子ワールドカップ準々決勝で、日本が延長戦の末に1対0で破った相手は？','ドイツ','日本は開催国のドイツを破って準決勝へ進んだよ。',womenHistory],
+ ['wwc-2011-semi',2011,2,'女子ワールドカップ準決勝で、日本が3対1で破った相手は？','スウェーデン','逆転勝利で、日本は初めて決勝へ進んだよ。',womenHistory],
+ ['wwc-2011-final',2011,1,'女子ワールドカップ決勝で、日本がPK戦の末に破った相手は？','アメリカ','延長戦を終えて2対2。PK戦を3対1で制したよ。',womenHistory],
+ ['wwc-2015-quarter',2015,2,'女子ワールドカップ準々決勝で、日本が1対0で破った相手は？','オーストラリア','岩渕真奈のゴールで日本が勝ち進んだよ。',womenHistory],
+ ['wwc-2015-semi',2015,2,'女子ワールドカップ準決勝で、日本が2対1で破った相手は？','イングランド','日本は2大会連続の決勝進出を決めたよ。',womenHistory],
+ ['wc-2010-japan-round16',2010,2,'男子ワールドカップのラウンド16で、日本がPK戦を戦った相手は？','パラグアイ','延長戦まで0対0。日本はPK戦で3対5と惜しくも敗れたよ。',jfa(2010)],
+ ['wc-2018-japan-round16',2018,1,'男子ワールドカップのラウンド16で、日本が2対3で敗れた相手は？','ベルギー','日本が2点を先行したけれど、ベルギーが逆転した試合だよ。',jfa(2018)]
+];
+const opponentPool=[...new Set([...womenNations,'オーストラリア','パラグアイ','ベルギー','コロンビア'])];
+japanOpponents.forEach(([id,y,l,t,a,e,s],i)=>add(id,'world',l,`${y}年、${t}`,a,rotate(opponentPool,i+2),e,s,y));
+const extraMen=[
+ ['jp-2010-captain',2010,2,'男子ワールドカップで、日本のゲームキャプテンを務めた選手は？','長谷部誠','長谷部誠がゲームキャプテンを務め、日本はベスト16に進んだよ。'],
+ ['jp-2018-colombia-pk',2018,1,'男子ワールドカップのコロンビア戦で、PKによる先制点を決めた日本の選手は？','香川真司','香川真司のPKで日本が先制したよ。'],
+ ['jp-2018-colombia-header',2018,1,'男子ワールドカップのコロンビア戦で、勝ち越しゴールを決めた日本の選手は？','大迫勇也','本田圭佑のコーナーキックから大迫勇也が決め、日本は2対1で勝ったよ。'],
+ ['jp-2018-belgium-first',2018,2,'男子ワールドカップのベルギー戦で、日本の先制点を決めた選手は？','原口元気','後半に原口元気が決め、その後に乾貴士も得点したよ。'],
+ ['jp-2018-belgium-second',2018,2,'男子ワールドカップのベルギー戦で、日本の2点目を決めた選手は？','乾貴士','乾貴士のゴールで日本は一時2対0とリードしたよ。']
+];
+const menPool=[...new Set([...jp,...extraMen.map(r=>r[4])])];
+extraMen.forEach(([id,y,l,t,a,e],i)=>add(id,'players',l,`${y}年、${t}`,a,rotate(menPool,i+3),e,jfa(y),y));
+const extraWomen=[
+ ['wwc-player-2011-mvp',2011,1,'女子ワールドカップで、大会MVPと得点王を同時に受賞した日本の選手は？','澤穂希','澤穂希が2つの個人賞を獲得。日本の初優勝を支えたよ。',womenHistory],
+ ['wwc-player-2011-quarter',2011,2,'女子ワールドカップのドイツとの準々決勝で、延長戦の決勝点を決めた選手は？','丸山桂里奈','丸山桂里奈が延長戦で得点し、日本は1対0で勝ったよ。',womenHistory],
+ ['wwc-player-2011-final-first',2011,2,'女子ワールドカップ決勝で、日本の1点目を決め、1対1に追いついた選手は？','宮間あや','宮間あやが後半に同点ゴールを決めたよ。延長戦では澤穂希が2対2とするゴールを決めたよ。',womenHistory],
+ ['wwc-player-2011-semi',2011,2,'女子ワールドカップのスウェーデンとの準決勝で、2得点を挙げた日本の選手は？','川澄奈穂美','川澄奈穂美の2得点と澤穂希の1得点で、日本が3対1で勝ったよ。',womenHistory],
+ ['wwc-player-2023-scorer',2023,1,'女子ワールドカップで、5得点を挙げて得点王になった日本の選手は？','宮澤ひなた','宮澤ひなたが大会得点王に。日本の選手では2011年の澤穂希に続く受賞だよ。','https://www.fifa.com/ja/tournaments/womens/womensworldcup/australia-new-zealand2023/articles/womens-world-cup-australia-new-zealand-2023-golden-boots-japan-miyazawa-hinata-ja']
+];
+const womenPlayers=['澤穂希','丸山桂里奈','宮間あや','川澄奈穂美','宮澤ひなた','熊谷紗希','長谷川唯','田中美南','岩渕真奈'];
+extraWomen.forEach(([id,y,l,t,a,e,s],i)=>add(id,'players',l,`${y}年、${t}`,a,rotate(womenPlayers,i+2),e,s,y));
+const extraFlags=[['MX','メキシコ',1],['CR','コスタリカ',3],['EC','エクアドル',3],['CO','コロンビア',2],['CL','チリ',2],['MA','モロッコ',2],['TN','チュニジア',3],['EG','エジプト',2],['ZA','南アフリカ',2],['NZ','ニュージーランド',2]];
+const flagPool=[...flags,...extraFlags].map(r=>r[1]);
+extraFlags.forEach(([iso,a,l],i)=>{
+ const emoji=[...iso].map(c=>String.fromCodePoint(0x1f1e6+c.charCodeAt(0)-65)).join('');
+ add(`flag-${iso}`,'flags',l,'この国旗の国はどこ？',a,rotate(flagPool,(i*3+5)%flagPool.length),`${a}の国旗だよ。色の並びや、星・紋章などの模様にも注目しよう。`,'https://www.mofa.go.jp/mofaj/kids/kokki/list.html','国旗（2026-10-12確認）',emoji);
+});
+Q.slice(extraStart).forEach(q=>q.checkedAt='2026-10-12');
+if(Q.length!==200||new Set(Q.map(q=>q.id)).size!==200)throw Error('Question bank validation failed');
 return Q;
 })();
 </script>
@@ -102,7 +168,7 @@ function bind(id,fn){const el=document.getElementById(id);if(el)el.onclick=fn;}
 function set(html,name){stop();view=name;$('#app').innerHTML=html;window.scrollTo(0,0);}
 function player(keeper=false){return `<div aria-hidden="true" class="player ${keeper?'keeper':'striker'}"><i class="head"></i><i class="body"></i><i class="arm"></i><i class="arm right"></i><i class="leg"></i><i class="leg right"></i></div>`;}
 function pitch(cls='',banner=''){return `<div aria-hidden="true" class="pitch ${cls}"><div class="goal"></div>${player()}${player(true)}<div class="ball"></div><div class="pitch-label">QUIZ KING CUP</div>${banner?`<div class="banner">${banner}</div>`:''}</div>`;}
-function home(){set(`<section class="title"><h1><img class="title-logo" src="/games/sqz/assets/logo-approved-20261011.png" width="1448" height="1086" alt="目指せ！クイズ王 サッカー編 — SOCCER QUIZ" fetchpriority="high" decoding="async"></h1><p>選手も、国旗も、名勝負も。知識でゴール！</p></section><section class="screen"><div class="menu">${S?button('resume','▶ 途中から再開','primary green'):''}${button('cup','クイズ王カップ','primary')}${button('training','トレーニング','secondary')}${button('records','これまでの記録','secondary')}</div><p class="muted center space">4択をタップするだけ。114問を収録。<br>間違えても、覚えれば次のゴールにつながる。</p></section>`,'home');bind('cup',()=>{if(S&&!S.done){dialog('途中のラウンドがあります','「途中から再開」から続けてください。新しく始める場合は、記録画面で途中ラウンドを終了できます。');return;}story();});bind('training',training);bind('records',records);bind('resume',()=>{if(S.done)result();else question();});}
+function home(){set(`<section class="title"><h1><img class="title-logo" src="/games/sqz/assets/logo-approved-20261011.png" width="1448" height="1086" alt="目指せ！クイズ王 サッカー編 — SOCCER QUIZ" fetchpriority="high" decoding="async"></h1><p>選手も、国旗も、名勝負も。知識でゴール！</p></section><section class="screen"><div class="menu">${S?button('resume','▶ 途中から再開','primary green'):''}${button('cup','クイズ王カップ','primary')}${button('training','トレーニング','secondary')}${button('records','これまでの記録','secondary')}</div><p class="muted center space">4択をタップするだけ。${BANK.length}問を収録。<br>間違えても、覚えれば次のゴールにつながる。</p></section>`,'home');bind('cup',()=>{if(S&&!S.done){dialog('途中のラウンドがあります','「途中から再開」から続けてください。新しく始める場合は、記録画面で途中ラウンドを終了できます。');return;}story();});bind('training',training);bind('records',records);bind('resume',()=>{if(S.done)result();else question();});}
 function story(){set(`<section class="screen"><p class="eyebrow">ROAD TO THE QUIZ KING</p><h2>その知識が、<br>決勝ゴールになる。</h2>${pitch()}<div class="card space"><p>ここは、サッカーの知識で勝負する「クイズ王カップ」。</p><p>選手、大会の記録、世界の国旗。4つの答えから正解を選んで、ゴールを決めよう！</p><p><strong>予選、準決勝、そして決勝へ。<br>きみはクイズ王になれるかな？</strong></p></div>${button('go','大会を選ぶ','primary')}${button('back','タイトルへ','linkbtn space')}</section>`,'story');bind('go',()=>setup());bind('back',home);}
 function stages(d){const c=cup(d);return `<div class="stage">${STAGES.map((s,i)=>`<div class="${i===c.stage?'active':''}">${i<c.stage?'✓ ':''}${s}<small>${TARGET[i]}/10問で突破</small></div>`).join('')}</div>`;}
 function setup(){const c=cup(diff);set(`<section class="screen"><div class="viewtop"><h2>クイズ王カップ</h2>${button('back','戻る','linkbtn')}</div><p>1問20秒、各ラウンド10問。<br>最後の問題まで、あきらめずに挑もう。</p><div class="difficulty">${[1,2,3].map(d=>`<button data-diff="${d}" class="${d===diff?'selected':''}" aria-pressed="${d===diff}">${DIFF[d]}<small>${['','基本から挑戦','記録にも挑戦','細かな記録へ'][d]}</small></button>`).join('')}</div>${stages(diff)}<div class="card"><p><strong>${DIFF[diff]}・${STAGES[c.stage]}からスタート</strong></p><p class="muted">正解でゴール！ 3問連続正解でハットトリック。<br>途中で中断しても、この端末から再開できます。</p></div><label class="check"><input type="checkbox" id="flags" ${P.flags?'checked':''}>国旗問題を出す（国旗が文字に見える端末ではOFF）</label>${button('start',`${STAGES[c.stage]}に挑む`,'primary green')}<p class="muted center space">難易度は問題の内容で調整。制限時間は共通です。</p></section>`,'setup');document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{diff=+b.dataset.diff;setup();});$('#flags').onchange=e=>{P.flags=e.target.checked;save();};bind('start',()=>start('cup'));bind('back',home);}
@@ -121,7 +187,7 @@ function records(){set(`<section class="screen"><div class="viewtop"><h2>これ�
 let onDialogClose=null,dialogReturnFocus=null;
 function dialog(title,text,cb=null,cancel=false){dialogReturnFocus=document.activeElement;$('#dialogTitle').textContent=title;$('#dialogText').innerHTML=`<p>${esc(text)}</p>`+(cancel?button('dialogCancel','キャンセル','secondary space'):'');$('#overlay').hidden=false;onDialogClose=()=>{const fn=cb;$('#overlay').hidden=true;onDialogClose=null;if(fn)fn();else dialogReturnFocus?.focus();};$('#dialogOK').textContent=cancel?'実行する':'OK';$('#dialogOK').onclick=onDialogClose;if(cancel)bind('dialogCancel',()=>{$('#overlay').hidden=true;onDialogClose=null;dialogReturnFocus?.focus();});$('#dialogOK').focus();}
 document.addEventListener('keydown',e=>{if($('#overlay').hidden)return;if(e.key==='Tab'){const list=[...$('#overlay').querySelectorAll('button,a')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
-$('#sources').onclick=()=>{if(view==='question'&&!completedAnswer()){syncTime();stop();save();}dialog('出典・素材について','問題ごとに、日本サッカー協会、プレミアリーグ、Jリーグ、外務省の出典・対象年・確認日を記録しています。実在選手の写真とクラブのエンブレムは未収録です。国旗は端末の絵文字表示を使用しています。タイトルロゴは2026年10月11日確定の透過PNGを使用しています。選手のシュート演出は試作用のデザインです。',()=>{if(view==='question'&&!completedAnswer()&&S.kind==='cup')startTimer();});};
+$('#sources').onclick=()=>{if(view==='question'&&!completedAnswer()){syncTime();stop();save();}dialog('出典・素材について','問題ごとに、日本サッカー協会、FIFA、UEFA、プレミアリーグ、Jリーグ、外務省の出典・対象年・確認日を記録しています。実在選手の写真とクラブのエンブレムは未収録です。国旗は端末の絵文字表示を使用しています。タイトルロゴは2026年10月11日確定の透過PNGを使用しています。選手のシュート演出は試作用のデザインです。',()=>{if(view==='question'&&!completedAnswer()&&S.kind==='cup')startTimer();});};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){syncTime();stop();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
 window.addEventListener('pagehide',()=>{syncTime();stop();save();});
 window.SQZ=Object.freeze({questions:BANK,selectQuestions,allowed});
