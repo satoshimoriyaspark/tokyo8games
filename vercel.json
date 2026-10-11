@@ -22,6 +22,14 @@
     {
       "source": "/kwb/",
       "destination": "/games/kwb/index.html"
+    },
+    {
+      "source": "/sqz",
+      "destination": "/games/sqz/index.html"
+    },
+    {
+      "source": "/sqz/",
+      "destination": "/games/sqz/index.html"
     }
   ]
 }
