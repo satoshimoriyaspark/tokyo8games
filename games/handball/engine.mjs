@@ -107,7 +107,7 @@ export class Match{
    if(repeated){this.feints++;this.commands[beat]='feint';from.pose='feint';from.poseTime=.7;this.notify('ポストでもう一度！ フェイントで揺さぶる');this.animate('post',.8,{},done);}
    else{const target=this.players[this.possession*4+(from.slot===0?1:0)];this.postSlot=target.slot;this.ownerId=null;this.ball={mode:'pass',from:from.id,target:target.id,x:from.x,y:from.y,z:24,elapsed:0,windup:.5};from.pose='pass';from.poseTime=.5;this.notify('ポストへ！ '+target.name+' がゴール前に入る');this.animate('post',1,{from:from.id,target:target.id,start:{x:from.x,y:from.y}},()=>{this.setOwner(target);this.gauge[this.possession]=clamp(this.gauge[this.possession]+8,0,100);done();});}
   }else if(action==='shoot'){
-   this.pendingShot=this.owner.id;this.owner.pose='shoot';this.owner.poseTime=.55;this.notify(`${beat+1}拍目：シュート！ 4拍目でコースを選ぶ`);this.animate('ready',.65,{},done);
+   this.pendingShot=this.owner.id;this.owner.pose='shoot';this.owner.poseTime=.55;this.notify(this.attacking?`${beat+1}拍目：シュート！ 4拍目でコースを選ぶ`:`相手が${beat+1}拍目にシュート！ 残りの守備入力後にGK勝負`);this.animate('ready',.65,{},done);
   }else{this.notify('相手はシュートを準備中。4拍目のあとGKで守る');this.animate('wait',.4,{},done);}
  }
  animate(kind,duration,extra,done){const length=this.shortScenes?Math.max(.62,duration*.7):duration;this.scene={kind,t:0,duration:length,...extra,done};}

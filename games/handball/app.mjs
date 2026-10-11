@@ -32,7 +32,7 @@ function updateHud(){
  text('turn-title',keeper?'GK勝負':course?'4拍目 / コースを選んでシュート':attack?'攻撃 / '+Math.min(4,m.beat+1)+'拍目':'守備 / '+Math.min(4,m.beat+1)+'拍目');
  text('turn-hint',keeper?'予兆の的中率65%':course?'押したコースへシュート':m.fast?'速攻！ すぐコース選択':'考える間は時計停止');
  const displayed=attack?m.commands:m.defense;
- $('beat-track').innerHTML=Array.from({length:4},(_,i)=>{const val=displayed[i],active=!keeper&&i===m.beat;const opponent=!attack&&m.commands[i]?`<em>相手：${LABELS[m.commands[i]]??'―'}</em>`:'';return `<div class="beat ${active?'current':''} ${val?'done':''} ${val==='skip'?'skipped':''}"><small>${i+1}</small><b>${val?LABELS[val]??val:i===3&&attack?'コース':'？'}</b>${opponent}</div>`;}).join('');
+ $('beat-track').innerHTML=Array.from({length:4},(_,i)=>{const val=displayed[i],active=!keeper&&i===m.beat;const opponent=!attack&&m.commands[i]?`<em>相手：${LABELS[m.commands[i]]??'―'}</em>`:'';return `<div class="beat ${active?'current':''} ${val?'done':''} ${val==='skip'?'skipped':''}"><small>${i+1}</small><b>${val?LABELS[val]??val:i===3&&attack?(m.stayPending?'ステイ':'コース'):'？'}</b>${opponent}</div>`;}).join('');
  const buttons=m.buttons();document.querySelectorAll('[data-slot]').forEach((b,i)=>{const opt=buttons[i];b.disabled=opt.disabled;b.dataset.command=opt.id;b.classList.toggle('course-mode',course||keeper);b.classList.toggle('cue',keeper&&m.choice.cue===opt.id);b.setAttribute('aria-label',opt.label+(course?' 得点目安 '+opt.sub:''));text('label-'+i,opt.label);text('sub-'+i,opt.sub);});
  $('gauge-fill').style.width=m.gauge[0]+'%';text('gauge-text',m.gauge[0]>=100?'MAX！ エースの必殺':Math.floor(m.gauge[0])+'%');
  const bonus=m.stayBonus[m.possession],pass=m.combo;
