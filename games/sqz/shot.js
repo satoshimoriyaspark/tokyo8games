@@ -48,11 +48,11 @@
     return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div>${spriteMarkup('keeper',KEEPER[0],160,74,true)}${spriteMarkup('striker',STRIKER[0],85,174)}<div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
   }
   function create(element, options) {
-    const {ok,side='right',superShot=false,onComplete=()=>{}}=options;
+    const {ok,side='right',superShot=false,onImpact=()=>{},onComplete=()=>{}}=options;
     const $=s=>element.querySelector(s),sprite=$('.keeper-sprite'),img=$('.keeper-sprite img');
     const ball=$('.ball'),net=$('.goal-net'),striker=$('.striker-sprite'),strikerImg=$('.striker-sprite img');
     const banner=$('.shot-banner'),trail=$('.shot-trail'),combo=$('.shot-combo');
-    let active=true,raf=0,started=false,start=0,loadTimer=0;
+    let active=true,raf=0,started=false,start=0,loadTimer=0,impactPlayed=false;
     element.dataset.shotState='waiting';
     element.dataset.shotSide=side;
     element.dataset.superShot=String(ok&&superShot);
@@ -78,13 +78,15 @@
     }
     function tick(now) {
       if(!active||!element.isConnected)return;
-      const elapsed=now-start;draw(elapsed);
+      const elapsed=now-start;
+      if(elapsed>=CONTACT&&!impactPlayed){impactPlayed=true;onImpact();}
+      draw(elapsed);
       if(elapsed>=END)finish();else raf=requestAnimationFrame(tick);
     }
     function begin() {
       if(!active||started)return;
       started=true;
-      if(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){finish();return;}
+      if(root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){impactPlayed=true;onImpact();finish();return;}
       const launch=()=>{if(!active)return;clearTimeout(loadTimer);start=performance.now();raf=requestAnimationFrame(tick);};
       // A missing sprite must not strand the quiz or be replaced by fake art.
       if(img.complete){if(img.naturalWidth)launch();else finish();}

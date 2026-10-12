@@ -123,7 +123,7 @@ test('real game: double answer, next lock, skip, combo, wrong answer, resume and
 });
 test('real game: crowd recordings, mute and cancellation during loading',async()=>{
  const g=game();g.run('P.sound=true');await g.run('tone(true)');await g.run('tone(false)');
- assert.deepEqual(g.calls.map(n=>n.buffer),['/games/sqz/assets/audio/cheer.mp3','/games/sqz/assets/audio/boo.mp3']);
+ assert.deepEqual(g.calls.map(n=>n.buffer),['/games/sqz/assets/audio/goal-crowd.mp3','/games/sqz/assets/audio/boo.mp3']);
  await g.run('tone(true,()=>false)');assert.equal(g.calls.length,2);
  const pending=g.run('tone(true)');g.run('silence()');await pending;
  assert.equal(g.calls.length,2);assert.ok(g.calls.every(n=>n.stopped));
@@ -148,4 +148,10 @@ test('reading speaks only question and visible choice order, then cancels on ans
  g.node('#read-toggle').onclick();const n=g.spoken.length;g.run('readQuestion()');assert.equal(g.spoken.length,n);
  g.run('P.readAloud=true;readQuestion();home()');assert.equal(g.run('speechUtterance'),null);
  const unsupported=game(false);unsupported.run("P.readAloud=true;start('training')");assert.equal(unsupported.spoken.length,0);
+});
+
+test('crowd reaction starts once at ball contact; skipping never triggers it',()=>{
+ const e=env();let hits=0;const c=e.api.create(e.element,{ok:true,onImpact:()=>hits++});c.begin();
+ e.tick(0);e.tick(789);assert.equal(hits,0);e.tick(790);assert.equal(hits,1);e.tick(1000);e.tick(1750);assert.equal(hits,1);
+ const skip=env();skip.api.create(skip.element,{ok:true,onImpact:()=>hits++}).skip();assert.equal(hits,1);
 });
