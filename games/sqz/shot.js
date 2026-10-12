@@ -40,12 +40,12 @@
     return {box:`width:${w*SCALE}px;height:${h*SCALE}px;transform:translate(${x-anchorX*SCALE}px,${y-(ay-sy)*SCALE}px)${mirror?' scaleX(-1)':''}`,
       image:`width:${ATLAS_SIZE*SCALE}px;height:${ATLAS_SIZE*SCALE}px;transform:translate(${-sx*SCALE}px,${-sy*SCALE}px)`};
   }
-  function spriteMarkup(name,frame,x,y){
-    const style=spriteStyle(frame,x,y);
+  function spriteMarkup(name,frame,x,y,mirror=false){
+    const style=spriteStyle(frame,x,y,mirror);
     return `<div class="character-sprite ${name}-sprite" style="${style.box}"><img src="${ASSET}" width="1254" height="1254" style="${style.image}" alt="" draggable="false"></div>`;
   }
   function markup() {
-    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div>${spriteMarkup('keeper',KEEPER[0],160,74)}${spriteMarkup('striker',STRIKER[0],85,174)}<div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
+    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div>${spriteMarkup('keeper',KEEPER[0],160,74,true)}${spriteMarkup('striker',STRIKER[0],85,174)}<div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
   }
   function create(element, options) {
     const {ok,side='right',superShot=false,onComplete=()=>{}}=options;
@@ -58,7 +58,8 @@
     element.dataset.superShot=String(ok&&superShot);
     function draw(ms) {
       const p=pose(ms,ok,side,superShot);
-      const kStyle=spriteStyle(KEEPER[p.keeper.frame],p.keeper.x,p.keeper.y,side==='left');
+      // Face the striker while set; turn toward the selected side on take-off.
+      const kStyle=spriteStyle(KEEPER[p.keeper.frame],p.keeper.x,p.keeper.y,p.keeper.frame===0||side==='left');
       sprite.style.cssText=kStyle.box;img.style.cssText=kStyle.image;
       const sStyle=spriteStyle(STRIKER[p.strikerFrame],85+p.run,174);
       striker.style.cssText=sStyle.box;strikerImg.style.cssText=sStyle.image;
