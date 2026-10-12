@@ -17,6 +17,8 @@
 <link rel="stylesheet" href="/games/sqz/shot.css">
 <link rel="preload" as="image" href="/games/sqz/assets/characters-v3/characters-atlas.png">
 <script src="/games/sqz/shot.js"></script>
+<link rel="preload" href="/games/sqz/assets/audio/cheer.mp3" as="fetch" crossorigin>
+<link rel="preload" href="/games/sqz/assets/audio/boo.mp3" as="fetch" crossorigin>
 </head>
 <body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.7</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main></div>
 <div id="overlay" class="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="card"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button id="dialogOK" class="primary">OK</button></div></div>
@@ -137,8 +139,9 @@ let P=fresh(),storageOK=true,loadMessage='';
 try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x.version!==1)throw Error('version');P={...fresh(),...x};for(const k of ['mistakes','seen'])P[k]=Array.isArray(x[k])?[...new Set(x[k].filter(id=>MAP.has(id)))]:[];for(const k of ['total','correct','bestStreak'])P[k]=Number.isFinite(x[k])&&x[k]>=0?Math.floor(x[k]):0;P.cups=x.cups&&typeof x.cups==='object'&&!Array.isArray(x.cups)?x.cups:{};P.sound=x.sound===true;P.flags=x.flags!==false;const s=P.active;if(s&&(!['cup','training','review'].includes(s.kind)||!Array.isArray(s.ids)||s.ids.length<1||s.ids.length>10||new Set(s.ids).size!==s.ids.length||s.ids.some(id=>!MAP.has(id))||!Number.isInteger(s.i)||s.i<0||s.i>=s.ids.length||!Array.isArray(s.picks)||s.picks.length<s.i||s.picks.length>s.i+1||s.picks.some((a,i)=>a!==null&&!MAP.get(s.ids[i]).choices.includes(a))||![1,2,3].includes(s.diff)||![0,1,2].includes(s.stage))){P.active=null;loadMessage='途中データを読み込めなかったため、メニューに戻りました。記録は保持しています。';}if(P.active)P.active.ms=Math.max(0,Math.min(20000,Number(P.active.ms)||0));}}
 catch(e){P=fresh();loadMessage='保存データを読み込めなかったため、初期状態で開始します。';}
 let S=P.active,view='home',diff=1,category='all',timer=null,lastTick=0,lastSave=0,audio=null,shot=null;
-const soundNodes=new Set();
-function silence(){for(const node of soundNodes){try{node.stop();}catch(e){}}soundNodes.clear();}
+const soundNodes=new Set(), crowdBuffers=new Map();
+let soundGeneration=0;
+function silence(){soundGeneration++;for(const node of soundNodes){try{node.stop();}catch(e){}}soundNodes.clear();}
 function notify(t){$('#notice').textContent=t;$('#notice').classList.add('on');}
 function save(){P.active=S;try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){storageOK=false;notify('このブラウザでは記録を保存できません。ページを閉じると進行状況が失われます。');}}
 function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
@@ -147,25 +150,21 @@ function selectQuestions(d,cat,excluded=[],review=false){let pool=BANK.filter(q=
 function stop(){if(timer){clearInterval(timer);timer=null;}}
 async function tone(ok,valid=()=>true){
  if(!P.sound)return;
+ const generation=soundGeneration;
  try{
   audio??=new(window.AudioContext||window.webkitAudioContext)();
-  await audio.resume();
-  if(!P.sound||!valid())return;
-  const t=audio.currentTime+.01;
-  // Correct: two clear bell notes (pin-pon). Incorrect: two low buzzer pulses (bu-bu).
-  const notes=ok?[[880,0,.5],[660,.24,.75]]:[[150,0,.22],[150,.32,.26]];
-  for(const [frequency,delay,duration] of notes){
-   const o=audio.createOscillator(),g=audio.createGain();
-   o.type=ok?'sine':'square';o.frequency.setValueAtTime(frequency,t+delay);
-   g.gain.setValueAtTime(0,t+delay);
-   g.gain.linearRampToValueAtTime(ok?.16:.065,t+delay+.012);
-   if(ok)g.gain.exponentialRampToValueAtTime(.001,t+delay+duration);
-   else{g.gain.setValueAtTime(.065,t+delay+duration-.035);g.gain.linearRampToValueAtTime(0,t+delay+duration);}
-   o.connect(g).connect(audio.destination);o.start(t+delay);o.stop(t+delay+duration+.02);
-   soundNodes.add(o);
-   o.onended=()=>{soundNodes.delete(o);o.disconnect();g.disconnect();};
-  }
- }catch(e){P.sound=false;updateSound();save();notify('音を再生できないため、音なしで続けます。');}
+  const resumed=audio.resume();
+  const url='/games/sqz/assets/audio/'+(ok?'cheer':'boo')+'.mp3';
+  if(!crowdBuffers.has(url))crowdBuffers.set(url,fetch(url).then(r=>{if(!r.ok)throw new Error('Audio unavailable');return r.arrayBuffer();}).then(bytes=>audio.decodeAudioData(bytes)).catch(e=>{crowdBuffers.delete(url);throw e;}));
+  const [buffer]=await Promise.all([crowdBuffers.get(url),resumed]);
+  if(!P.sound||!valid()||generation!==soundGeneration)return;
+  const source=audio.createBufferSource(),gain=audio.createGain();
+  source.buffer=buffer;gain.gain.setValueAtTime(.65,audio.currentTime);
+  source.connect(gain).connect(audio.destination);
+  soundNodes.add(source);
+  source.onended=()=>{soundNodes.delete(source);source.disconnect();gain.disconnect();};
+  source.start();
+ }catch(e){if(generation!==soundGeneration||!P.sound||!valid())return;P.sound=false;updateSound();save();notify('音を再生できないため、音なしで続けます。');}
 }
 function updateSound(){$('#sound').textContent='音 '+(P.sound?'ON':'OFF');$('#sound').setAttribute('aria-pressed',String(P.sound));}
 $('#sound').onclick=()=>{P.sound=!P.sound;if(!P.sound)silence();updateSound();save();tone(true);};
@@ -208,7 +207,7 @@ function question(animate=false){
    else{S.i++;S.ms=20000;save();question();}
   });
   if(animate){
-   // Schedule the existing Web Audio pin-pon / buzzer in the tap gesture.
+   // Unlock Web Audio in the tap gesture and play the crowd reaction.
    // Suspended/blocked audio cannot hold the visual sequence indefinitely.
    Promise.race([tone(ok,()=>shot===controller&&controller.active),new Promise(resolve=>setTimeout(resolve,180))]).then(()=>controller.begin());
   }else controller.skip(); // Reload/resume shows the saved answer, without scoring or replay.

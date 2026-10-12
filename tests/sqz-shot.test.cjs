@@ -93,8 +93,9 @@ function game(){
  }return nodes.get(key);}
  const document={hidden:false,querySelector:node,getElementById:id=>node('#'+id),querySelectorAll:()=>[],addEventListener:(n,fn)=>events.set(n,fn)};
  const calls=[];
- class AudioContext{constructor(){this.currentTime=0;this.destination={};}async resume(){}createOscillator(){const o={frequency:{setValueAtTime:(f,t)=>calls.push({f,t})},connect:()=>({connect(){}}),start(){},stop(){},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},disconnect(){}};}}
- const ctx=vm.createContext({document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
+ class AudioContext{constructor(){this.currentTime=0;this.destination={};}async resume(){}async decodeAudioData(bytes){return bytes;}createBufferSource(){const o={connect:()=>({connect(){}}),start(){calls.push({buffer:o.buffer,stopped:false});o.call=calls.at(-1);},stop(){if(o.call)o.call.stopped=true;},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(){}},disconnect(){}};}}
+
+ const ctx=vm.createContext({fetch:async url=>({ok:true,arrayBuffer:async()=>url}),document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
  vm.runInContext('globalThis.window=globalThis',ctx);vm.runInContext(source,ctx);
  const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
  for(const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g))vm.runInContext(m[1],ctx);
@@ -118,10 +119,13 @@ test('real game: double answer, next lock, skip, combo, wrong answer, resume and
  while(g.run('!S.done')){g.run('answer(current().answer);shot.skip()');g.node('#next').onclick();}
  assert.equal(g.run('view'),'result');assert.equal(g.run('P.total'),10);
 });
-test('real game: existing pin-pon and buzzer notes retained; cancelled audio cannot start late',async()=>{
+test('real game: crowd recordings, mute and cancellation during loading',async()=>{
  const g=game();g.run('P.sound=true');await g.run('tone(true)');await g.run('tone(false)');
- assert.deepEqual(g.calls.map(n=>n.f),[880,660,150,150]);
- await g.run('tone(true,()=>false)');assert.equal(g.calls.length,4);
+ assert.deepEqual(g.calls.map(n=>n.buffer),['/games/sqz/assets/audio/cheer.mp3','/games/sqz/assets/audio/boo.mp3']);
+ await g.run('tone(true,()=>false)');assert.equal(g.calls.length,2);
+ const pending=g.run('tone(true)');g.run('silence()');await pending;
+ assert.equal(g.calls.length,2);assert.ok(g.calls.every(n=>n.stopped));
+ g.run('P.sound=false');await g.run('tone(false)');assert.equal(g.calls.length,2);
 });
 test('real game: timeout and hidden-page interruption retain one answer',()=>{
  const g=game();g.run("start('cup');S.ms=0;answer(current().answer)");
