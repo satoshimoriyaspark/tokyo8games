@@ -155,3 +155,13 @@ test('crowd reaction starts once at ball contact; skipping never triggers it',()
  e.tick(0);e.tick(789);assert.equal(hits,0);e.tick(790);assert.equal(hits,1);e.tick(1000);e.tick(1750);assert.equal(hits,1);
  const skip=env();skip.api.create(skip.element,{ok:true,onImpact:()=>hits++}).skip();assert.equal(hits,1);
 });
+
+test('shipped crowd MP3s contain decodable audio of the intended length',()=>{
+ const {execFileSync}=require('node:child_process');
+ for(const [name,min,max] of [['goal-crowd',2.7,3],['boo',1.4,1.7]]){
+  const file=path.join(root,'games/sqz/assets/audio',name+'.mp3');
+  const info=JSON.parse(execFileSync('ffprobe',['-v','error','-show_entries','format=duration,size','-of','json',file],{encoding:'utf8'})).format;
+  assert.ok(+info.duration>=min&&+info.duration<=max);assert.ok(+info.size>1000);
+  execFileSync('ffmpeg',['-v','error','-i',file,'-f','null','-']);
+ }
+});

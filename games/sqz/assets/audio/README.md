@@ -21,11 +21,13 @@ The source pages identify these as cheers and audience booing. Device listening 
   https://freesound.org/people/paulw2k/sounds/196461/
   https://creativecommons.org/licenses/by/4.0/
   Public preview: https://cdn.freesound.org/previews/196/196461_755728-hq.mp3
-  Excerpt starts 4.35s; normalized and faded.
+  Excerpt starts 4.35s; gain-adjusted and faded.
 - Whistles by dklon, CC BY 3.0.
   https://opengameart.org/content/whistles
   https://creativecommons.org/licenses/by/3.0/
   Original: https://opengameart.org/sites/default/files/whistles.zip
-  whistle_1.wav and whistle_3.wav overlaid at 0.35s and 1.15s, normalized quieter.
+  whistle_1.wav and whistle_3.wav overlaid at 0.35s and 1.15s, mixed at lower gain.
 
 Sources mixed, gain-adjusted, limited and faded. Source licenses apply to their respective material. In-game title links to credits.html. The old CC0 cheer is kept only as an archived source, not played.
+
+2026-10-12 repair: regenerated the mix using gain filters after short whistle clips produced an empty result during loudness normalization. ffprobe confirms 2.847s / 46,019 bytes; full ffmpeg decode succeeds.
