@@ -1,44 +1,56 @@
-/* Supplied keeper v2: 8 fixed-size, 80 × 80 RGBA frames per direction.
+/* Reference-matched character v3 atlas: constant anatomical scale, 8 dive poses.
  * One clock drives kick, ball, keeper, net and banner. No CSS loop/restart. */
 (function (root) {
   'use strict';
-  const ASSET = '/games/sqz/assets/keeper-v2/keeper_atlas.png';
+  const ASSET = '/games/sqz/assets/characters-v3/characters-atlas.png';
+  const SCALE=.30, ATLAS_SIZE=1254;
+  // Source rectangles and body anchors preserve the generated art without stretching.
+  const KEEPER=[[60, 98, 178, 216, 152, 236, 205, 237], [349, 115, 220, 199, 460, 250, 539, 238], [662, 103, 234, 211, 768, 241, 862, 239], [962, 61, 273, 247, 1102, 209, 1195, 140], [35, 402, 301, 198, 172, 527, 301, 480], [344, 418, 299, 182, 486, 546, 607, 510], [656, 473, 292, 157, 788, 587, 914, 578], [964, 500, 282, 138, 1105, 604, 1218, 609]];
+  const STRIKER=[[60, 703, 175, 233, 150, 927], [349, 703, 200, 239, 450, 933], [674, 703, 205, 239, 778, 933], [981, 695, 232, 247, 1075, 933], [57, 961, 225, 257, 147, 1207], [378, 974, 176, 244, 465, 1207], [684, 976, 223, 249, 787, 1214], [1018, 1015, 181, 210, 1081, 1214]];
   const clamp = n => Math.max(0, Math.min(1, n));
   const lerp = (a, b, t) => a + (b - a) * t;
   const smooth = t => t * t * (3 - 2 * t);
   const DIVE_START = 350, FRAME_MS = 110, CONTACT = 790, END = 1750;
-  // Glove centers in the original 80px cells, measured without editing the PNG.
-  const GLOVES = [[48,39],[48,30],[49,20],[43,8],[35,3],[37,6],[48,20],[52,39]];
+  function keeperAt(ms,side){
+    const sign=side==='right'?1:-1,progress=clamp((ms-DIVE_START)/(7*FRAME_MS));
+    const frame=Math.min(7,Math.floor(Math.max(0,ms-DIVE_START)/FRAME_MS));
+    const x=160+sign*42*smooth(progress);
+    const y=74-Math.sin(progress*Math.PI)*18+20*smooth(clamp((progress-.65)/.35));
+    const k=KEEPER[frame];
+    return {frame,x,y,glove:{x:x+sign*(k[6]-k[4])*SCALE,y:y+(k[7]-k[5])*SCALE}};
+  }
   function pose(ms, ok, side = 'right', superShot = false) {
-    const sign = side === 'right' ? 1 : -1;
-    const progress = clamp((ms - DIVE_START) / (7 * FRAME_MS));
-    const frame = Math.min(7, Math.floor(Math.max(0, ms - DIVE_START) / FRAME_MS));
-    const travel = smooth(progress);
-    const keeper = {frame, x:120 + sign * 66 * travel, y:28 - Math.sin(progress * Math.PI) * 8};
-    const g = GLOVES[frame];
-    const glove = {x:keeper.x + (side === 'right' ? g[0] : 80-g[0]), y:keeper.y+g[1]};
-    // Contact is deliberately aligned with frame 4. From then on the caught
-    // ball follows the same glove anchor as landing, never an independent path.
-    const cp = clamp((CONTACT-DIVE_START)/(7*FRAME_MS));
-    const contact = {x:120+sign*66*smooth(cp)+(side==='right'?35:45), y:28-Math.sin(cp*Math.PI)*8+3};
+    const keeper=keeperAt(ms,side),glove=keeper.glove;
+    const contact=keeperAt(CONTACT,side).glove;
     const target = ok ? {x:side==='right'?96:224,y:48} : contact;
     const flight = clamp((ms-280)/(CONTACT-280));
-    let ball = {x:lerp(111,target.x,flight),y:lerp(142,target.y,flight)-Math.sin(flight*Math.PI)*21,scale:lerp(1,.68,flight)};
+    let ball = {x:lerp(122,target.x,flight),y:lerp(149,target.y,flight)-Math.sin(flight*Math.PI)*21,scale:lerp(1,.68,flight)};
+    if(ms<280){const approach=smooth(clamp((ms-100)/180));ball={x:lerp(112,122,approach),y:lerp(168,149,approach),scale:1};}
     if (ms >= CONTACT) ball = ok
       ? {x:target.x,y:lerp(target.y,80,clamp((ms-CONTACT)/270)),scale:.68}
       : {...glove,scale:.68};
     return {keeper,ball,flight,caught:!ok&&ms>=CONTACT,goal:ok&&ms>=CONTACT,
       net:ok&&ms>=CONTACT?Math.sin((ms-CONTACT)/45)*Math.exp(-(ms-CONTACT)/230)*5:0,
       banner:ms>=CONTACT+110,superShot:ok&&superShot,kick:Math.sin(clamp((ms-110)/430)*Math.PI)*-76,
-      run:Math.sin(clamp(ms/280)*Math.PI)*4,done:ms>=END};
+      run:4*smooth(clamp(ms/280)),strikerFrame:ms<70?0:ms<150?1:ms<260?2:ms<360?3:ms<470?4:ms<900?5:ok?6:7,done:ms>=END};
+  }
+  function spriteStyle(frame,x,y,mirror=false){
+    const [sx,sy,w,h,ax,ay]=frame;
+    const anchorX=mirror?w-(ax-sx):ax-sx;
+    return {box:`width:${w*SCALE}px;height:${h*SCALE}px;transform:translate(${x-anchorX*SCALE}px,${y-(ay-sy)*SCALE}px)${mirror?' scaleX(-1)':''}`,
+      image:`width:${ATLAS_SIZE*SCALE}px;height:${ATLAS_SIZE*SCALE}px;transform:translate(${-sx*SCALE}px,${-sy*SCALE}px)`};
+  }
+  function spriteMarkup(name,frame,x,y){
+    const style=spriteStyle(frame,x,y);
+    return `<div class="character-sprite ${name}-sprite" style="${style.box}"><img src="${ASSET}" width="1254" height="1254" style="${style.image}" alt="" draggable="false"></div>`;
   }
   function markup() {
-    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div><div class="keeper-sprite"><img src="${ASSET}" width="640" height="160" alt="" draggable="false"></div><div class="player striker"><i class="head"></i><i class="body"></i><i class="arm"></i><i class="arm right"></i><i class="leg"></i><i class="leg right"></i></div><div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
+    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div>${spriteMarkup('keeper',KEEPER[0],160,74)}${spriteMarkup('striker',STRIKER[0],85,174)}<div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
   }
   function create(element, options) {
     const {ok,side='right',superShot=false,onComplete=()=>{}}=options;
     const $=s=>element.querySelector(s),sprite=$('.keeper-sprite'),img=$('.keeper-sprite img');
-    const ball=$('.ball'),net=$('.goal-net'),leg=$('.striker .leg.right'),striker=$('.striker');
+    const ball=$('.ball'),net=$('.goal-net'),striker=$('.striker-sprite'),strikerImg=$('.striker-sprite img');
     const banner=$('.shot-banner'),trail=$('.shot-trail'),combo=$('.shot-combo');
     let active=true,raf=0,started=false,start=0,loadTimer=0;
     element.dataset.shotState='waiting';
@@ -46,12 +58,12 @@
     element.dataset.superShot=String(ok&&superShot);
     function draw(ms) {
       const p=pose(ms,ok,side,superShot);
-      img.style.transform=`translate(${-80*p.keeper.frame}px, ${side==='right'?0:-80}px)`;
-      sprite.style.transform=`translate(${p.keeper.x}px, ${p.keeper.y}px)`;
+      const kStyle=spriteStyle(KEEPER[p.keeper.frame],p.keeper.x,p.keeper.y,side==='left');
+      sprite.style.cssText=kStyle.box;img.style.cssText=kStyle.image;
+      const sStyle=spriteStyle(STRIKER[p.strikerFrame],85+p.run,174);
+      striker.style.cssText=sStyle.box;strikerImg.style.cssText=sStyle.image;
       ball.style.transform=`translate(${p.ball.x}px, ${p.ball.y}px) translate(-50%, -50%) scale(${p.ball.scale}) rotate(${ms/4}deg)`;
       net.style.transform=`translateX(${p.net}px)`;
-      leg.style.transform=`rotate(${p.kick}deg)`;
-      striker.style.transform=`translateX(${p.run}px)`;
       banner.hidden=!p.banner;
       banner.innerHTML=ok?`GOAL!<small>${superShot?'スーパーゴール！':'ナイスシュート！'}</small>`:'SAVE!<small>キーパーがセーブ！</small>';
       combo.hidden=!(p.superShot&&ms<CONTACT);
@@ -80,5 +92,5 @@
     draw(0);
     return {begin,skip:finish,cancel(){active=false;clearTimeout(loadTimer);cancelAnimationFrame(raf);},get active(){return active;}};
   }
-  root.SQZShot=Object.freeze({markup,create,pose,duration:END});
+  root.SQZShot=Object.freeze({markup,create,pose,duration:END,asset:ASSET,scale:SCALE,keeperFrames:KEEPER,strikerFrames:STRIKER});
 })(typeof window!=='undefined'?window:globalThis);

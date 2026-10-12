@@ -14,13 +14,13 @@ function env(reduced=false){
  const element={dataset:{},isConnected:true,querySelector(s){if(!nodes.has(s))nodes.set(s,{style:{},complete:true,naturalWidth:640,addEventListener(){}});return nodes.get(s);}};
  return {api:ctx.SQZShot,element,queue,tick(ms){for(const [id,fn] of [...queue]){queue.delete(id);fn(ms);}}};
 }
-test('both directions use all 8 frames, monotonic movement and constant frame size',()=>{
+test('both directions use all 8 poses, continuous body movement and common artwork scale',()=>{
  const {api}=env();
  for(const side of ['left','right']){
   const frames=new Set();let last=null;
   for(let ms=0;ms<=1750;ms+=5){const p=api.pose(ms,false,side);frames.add(p.keeper.frame);
    if(last!==null)assert.ok(Math.abs(p.keeper.x-last)<1, 'no travel teleport');last=p.keeper.x;
-   assert.ok(p.keeper.x>=54&&p.keeper.x<=186);
+   assert.ok(p.keeper.x>=118&&p.keeper.x<=202);
   }
   assert.deepEqual([...frames],[0,1,2,3,4,5,6,7]);
  }
@@ -32,7 +32,7 @@ test('goal misses keeper, save contacts glove, only goal moves net',()=>{
   assert.ok(Math.hypot(contact.ball.x-before.ball.x,contact.ball.y-before.ball.y)<.05);
   assert.equal(contact.caught,true);assert.equal(contact.banner,false);
   const goal=api.pose(850,true,side),save=api.pose(850,false,side);
-  assert.ok(Math.abs(goal.ball.x-(goal.keeper.x+40))>75);
+  assert.ok(Math.abs(goal.ball.x-goal.keeper.x)>75);
   assert.notEqual(goal.net,0);assert.equal(save.net,0);
   assert.equal(api.pose(900,false,side).banner,true);
  }
@@ -69,8 +69,17 @@ test('question bank retains 200 valid unique questions and inline scripts parse'
  const bank=ctx.window.QUIZ_BANK;
  assert.equal(bank.length,200);assert.equal(new Set(bank.map(q=>q.id)).size,200);
  for(const q of bank){assert.equal(q.choices.length,4);assert.equal(new Set(q.choices).size,4);assert.ok(q.choices.includes(q.answer));}
- const atlas=JSON.parse(fs.readFileSync(path.join(root,'games/sqz/assets/keeper-v2/keeper_atlas.json')));
- for(const side of ['left','right']){assert.equal(atlas.animations['dive_'+side].length,8);for(const key of atlas.animations['dive_'+side]){assert.equal(atlas.frames[key].frame.w,80);assert.equal(atlas.frames[key].frame.h,80);}}
+ const {api}=env();
+ const atlas=JSON.parse(fs.readFileSync(path.join(root,'games/sqz/assets/characters-v3/frames.json')));
+ assert.equal(api.keeperFrames.length,8);assert.equal(api.strikerFrames.length,8);
+ assert.equal(api.scale,.30);
+ assert.deepEqual(JSON.parse(JSON.stringify(api.keeperFrames)),atlas.keeperRight);
+ for(const [x,y,w,h,ax,ay] of [...atlas.keeperRight,...atlas.striker]){
+  assert.ok(x>=0&&y>=0&&x+w<=1254&&y+h<=1254);assert.ok(ax>=x&&ax<=x+w&&ay>=y&&ay<=y+h);
+ }
+ assert.match(api.markup(),/shot-trail" hidden/);
+ assert.match(api.markup(),/striker-sprite/);
+ assert.doesNotMatch(api.markup(),/class="player striker"/);
 });
 
 // Executes the real game scripts with a minimal DOM adapter. This verifies
