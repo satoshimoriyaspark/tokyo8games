@@ -1,0 +1,245 @@
+{
+  "frames": {
+    "keeper_right_00": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_01": {
+      "frame": {
+        "x": 80,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_02": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_03": {
+      "frame": {
+        "x": 240,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_04": {
+      "frame": {
+        "x": 320,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_05": {
+      "frame": {
+        "x": 400,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_06": {
+      "frame": {
+        "x": 480,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_right_07": {
+      "frame": {
+        "x": 560,
+        "y": 0,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_00": {
+      "frame": {
+        "x": 0,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_01": {
+      "frame": {
+        "x": 80,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_02": {
+      "frame": {
+        "x": 160,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_03": {
+      "frame": {
+        "x": 240,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_04": {
+      "frame": {
+        "x": 320,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_05": {
+      "frame": {
+        "x": 400,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_06": {
+      "frame": {
+        "x": 480,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    },
+    "keeper_left_07": {
+      "frame": {
+        "x": 560,
+        "y": 80,
+        "w": 80,
+        "h": 80
+      },
+      "duration": 110,
+      "anchor": {
+        "x": 0.5,
+        "y": 0.75
+      }
+    }
+  },
+  "meta": {
+    "image": "keeper_atlas.png",
+    "size": {
+      "w": 640,
+      "h": 160
+    },
+    "scale": "1",
+    "frameDurationMs": 110,
+    "format": "RGBA8888",
+    "note": "Animation-ready prototype. Visual design requires comparison to approved reference."
+  },
+  "animations": {
+    "dive_right": [
+      "keeper_right_00",
+      "keeper_right_01",
+      "keeper_right_02",
+      "keeper_right_03",
+      "keeper_right_04",
+      "keeper_right_05",
+      "keeper_right_06",
+      "keeper_right_07"
+    ],
+    "dive_left": [
+      "keeper_left_00",
+      "keeper_left_01",
+      "keeper_left_02",
+      "keeper_left_03",
+      "keeper_left_04",
+      "keeper_left_05",
+      "keeper_left_06",
+      "keeper_left_07"
+    ]
+  }
+}

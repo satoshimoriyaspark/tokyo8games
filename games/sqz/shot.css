@@ -1,0 +1,39 @@
+/* Reference-matched v3 sprites: original PNG alpha and constant anatomy scale. */
+.pitch{height:194px;isolation:isolate}
+.shot-world{position:absolute;width:320px;height:194px;left:50%;top:0;transform:translateX(-50%)}
+.shot-goal{position:absolute;left:63px;top:14px;width:194px;height:88px;border:5px solid #f4faf7;border-bottom-width:3px;box-shadow:4px 3px #10213980;overflow:hidden}
+.goal-net{position:absolute;inset:-5px;background:repeating-linear-gradient(90deg,transparent 0 13px,#fff7 13px 14px),repeating-linear-gradient(0deg,#143c4266 0 11px,#fff7 11px 12px)}
+.character-sprite{position:absolute;left:0;top:0;overflow:hidden;z-index:2;image-rendering:pixelated;transform-origin:50% 50%}
+.character-sprite img{position:absolute;left:0;top:0;max-width:none;image-rendering:pixelated;pointer-events:none}
+.striker-sprite{z-index:3}
+.shot-world .ball{left:0;top:0;margin:0;transform:translate(112px,168px) translate(-50%,-50%);z-index:3}
+.shot-banner{position:absolute;z-index:5;left:0;right:0;top:145px;text-align:center;font:1000 27px/1 monospace;letter-spacing:3px;color:#fff29c;text-shadow:3px 3px #102139,-1px -1px #102139}
+.shot-banner small{display:block;margin-top:5px;font:800 11px/1.4 system-ui;letter-spacing:0;color:white}
+.shot-banner[hidden],.shot-combo[hidden],.shot-trail[hidden]{display:none}
+.shot-combo{position:absolute;top:4px;left:0;right:0;text-align:center;color:#ffe05c;text-shadow:2px 2px #102139;font:900 18px/1.2 monospace;z-index:4}
+.shot-trail{position:absolute;left:0;top:0;width:40px;height:11px;transform-origin:right center;background:linear-gradient(90deg,transparent,#ff723e 40%,#fff18b);box-shadow:0 4px #ffb43780;z-index:2}
+.questionpitch{height:194px}
+.answer-stage{padding:12px 14px 20px}
+.answer-stage .scoreboard{padding:7px 10px}
+.answer-stage .scoreboard strong{font-size:19px}
+.answer-pitch{margin:9px -14px 0}
+.shot-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0;font-size:12px;font-weight:800;min-height:40px}
+.shot-controls button{min-height:40px;padding:6px 12px;font-size:12px}
+.answer-stage .feedback{margin-top:8px;padding:12px;box-shadow:3px 3px #d8d2c3}
+.answer-stage .feedback h3{font-size:20px;margin-bottom:6px;color:#086742}
+.answer-stage .feedback.is-wrong h3{color:#a12e23}
+.answer-stage .feedback p{font-size:13px;line-height:1.55;margin-bottom:8px;overflow-wrap:anywhere}
+.answer-stage .feedback details{margin-bottom:8px}
+.answer-stage .feedback .primary{font-size:16px;padding:8px;min-height:46px}
+.answer-stage .feedback[hidden]{display:none}
+.answer-stage.is-feedback .pitch{height:153px}
+.answer-stage.is-feedback .shot-world{transform:translateX(-50%) scale(.78);transform-origin:50% 0}
+.answer-stage.is-feedback .shot-controls{display:none}
+.review-question{margin-top:16px;font-size:12px}
+.review-question summary{padding:6px 0;cursor:pointer}
+.review-question .question{font-size:16px;margin-top:12px}
+.review-question .flag{font-size:64px}
+.answer-stage>.space{margin-top:12px}
+.answer-stage .answers{margin-top:10px}
+@media(max-height:650px){.answer-stage{padding-top:8px}.answer-stage.is-feedback .pitch{height:105px}.answer-stage.is-feedback .shot-world{transform:translateX(-50%) scale(.53)}.answer-stage .feedback{padding:10px}.answer-stage .feedback p{margin-bottom:6px}}
+@media(prefers-reduced-motion:reduce){.shot-trail,.shot-combo{display:none}}
