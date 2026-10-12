@@ -27,6 +27,19 @@
 const events=[['100m走','A・Bを交互に連打','time'],['1500m走','A連打。スタミナに注意！','time'],['110mハードル','A連打で走り、Bでジャンプ','time'],['走り幅跳び','A連打→踏切線でB。3回挑戦','length'],['ジャベボール投げ','A連打→B長押しで角度→離して投げる','length']];
 const cv=document.querySelector('#screen'),c=cv.getContext('2d'),$=x=>document.querySelector(x),lim=(v,a,b)=>Math.max(a,Math.min(b,v));c.imageSmoothingEnabled=false;
 let jumpStarted=-10,throwHeldStart=0,throwAge=0,throwOrigin=0;
+// World-space metres keep the ball, camera, ground ruler and recorded distance aligned.
+const JAVE_SCALE=7.1,JAVE_LINE=326,JAVE_GROUND=286,JAVE_LANDING_HOLD=1.2;
+function javeFlightDuration(){return 1.2+(records.at(-1)||0)*.035;}
+function javeFlightPoint(u){
+ const distance=records.at(-1)||0,launch=32+throwOrigin*JAVE_SCALE+12;
+ const end=JAVE_LINE+distance*JAVE_SCALE,arc=48+distance*.6;
+ return {x:launch+(end-launch)*u,y:264+(JAVE_GROUND-6-264)*u-4*arc*u*(1-u)};
+}
+function javeView(){
+ const active=selected===4&&mode==='between',u=active?Math.min(1,throwAge/javeFlightDuration()):0;
+ const ball=javeFlightPoint(u),camera=active?Math.max(0,ball.x-230)*Math.min(1,throwAge/.45):0;
+ return {active,u,ball,camera,landed:active&&u===1};
+}
 let selected=0,mode='menu',cup=false,results=[],attempt=1,records=[],pos=0,spd=0,sta=100,last='',angle=42,bHeld=false,elapsed=0,prev=0,carry=0,deadline=0,invuln=0,hit=new Set(),feedback='',feedbackTime=0,downs=new Set();
 let rivals=[{name:'CPU 1',color:'#53b4ee',dist:0,skill:1.02},{name:'CPU 2',color:'#ef7474',dist:0,skill:.96},{name:'CPU 3',color:'#78d99b',dist:0,skill:.91}],cpuRecords=[],cpuTotal=[0,0,0],currentRank=1,finishDashTime=0,finishDashRecord=0,finishDashSpeed=0,ceremonyTime=0,ceremonyRank=1,ceremonyTotal=false,ceremonyScores=[];
 // Presentation only: each athlete has an independent, fixed-step animation clock.
@@ -132,7 +145,7 @@ if(selected===2&&k==='B'){let next=12+Math.ceil(Math.max(0,pos-12)/10)*10,delta=
 if(selected===3&&k==='B')finishAttempt()}
 function release(k){if(k==='B'&&bHeld){bHeld=false;if(mode==='run'&&selected===4)finishAttempt()}}
 function flash(s){feedback=s;feedbackTime=elapsed+.75}
-function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);if(selected===4){throwAge=0;throwOrigin=pos;bHeld=false;}rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(attempt+'回目：'+(v?label(selected,v):'ファウル'))}
+function finishAttempt(){if(mode!=='run')return;let v=0;if(selected===3){v=pos>=32&&pos<=40?lim(1.1+spd*.37+(pos-32)*.12,0,7.8):0}else if(selected===4){v=lim(4+spd*3.6*Math.max(0,1-Math.abs(angle-42)/60),0,55)}else return;records.push(v);if(selected===4){throwAge=0;throwOrigin=pos;bHeld=false;}rivals.forEach((r,j)=>{const base=selected===3?4.2:31;const skill=(j===0?1.12:j===1?1.02:.94);cpuRecords[j]=Math.max(cpuRecords[j]||0,+(base*skill+(attempt-2)*.18).toFixed(2))});mode='between';deadline=performance.now()+1200;message(selected===4?attempt+'回目：ボールを追え！':attempt+'回目：'+(v?label(selected,v):'ファウル'))}
 function cpuRaceTime(j,i){
  const r=rivals[j],goal=i===1?150:i===2?110:100;
  let dist=0,sec=0,dt=1/60;
@@ -166,7 +179,7 @@ $('#resultRanking').replaceChildren();
 $('#resultHint').textContent='大会終了！ もう一度挑戦できます。';$('#start').textContent='もう一度大会'}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人');$('#start').textContent='次の種目へ'}}else{message(events[selected][0]+' '+label(selected,v)+' / '+p+'点　'+thisRank+'位 / 4人'+(improved?' ★NEW BEST!':''));$('#start').textContent='もう一度'}render();ceremonyTime=0;mode='ceremony';$('#start').disabled=true;$('#cup').disabled=true;}
 function step(dt,t){stepSimulation(dt,t);advanceRunnerMotion(dt)}
 function stepSimulation(dt,t){
-if(mode==='between'&&selected===4)throwAge+=dt;
+if(mode==='between'&&selected===4){const wasFlying=throwAge<javeFlightDuration();throwAge+=dt;if(wasFlying&&throwAge>=javeFlightDuration())message(attempt+'回目：'+label(4,records.at(-1)));}
 if(mode==='ceremony'){ceremonyTime+=dt;if(ceremonyTime>=3.7){mode=ceremonyTotal?'finished':'result';$('#resultPanel').hidden=false;$('#start').disabled=false;$('#cup').disabled=false;}return;}
 if(mode==='finishDash'){
  finishDashTime+=dt;
@@ -176,7 +189,7 @@ if(mode==='finishDash'){
  if(finishDashTime>=2.1)finish(finishDashRecord);
  return;
 }
-if(mode==='ready'){const nextPhase=deadline-t>1500?0:1;if(nextPhase!==startPhase&&t<deadline&&selected<3)playStartCue(1);startPhase=nextPhase;if(t<deadline)message(selected<3?(startPhase?'Set — 用意':'On your marks — 位置について'):'READY ...');if(t>=deadline){mode='run';if(selected<3)playStartCue(2);message(selected<3?'ドン！ '+events[selected][1]:events[selected][1])}}if(mode==='between'&&t>=deadline){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
+if(mode==='ready'){const nextPhase=deadline-t>1500?0:1;if(nextPhase!==startPhase&&t<deadline&&selected<3)playStartCue(1);startPhase=nextPhase;if(t<deadline)message(selected<3?(startPhase?'Set — 用意':'On your marks — 位置について'):'READY ...');if(t>=deadline){mode='run';if(selected<3)playStartCue(2);message(selected<3?'ドン！ '+events[selected][1]:events[selected][1])}}if(mode==='between'&&(selected===4?throwAge>=javeFlightDuration()+JAVE_LANDING_HOLD:t>=deadline)){if(attempt<3){attempt++;resetRun();mode='ready';deadline=t+900;message(attempt+'回目 READY...')}else finish(Math.max(...records))}if(mode!=='run')return;elapsed+=dt;
 if(selected===4&&bHeld)angle=30+27*Math.sin(elapsed*4.6);
 if(selected<3){rivals.forEach((r,j)=>{let base=selected===1?4.8:selected===0?4.65:6.8;let pace=base*r.skill*(selected===1?(elapsed>18?1.25:elapsed<8?.87:1):1);r.dist=Math.min(selected===1?150:selected===2?110:100,r.dist+pace*dt)});}
 if(selected===1){spd=Math.max(0,spd-(sta<8?2.3:1.35)*dt);sta=lim(sta+(spd<7?10:3)*dt,0,100)}else spd=Math.max(0,spd-1.55*dt);
@@ -244,6 +257,11 @@ function blitSprite(x,y,row,frame,cpuIndex=-1,anchorChest=false){
 function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
  const isRun=phase==='run'||phase==='finishDash';let row=0,frame=0,lift=0;
  const motion=runnerMotion[cpuIndex+1];
+ // Layer the approved carrying/wind-up torso over the approved eight running-leg frames.
+ // This animates the PNG artwork; it does not redraw or replace the character.
+ if(selected===4&&isRun&&motion.moving){
+  drawJaveRunSprite(x,y,motion,cpuIndex);return;
+ }
  let age=-1;
  if(selected===2&&isRun){
   if(cpuIndex<0)age=elapsed-jumpStarted;
@@ -281,6 +299,16 @@ function drawRunnerSprite(x,y,travel,phase,seed,cpuIndex=-1){
  }
  blitSprite(x,y-lift,row,frame,cpuIndex,true);
 }
+function drawJaveRunSprite(x,y,motion,cpuIndex){
+ const frame=Math.floor(motion.frameTime)%8,lift=[0,0,0,2,0,0,0,2][frame];
+ const held=bHeld?elapsed-throwHeldStart:0,row=bHeld&&held>=.16?8:7,upper=row===7?1:held<.38?0:1;
+ const dx=Math.round(x+14-29),dy=Math.round(y-lift),waist=33;
+ c.imageSmoothingEnabled=false;
+ c.drawImage(spriteVariants[cpuIndex+1][2],frame*48,waist,48,48-waist,dx,dy+waist,48,48-waist);
+ c.drawImage(spriteVariants[cpuIndex+1][row],upper*48,0,48,waist,dx,dy,48,waist);
+ spriteDebug.last[cpuIndex+1]={row,frame:upper,runFrame:frame,dx,dy,chestX:dx+CHEST_ANCHORS[row][upper]};
+ spriteDebug.draws+=2;
+}
 function drawProp(which,x,y){
  if(!spriteReady)return;
  const w=which===0?16:22,h=which===0?11:22;
@@ -288,10 +316,27 @@ function drawProp(which,x,y){
  c.drawImage(spriteVariants[0][11],which*FRAME_SIZE,0,w,h,Math.round(x),Math.round(y),w,h);
 }
 function drawJaveBallFlight(){
- if(selected!==4||mode!=='between'||!spriteReady||throwAge>1.2)return;
- const u=Math.min(1,throwAge/1.2), launchX=32+throwOrigin*7.1+12;
- const flightX=launchX+u*135,flightY=252-Math.sin(u*Math.PI)*68+u*20;
- drawProp(0,flightX,flightY);
+ const view=javeView();if(!view.active||!spriteReady)return;
+ const x=Math.round(view.ball.x-view.camera),y=Math.round(view.ball.y);
+ rect(x-5,JAVE_GROUND-1,10,2,'#2b5046');drawProp(0,x-8,y-5);
+ if(view.landed){
+  rect(x,JAVE_GROUND+1,2,17,'#ffdb65');rect(x-42,y-31,84,19,'#101927');
+  txt((records.at(-1)||0).toFixed(2)+'m',x,y-17,14,'#ffdb65','center');
+ }else txt('ボールを追え！',192,101,13,'#ffdb65','center');
+}
+function drawJaveField(){
+ const {camera}=javeView(),line=JAVE_LINE-camera;
+ rect(0,77,384,212,'#365e4d');rect(0,259,Math.max(0,line),30,'#a54b3e');
+ rect(0,286,384,3,'#f1e2b7');rect(0,289,384,31,'#203b36');
+ for(let m=0;m<=110;m+=5){
+  const x=Math.round(JAVE_LINE+m*JAVE_SCALE-camera);if(x<-24||x>408)continue;
+  rect(x,m%10===0?232:268,1,m%10===0?57:21,'#93b69a');
+  if(m%10===0)txt(m+'m',x,305,11,'#fff4d3','center');
+ }
+ if(line>-5&&line<389){rect(line,77,4,212,'#ffde65');txt('0m',Math.min(366,Math.max(17,line)),94,11,'#ffdb65','center');}
+ txt('TRY '+attempt+' / 3',8,59,12,'#ffdb65');
+ if(mode==='run'&&!bHeld)txt('B長押し→離す',192,177,12,'#ffdb65','center');
+ if(mode!=='between')txt('助走 '+Math.floor(pos)+' / 40m',8,305,10,'#fff4d3');
 }
 function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){blitSprite(x,y,kind==='victory'?4:5,kind==='victory'?frame:0,cpuIndex,false);}
 function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
@@ -308,7 +353,8 @@ if(selected===2)for(let i=0;i<10;i++){
   if(mode==='run'&&delta>=0&&delta<4.6)txt('B!',h,230,12,'#ffdb65','center');
  }
 }
-if(selected>=3){rect(326,77,4,212,'#ffde65');if(selected===3){rect(299,265,27,8,'#72db91');rect(330,190,54,99,'#d9b474');txt('Bで踏切!',290,177,12,'#ffdb65','center')}else txt('B長押し→離す',192,177,12,'#ffdb65','center')}
+if(selected===3){rect(326,77,4,212,'#ffde65');rect(299,265,27,8,'#72db91');rect(330,190,54,99,'#d9b474');txt('Bで踏切!',290,177,12,'#ffdb65','center')}
+if(selected===4){drawJaveField();x-=javeView().camera;}
 let y=241;drawRunnerSprite(x,y,pos,mode,4);drawJaveBallFlight();if(selected<3)txt('YOU',Math.max(2,x+1),y-4,9,'#ffdb65');
 if(mode==='run'&&selected<3&&elapsed<.7)txt('ドン！',192,164,24,'#ffdb65','center');
 if(mode==='finishDash')txt('GOAL! →',192,69,18,'#ffdb65','center');if(selected===1){rect(106,44,172,11,'#111b2b');rect(106,44,172*sta/100,11,sta<25?'#e46b64':'#75df9c');txt('STAMINA',106,69,11,'#fff');txt('SECTION '+Math.min(4,Math.floor(pos/37.5)+1)+'/4',8,69,10,'#ffdb65')}if(selected===2){txt('HURDLE '+Math.min(10,hit.size+1)+'/10',8,69,11,'#ffdb65')}if(selected===0&&mode==='run')txt('NEXT: '+(last==='A'?'B':'A'),186,66,14,'#ffdb65','center');if(selected===4&&bHeld){rect(104,44,176,12,'#111b2b');rect(104,44,176*(angle+1)/60,12,'#ffce53');rect(104+176*42/60,42,3,16,'#75df9c');txt('42°をねらえ! Bを離す',192,70,11,'#fff','center')}if(feedback&&elapsed<feedbackTime)txt(feedback,8,68,10,'#ffdb65','left');

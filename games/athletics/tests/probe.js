@@ -57,7 +57,7 @@ window.qa={
    begin();check('retry clears effects '+ev,pos===0&&elapsed===0&&finishDashTime===0&&throwOrigin===0&&throwAge===0&&ceremonyTime===0);
   }
   selected=4;begin();step(1/60,deadline+1);input('B');check('javeball hold',bHeld);release('B');check('javeball release',mode==='between'&&!bHeld&&records.length===1);
-  step(1/60,deadline+1);check('javeball next attempt clears flight',attempt===2&&throwAge===0&&throwOrigin===0&&mode==='ready');
+  for(let n=0;mode==='between'&&n<360;n++)step(1/60,deadline+1);check('javeball next attempt clears flight',attempt===2&&throwAge===0&&throwOrigin===0&&mode==='ready');
   selected=3;begin();step(1/60,deadline+1);pos=36;spd=12;input('B');check('long jump attempt',mode==='between'&&records[0]>0);
   // Exercise the real five-event tournament transition and totals.
   cup=true;results=[];cpuTotal=[0,0,0];
