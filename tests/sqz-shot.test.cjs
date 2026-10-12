@@ -84,7 +84,7 @@ test('question bank retains 200 valid unique questions and inline scripts parse'
 
 // Executes the real game scripts with a minimal DOM adapter. This verifies
 // storage/state/event integration; it does not claim browser layout coverage.
-function game(){
+function game(speechSupported=true){
  const e=env(),nodes=new Map(),events=new Map(),storage=new Map();
  function node(key){if(!nodes.has(key)){
   const classes=new Set();nodes.set(key,{style:{},dataset:{},isConnected:true,complete:true,naturalWidth:640,
@@ -92,14 +92,16 @@ function game(){
    setAttribute(){},addEventListener(){},focus(){},querySelector:s=>node(key+' '+s)});
  }return nodes.get(key);}
  const document={hidden:false,querySelector:node,getElementById:id=>node('#'+id),querySelectorAll:()=>[],addEventListener:(n,fn)=>events.set(n,fn)};
- const calls=[];
+ const calls=[],spoken=[];let speechCancels=0;
+ const speechSynthesis=speechSupported?{cancel(){speechCancels++;},getVoices:()=>[{lang:"en-US"},{lang:"ja-JP"}],speak:u=>spoken.push(u)}:undefined;
+ class SpeechSynthesisUtterance{constructor(text){this.text=text;}}
  class AudioContext{constructor(){this.currentTime=0;this.destination={};}async resume(){}async decodeAudioData(bytes){return bytes;}createBufferSource(){const o={connect:()=>({connect(){}}),start(){calls.push({buffer:o.buffer,stopped:false});o.call=calls.at(-1);},stop(){if(o.call)o.call.stopped=true;},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(){}},disconnect(){}};}}
 
- const ctx=vm.createContext({fetch:async url=>({ok:true,arrayBuffer:async()=>url}),document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
+ const ctx=vm.createContext({speechSynthesis,SpeechSynthesisUtterance,fetch:async url=>({ok:true,arrayBuffer:async()=>url}),document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
  vm.runInContext('globalThis.window=globalThis',ctx);vm.runInContext(source,ctx);
  const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
  for(const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g))vm.runInContext(m[1],ctx);
- return {run:s=>vm.runInContext(s,ctx),node,events,calls};
+ return {run:s=>vm.runInContext(s,ctx),node,events,calls,spoken,get speechCancels(){return speechCancels;}};
 }
 test('real game: double answer, next lock, skip, combo, wrong answer, resume and result',()=>{
  const g=game();g.run("start('training')");
@@ -133,4 +135,17 @@ test('real game: timeout and hidden-page interruption retain one answer',()=>{
  g.run('document.hidden=true');g.events.get('visibilitychange')();
  assert.equal(g.run('shot.active'),false);assert.equal(g.node('.feedback').hidden,false);
  assert.equal(g.run('P.total'),1);
+});
+
+test('reading speaks only question and visible choice order, then cancels on answer/navigation',()=>{
+ const g=game();g.run("start('training')");assert.equal(g.spoken.length,0);
+ g.node('#read-toggle').onclick();assert.equal(g.spoken.length,1);
+ const expected=g.run("current().text+'。'+S.order[current().id].map((a,i)=>['エー','ビー','シー','ディー'][i]+'。'+a+'。').join(' ')");
+ assert.equal(g.spoken[0].text,expected);assert.equal(g.spoken[0].voice.lang,'ja-JP');
+ g.node('#read-again').onclick();assert.equal(g.spoken.length,2);
+ const before=g.speechCancels;g.run('answer(current().answer);shot.skip()');assert.ok(g.speechCancels>before);
+ g.node('#next').onclick();assert.equal(g.spoken.length,3);
+ g.node('#read-toggle').onclick();const n=g.spoken.length;g.run('readQuestion()');assert.equal(g.spoken.length,n);
+ g.run('P.readAloud=true;readQuestion();home()');assert.equal(g.run('speechUtterance'),null);
+ const unsupported=game(false);unsupported.run("P.readAloud=true;start('training')");assert.equal(unsupported.spoken.length,0);
 });

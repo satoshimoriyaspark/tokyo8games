@@ -13,6 +13,7 @@
 .title p{margin:8px 0 0}
 /* The approved logo replaces the title's provisional pitch illustration. */
 .feedback{scroll-margin-top:12px}
+.reading-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.reading-controls .linkbtn{min-height:40px;padding:6px 10px;font-size:12px}#read-status:empty{display:none}
 </style>
 <link rel="stylesheet" href="/games/sqz/shot.css">
 <link rel="preload" as="image" href="/games/sqz/assets/characters-v3/characters-atlas.png">
@@ -166,11 +167,34 @@ async function tone(ok,valid=()=>true){
   source.start();
  }catch(e){if(generation!==soundGeneration||!P.sound||!valid())return;P.sound=false;updateSound();save();notify('音を再生できないため、音なしで続けます。');}
 }
+let speechGeneration=0, speechUtterance=null;
+const canRead=!!(window.speechSynthesis&&window.SpeechSynthesisUtterance);
+function stopReading(){speechGeneration++;speechUtterance=null;if(canRead)window.speechSynthesis.cancel();}
+function readQuestion(){
+ stopReading();
+ if(!canRead||!P.readAloud||view!=='question'||!S||completedAnswer()||document.hidden)return;
+ const q=current(),options=S.order[q.id],generation=speechGeneration;
+ // Only speak the displayed question and shuffled choices, never the flag emoji or answer metadata.
+ const text=q.text+'。'+options.map((a,i)=>['エー','ビー','シー','ディー'][i]+'。'+a+'。').join(' ');
+ const u=new window.SpeechSynthesisUtterance(text);speechUtterance=u;
+ u.lang='ja-JP';u.rate=1;u.pitch=1;u.volume=1;
+ const voice=window.speechSynthesis.getVoices().find(v=>/^ja(?:-|_|$)/i.test(v.lang));if(voice)u.voice=voice;
+ u.onend=()=>{if(generation===speechGeneration){speechUtterance=null;$('#read-status').textContent='';}};
+ u.onerror=e=>{if(generation!==speechGeneration||e.error==='canceled'||e.error==='interrupted')return;speechUtterance=null;$('#read-status').textContent='読み上げできませんでした。「もう一度読む」を押してください。';};
+ $('#read-status').textContent='読み上げ中';
+ try{window.speechSynthesis.speak(u);}catch(e){u.onerror({error:'unavailable'});}
+}
+function readingControls(){return `<div class="reading-controls"><button id="read-toggle" class="linkbtn" aria-pressed="${!!P.readAloud}" ${canRead?'':'disabled'}>読み上げ ${P.readAloud?'ON':'OFF'}</button><button id="read-again" class="linkbtn" ${canRead&&P.readAloud?'':'disabled'}>もう一度読む</button></div><p id="read-status" class="muted" role="status">${canRead?'':'このブラウザは読み上げに対応していません。'}</p>${S.kind==='cup'?'<p class="muted">読み上げ中も制限時間は進みます。</p>':''}`;}
+function bindReading(){
+ bind('read-toggle',()=>{P.readAloud=!P.readAloud;save();$('#read-toggle').textContent='読み上げ '+(P.readAloud?'ON':'OFF');$('#read-toggle').setAttribute('aria-pressed',String(P.readAloud));$('#read-again').disabled=!P.readAloud;if(P.readAloud)readQuestion();else{stopReading();$('#read-status').textContent='';}});
+ bind('read-again',readQuestion);
+ if(P.readAloud)readQuestion();
+}
 function updateSound(){$('#sound').textContent='音 '+(P.sound?'ON':'OFF');$('#sound').setAttribute('aria-pressed',String(P.sound));}
 $('#sound').onclick=()=>{P.sound=!P.sound;if(!P.sound)silence();updateSound();save();tone(true);};
 function button(id,text,cls='secondary',disabled=false){return `<button id="${id}" class="${cls}" ${disabled?'disabled':''}>${text}</button>`;}
 function bind(id,fn){const el=document.getElementById(id);if(el)el.onclick=fn;}
-function set(html,name){stop();if(shot){shot.cancel();shot=null;}silence();view=name;$('#app').innerHTML=html;window.scrollTo(0,0);}
+function set(html,name){stopReading();stop();if(shot){shot.cancel();shot=null;}silence();view=name;$('#app').innerHTML=html;window.scrollTo(0,0);}
 function pitch(cls=''){return `<div class="pitch ${cls}" aria-label="シュート演出">${window.SQZShot.markup()}</div>`;}
 function home(){set(`<section class="title"><h1><img class="title-logo" src="/games/sqz/assets/logo-approved-20261011.png" width="1448" height="1086" alt="目指せ！クイズ王 サッカー編 — SOCCER QUIZ" fetchpriority="high" decoding="async"></h1><p>選手も、国旗も、名勝負も。知識でゴール！</p></section><section class="screen"><div class="menu">${S?button('resume','▶ 途中から再開','primary green'):''}${button('cup','クイズ王カップ','primary')}${button('training','トレーニング','secondary')}${button('records','これまでの記録','secondary')}</div><p class="muted center space">4択をタップするだけ。${BANK.length}問を収録。<br>間違えても、覚えれば次のゴールにつながる。</p></section>`,'home');bind('cup',()=>{if(S&&!S.done){dialog('途中のラウンドがあります','「途中から再開」から続けてください。新しく始める場合は、記録画面で途中ラウンドを終了できます。');return;}story();});bind('training',training);bind('records',records);bind('resume',()=>{if(S.done)result();else question();});}
 function story(){set(`<section class="screen"><p class="eyebrow">ROAD TO THE QUIZ KING</p><h2>その知識が、<br>決勝ゴールになる。</h2>${pitch()}<div class="card space"><p>ここは、サッカーの知識で勝負する「クイズ王カップ」。</p><p>選手、大会の記録、世界の国旗。4つの答えから正解を選んで、ゴールを決めよう！</p><p><strong>予選、準決勝、そして決勝へ。<br>きみはクイズ王になれるかな？</strong></p></div>${button('go','大会を選ぶ','primary')}${button('back','タイトルへ','linkbtn space')}</section>`,'story');bind('go',()=>setup());bind('back',home);}
@@ -212,8 +236,9 @@ function question(animate=false){
    Promise.race([tone(ok,()=>shot===controller&&controller.active),new Promise(resolve=>setTimeout(resolve,180))]).then(()=>controller.begin());
   }else controller.skip(); // Reload/resume shows the saved answer, without scoring or replay.
  }else{
-  set(`<section class="screen">${pitch('questionpitch')}${scoreboard()}<div class="timer" id="timer"><div style="width:${S.kind==='cup'?S.ms/200:100}%"></div></div>${questionContent(q,options,false)}${pause}</section>`,'question');
+  set(`<section class="screen">${pitch('questionpitch')}${scoreboard()}<div class="timer" id="timer"><div style="width:${S.kind==='cup'?S.ms/200:100}%"></div></div>${readingControls()}${questionContent(q,options,false)}${pause}</section>`,'question');
   document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>answer(options[+b.dataset.choice]));
+  bindReading();
   if(S.kind==='cup')startTimer();
  }
  bind('pause',()=>{syncTime();stop();save();home();});save();
@@ -226,8 +251,8 @@ function records(){set(`<section class="screen"><div class="viewtop"><h2>これ�
 let onDialogClose=null,dialogReturnFocus=null;
 function dialog(title,text,cb=null,cancel=false){dialogReturnFocus=document.activeElement;$('#dialogTitle').textContent=title;$('#dialogText').innerHTML=`<p>${esc(text)}</p>`+(cancel?button('dialogCancel','キャンセル','secondary space'):'');$('#overlay').hidden=false;onDialogClose=()=>{const fn=cb;$('#overlay').hidden=true;onDialogClose=null;if(fn)fn();else dialogReturnFocus?.focus();};$('#dialogOK').textContent=cancel?'実行する':'OK';$('#dialogOK').onclick=onDialogClose;if(cancel)bind('dialogCancel',()=>{$('#overlay').hidden=true;onDialogClose=null;dialogReturnFocus?.focus();});$('#dialogOK').focus();}
 document.addEventListener('keydown',e=>{if($('#overlay').hidden)return;if(e.key==='Tab'){const list=[...$('#overlay').querySelectorAll('button,a')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){syncTime();stop();silence();if(shot?.active)shot.skip();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
-window.addEventListener('pagehide',()=>{syncTime();stop();silence();if(shot?.active)shot.skip();save();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopReading();syncTime();stop();silence();if(shot?.active)shot.skip();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
+window.addEventListener('pagehide',()=>{stopReading();syncTime();stop();silence();if(shot?.active)shot.skip();save();});
 window.SQZ=Object.freeze({questions:BANK,selectQuestions,allowed});
 updateSound();home();if(loadMessage)notify(loadMessage);
 </script></body></html>
