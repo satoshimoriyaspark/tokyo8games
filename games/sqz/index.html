@@ -18,7 +18,7 @@
 <link rel="preload" as="image" href="/games/sqz/assets/characters-v3/characters-atlas.png">
 <script src="/games/sqz/shot.js"></script>
 </head>
-<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.7</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main><footer class="footer"><button id="sources">出典・素材について</button>｜<a href="/">ゲーム一覧</a><br>非公式のサッカークイズゲームです。</footer></div>
+<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.7</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main></div>
 <div id="overlay" class="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="card"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button id="dialogOK" class="primary">OK</button></div></div>
 <script>
 'use strict';
@@ -227,7 +227,6 @@ function records(){set(`<section class="screen"><div class="viewtop"><h2>これ�
 let onDialogClose=null,dialogReturnFocus=null;
 function dialog(title,text,cb=null,cancel=false){dialogReturnFocus=document.activeElement;$('#dialogTitle').textContent=title;$('#dialogText').innerHTML=`<p>${esc(text)}</p>`+(cancel?button('dialogCancel','キャンセル','secondary space'):'');$('#overlay').hidden=false;onDialogClose=()=>{const fn=cb;$('#overlay').hidden=true;onDialogClose=null;if(fn)fn();else dialogReturnFocus?.focus();};$('#dialogOK').textContent=cancel?'実行する':'OK';$('#dialogOK').onclick=onDialogClose;if(cancel)bind('dialogCancel',()=>{$('#overlay').hidden=true;onDialogClose=null;dialogReturnFocus?.focus();});$('#dialogOK').focus();}
 document.addEventListener('keydown',e=>{if($('#overlay').hidden)return;if(e.key==='Tab'){const list=[...$('#overlay').querySelectorAll('button,a')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
-$('#sources').onclick=()=>{if(shot?.active){silence();shot.skip();}if(view==='question'&&!completedAnswer()){syncTime();stop();save();}dialog('出典・素材について','問題ごとに、日本サッカー協会、FIFA、UEFA、プレミアリーグ、Jリーグ、外務省の出典・対象年・確認日を記録しています。実在選手の写真とクラブのエンブレムは未収録です。国旗は端末の絵文字表示を使用しています。タイトルロゴは2026年10月11日確定の透過PNGを使用しています。キャラクターは指定のデザイン参考画像とキーパーv2をもとに調整した透過PNGです。赤いキーパーと青いストライカーを同じドット絵のテイストに統一しています。',()=>{if(view==='question'&&!completedAnswer()&&S.kind==='cup')startTimer();});};
 document.addEventListener('visibilitychange',()=>{if(document.hidden){syncTime();stop();silence();if(shot?.active)shot.skip();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
 window.addEventListener('pagehide',()=>{syncTime();stop();silence();if(shot?.active)shot.skip();save();});
 window.SQZ=Object.freeze({questions:BANK,selectQuestions,allowed});
