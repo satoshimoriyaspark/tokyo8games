@@ -21,7 +21,7 @@ for(const path of sources){
 const names=['待機','スタート','100m 走行','1500m 走行','正面ガッツポーズ','表彰台','ハードル','ジャベボール 構え','ジャベボール 放球','幅跳び（既存ポーズ）','ジャベボール フォロー','競技用具'];
 const samples=[
  ['100m 開始前',{mode:'ready',pos:0,elapsed:0}],
- ['100m スタート1',{pos:.1,elapsed:.1}],['100m スタート2',{pos:.25,elapsed:.2}],['100m スタート3',{pos:.45,elapsed:.3}],
+ ['100m 位置について',{mode:'ready',startPhase:0,pos:0,elapsed:0}],['100m 用意',{mode:'ready',startPhase:1,pos:0,elapsed:0}],['100m 号砲',{pos:0,elapsed:.05}],
  ...Array.from({length:8},(_,f)=>['100m 走行 '+(f+1),{pos:(270+f+.1)/2.8,elapsed:19}]),
  ['100m ゴール直前 96m',{pos:96}],['100m 胸部通過直前',{pos:99.99}],
  ['100m 通過直後',{mode:'finishDash',pos:100,dash:0}],['100m 駆け抜け 0.5秒',{mode:'finishDash',pos:103.5,dash:.5}],['100m 演出終了後 1.2秒',{mode:'finishDash',pos:107.6,dash:1.2}],

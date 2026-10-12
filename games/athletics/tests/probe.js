@@ -9,6 +9,7 @@ window.qa={
  counts:SPRITE_COUNTS,
  scene(s){
   resetRun();cup=false;results=[];cpuTotal=[0,0,0];records=[];attempt=1;
+  if(typeof startPhase!=='undefined')startPhase=s.startPhase??0;
   selected=s.event||0;mode=s.mode||'run';pos=s.pos??96;elapsed=s.elapsed??19.2;spd=mode==='ready'?0:12;
   rivals.forEach((r,j)=>r.dist=mode==='ready'?0:pos-3-j*2);currentRank=1;
   finishDashTime=s.dash??0;finishDashRecord=elapsed;finishDashSpeed=7;
