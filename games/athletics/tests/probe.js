@@ -17,6 +17,7 @@ window.qa={
   bHeld=!!s.held;throwHeldStart=elapsed-(s.heldAge??0);throwAge=s.throwAge??0;throwOrigin=s.pos??36;
   if(s.jumpAge!=null)jumpStarted=elapsed-s.jumpAge;
   deadline=performance.now()+(s.attemptRemain??1.2)*1000;
+  if(typeof runnerMotion!=='undefined')runnerMotion.forEach((m,i)=>Object.assign(m,{travel:i? rivals[i-1].dist:pos,age:1,frameTime:pos*(selected===1?1.2:2.8)+(i?i-1:4)*.5,speed:spd,moving:mode==='run'||mode==='finishDash'}));
   render();qaPaint();return qaState();
  },
  sprite(row,frame,bg,cpu=-1){
