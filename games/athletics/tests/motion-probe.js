@@ -4,7 +4,7 @@ window.motionQA={
  reset(event){selected=event;resetRun();mode='run';pos=40;elapsed=1;rivals.forEach((r,i)=>r.dist=39-i*2);if(typeof runnerMotion!=='undefined')runnerMotion.forEach((m,i)=>m.travel=i?rivals[i-1].dist:pos);},
  tick(dt,speed){
   const factor=selected===0?.39:selected===1?1.85:1.1;
-  spd=speed/factor;elapsed+=dt;elapsed+=dt;pos+=speed*dt;rivals.forEach((r,i)=>r.dist+=speed*r.skill*dt);
+  spd=speed/factor;elapsed+=dt;pos+=speed*dt;rivals.forEach((r,i)=>r.dist+=speed*r.skill*dt);
   if(typeof runnerMotion!=='undefined')advanceRunnerMotion(dt);
   draw(0);const a=spriteDebug.last[0];
   return {canvas:cv,frame:a.frame,row:a.row,dx:a.dx,dy:a.dy,feet:a.dy+45};
@@ -43,7 +43,7 @@ window.motionQA={
     input('A');input('B');assert('no movement or clock before gun '+ev+' '+time,pos===0&&elapsed===0&&rivals.every(r=>r.dist===0));
    }
    step(1/60,gun);draw(0);assert('gun uses launch pose '+ev,mode==='run'&&spriteDebug.last.every(a=>a.row===1&&a.frame===2));
-   for(let n=0;n<15;n++){input('A');step(1/60,gun+20+n*17)}draw(0);
+   for(let n=0;n<15;n++){input(ev===0&&n%2?'B':'A');step(1/60,gun+20+n*17)}draw(0);
    assert('running after gun '+ev,spriteDebug.last[0].row===2);
    begin();draw(0);assert('retry returns to marks '+ev,startPhase===0&&spriteDebug.last[0].frame===0);
   }
