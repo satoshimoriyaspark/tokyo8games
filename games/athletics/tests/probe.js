@@ -1,3 +1,4 @@
+if(typeof showOpening==='function')showOpening('game');
 // Injected by visual.html into isolated copies of the real game, never the game URL.
 const qaPaint=()=>{draw(0);if(mode==='finishDash')drawTapeBurst(0);if(mode==='ceremony')drawCeremony(0);return cv};
 const qaState=()=>({selected,mode,pos,elapsed,finishDashTime,finishDashRecord,throwAge,throwOrigin,bHeld,ceremonyTime,attempt,records:[...records],results:results.map(r=>({...r})),anchors:spriteDebug.last.map(r=>({...r})),smoothing:c.imageSmoothingEnabled});
@@ -8,6 +9,7 @@ window.qa={
  sheets:()=>spriteVariants,
  counts:SPRITE_COUNTS,
  scene(s){
+  if(typeof showOpening==='function')showOpening('game');
   resetRun();cup=false;results=[];cpuTotal=[0,0,0];records=[];attempt=1;
   if(typeof startPhase!=='undefined')startPhase=s.startPhase??0;
   selected=s.event||0;mode=s.mode||'run';pos=s.pos??96;elapsed=s.elapsed??19.2;spd=mode==='ready'?0:12;

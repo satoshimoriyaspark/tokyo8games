@@ -1,3 +1,4 @@
+if(typeof showOpening==='function')showOpening('game');
 // Isolated comparison hook, loaded only by motion.html.
 window.motionQA={
  ready:()=>spriteReady,
