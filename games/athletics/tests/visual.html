@@ -1,9 +1,9 @@
 <!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>8BIT ATHLETICS 1.5.1 — 修正前後の表示検証</title>
+<title>8BIT ATHLETICS 1.7 — 修正前後の表示検証</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#172337;color:#f5f0df;font:14px system-ui;padding:16px}h1{font-size:24px;margin:0 0 8px}p{margin:5px 0 12px}button,select{font:inherit;padding:8px;margin-right:6px}nav{margin:10px 0}.pair{display:flex;gap:16px}.panel{width:calc(50% - 8px)}canvas{image-rendering:pixelated;max-width:100%;height:auto;display:block}h2{font-size:18px;margin:8px 0}#scene canvas{width:576px;border:2px solid #708096}#zoom canvas{width:576px}#atlas{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#334357;padding:8px}.card canvas{width:100%}.card h3{font:13px system-ui;margin:0 0 4px}iframe{display:none}#status{color:#8dffc1}#layout iframe{display:block;background:#101927;border:1px solid #8dffc1}#layout{display:flex;gap:20px;align-items:start;overflow:auto}pre{white-space:pre-wrap}section[hidden]{display:none}
 </style>
-<h1>8BIT ATHLETICS｜表示修正の比較</h1><p>左：修正前 0638498 ／ 右：修正後 ART 1.5.1。同じゲーム描画関数・同じ状態で比較。画像補間なし。</p>
+<h1>8BIT ATHLETICS｜表示修正の比較</h1><p>左：修正前 0638498 ／ 右：修正後 ART 1.7。同じゲーム描画関数・同じ状態で比較。画像補間なし。</p>
 <p id="status">承認PNGを読み込み中…</p>
 <nav><button id="scenes">場面比較</button><button id="frames">全フレーム</button><button id="layouts">画面幅確認</button><button id="test">実行時検証</button></nav>
 <section id="scene"><select id="sample" aria-label="確認場面"></select><div class="pair"><div class="panel"><h2>修正前</h2><canvas id="before" width="384" height="320"></canvas></div><div class="panel"><h2>修正後</h2><canvas id="after" width="384" height="320"></canvas></div></div><h2>プレイヤーとゴール周辺（同一範囲を拡大）</h2><div id="zoom" class="pair"><div class="panel"><canvas width="160" height="64"></canvas></div><div class="panel"><canvas width="160" height="64"></canvas></div></div></section>
