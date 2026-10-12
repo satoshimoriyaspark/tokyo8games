@@ -1,0 +1,111 @@
+{
+  "environment": "Node + @napi-rs/canvas; not a browser/device test",
+  "javeball": {
+    "count": 28,
+    "passed": [
+      "A accelerates and uses running legs",
+      "run plays all eight approved running frames",
+      "hold plays all eight approved running frames",
+      "all layered PNG crops and draws are integer pixels",
+      "stopped run-up returns to still carrying pose",
+      "unchanged scoring formula 0",
+      "ball stays visible through landing 0",
+      "landing agrees with ground ruler and record 0",
+      "wall clock cannot skip flight 0",
+      "landing is held before retry 0",
+      "retry clears camera and motion 0",
+      "unchanged scoring formula 12.5",
+      "ball stays visible through landing 12.5",
+      "landing agrees with ground ruler and record 12.5",
+      "wall clock cannot skip flight 12.5",
+      "landing is held before retry 12.5",
+      "retry clears camera and motion 12.5",
+      "unchanged scoring formula 8",
+      "ball stays visible through landing 8",
+      "landing agrees with ground ruler and record 8",
+      "wall clock cannot skip flight 8",
+      "landing is held before retry 8",
+      "retry clears camera and motion 8",
+      "attempt finishes after landing 1",
+      "attempt finishes after landing 2",
+      "attempt finishes after landing 3",
+      "three attempts retain best distance",
+      "title clears flight"
+    ]
+  },
+  "regression": {
+    "checks": 206,
+    "failed": [],
+    "snapshots": [
+      {
+        "event": 0,
+        "time": 19.55000000000017,
+        "display": "19.55秒",
+        "points": "831 / 1000点★ NEW BEST!"
+      },
+      {
+        "event": 1,
+        "time": 9.05000000000003,
+        "display": "9.05秒",
+        "points": "1000 / 1000点★ NEW BEST!"
+      },
+      {
+        "event": 2,
+        "time": 8.566666666666672,
+        "display": "8.57秒",
+        "points": "1000 / 1000点★ NEW BEST!"
+      },
+      {
+        "total": 3685,
+        "scores": [
+          3275,
+          3059,
+          2819
+        ]
+      }
+    ]
+  },
+  "running": {
+    "count": 38,
+    "passed": [
+      "no crouch after gun at speed 0.5",
+      "all eight running frames at speed 0.5",
+      "no crouch after gun at speed 5",
+      "all eight running frames at speed 5",
+      "no crouch after gun at speed 10",
+      "all eight running frames at speed 10",
+      "no crouch after gun at speed 30",
+      "all eight running frames at speed 30",
+      "sprint capped at 12 fps",
+      "jog capped at 12 fps",
+      "same clock at 30 and 60 fps",
+      "ready holds marks pose",
+      "stopped athlete is still",
+      "finish continues cycle without restart",
+      "finish time unchanged",
+      "retry resets all four clocks",
+      "pre-gun pose 0 1500",
+      "no movement or clock before gun 0 1500",
+      "pre-gun pose 0 2400",
+      "no movement or clock before gun 0 2400",
+      "pre-gun pose 0 2600",
+      "no movement or clock before gun 0 2600",
+      "pre-gun pose 0 3999",
+      "no movement or clock before gun 0 3999",
+      "gun uses launch pose 0",
+      "running after gun 0",
+      "retry returns to marks 0",
+      "pre-gun pose 2 1500",
+      "no movement or clock before gun 2 1500",
+      "pre-gun pose 2 2400",
+      "no movement or clock before gun 2 2400",
+      "pre-gun pose 2 2600",
+      "no movement or clock before gun 2 2600",
+      "pre-gun pose 2 3999",
+      "no movement or clock before gun 2 3999",
+      "gun uses launch pose 2",
+      "running after gun 2",
+      "retry returns to marks 2"
+    ]
+  }
+}
