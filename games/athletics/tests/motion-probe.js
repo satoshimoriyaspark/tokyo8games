@@ -25,8 +25,9 @@ window.motionQA={
    assert('all three start frames at speed '+speed,r.starts.join(',')==='0,1,2');
    assert('all eight running frames at speed '+speed,r.frames.length===8);
   }
-  const fast=simulate(0,30,1/60,1.24);assert('sprint capped at 12 fps',Math.abs(fast.clock-12)<.0001);
-  const jog=simulate(1,30,1/60,1.24);assert('jog capped at 12 fps',Math.abs(jog.clock-12)<.0001&&jog.frames.length===6);
+  // 1.25 seconds is exactly 75 fixed steps; 1.01 seconds remain after the start poses.
+  const fast=simulate(0,30,1/60,1.25);assert('sprint capped at 12 fps',Math.abs(fast.clock-12.12)<.0001);
+  const jog=simulate(1,30,1/60,1.25);assert('jog capped at 12 fps',Math.abs(jog.clock-12.12)<.0001&&jog.frames.length===6);
   const a=simulate(0,7,1/60,2),b=simulate(0,7,1/30,2);assert('same clock at 30 and 60 fps',Math.abs(a.clock-b.clock)<.0001);
   selected=0;resetRun();mode='ready';advanceRunnerMotion(1/60);draw(0);assert('ready is still',spriteDebug.last[0].row===0);
   simulate(0,7,1/60,1);advanceRunnerMotion(1/60);draw(0);assert('stopped athlete is still',spriteDebug.last[0].row===0);
