@@ -14,8 +14,11 @@
 /* The approved logo replaces the title's provisional pitch illustration. */
 .feedback{scroll-margin-top:12px}
 </style>
+<link rel="stylesheet" href="/games/sqz/shot.css">
+<link rel="preload" as="image" href="/games/sqz/assets/keeper-v2/keeper_atlas.png">
+<script src="/games/sqz/shot.js"></script>
 </head>
-<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.5</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main><footer class="footer"><button id="sources">出典・素材について</button>｜<a href="/">ゲーム一覧</a><br>非公式のサッカークイズゲームです。</footer></div>
+<body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.6</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main><footer class="footer"><button id="sources">出典・素材について</button>｜<a href="/">ゲーム一覧</a><br>非公式のサッカークイズゲームです。</footer></div>
 <div id="overlay" class="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="card"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button id="dialogOK" class="primary">OK</button></div></div>
 <script>
 'use strict';
@@ -133,19 +136,21 @@ function fresh(){return {version:1,sound:false,flags:true,total:0,correct:0,best
 let P=fresh(),storageOK=true,loadMessage='';
 try{const raw=localStorage.getItem(KEY);if(raw){const x=JSON.parse(raw);if(x.version!==1)throw Error('version');P={...fresh(),...x};for(const k of ['mistakes','seen'])P[k]=Array.isArray(x[k])?[...new Set(x[k].filter(id=>MAP.has(id)))]:[];for(const k of ['total','correct','bestStreak'])P[k]=Number.isFinite(x[k])&&x[k]>=0?Math.floor(x[k]):0;P.cups=x.cups&&typeof x.cups==='object'&&!Array.isArray(x.cups)?x.cups:{};P.sound=x.sound===true;P.flags=x.flags!==false;const s=P.active;if(s&&(!['cup','training','review'].includes(s.kind)||!Array.isArray(s.ids)||s.ids.length<1||s.ids.length>10||new Set(s.ids).size!==s.ids.length||s.ids.some(id=>!MAP.has(id))||!Number.isInteger(s.i)||s.i<0||s.i>=s.ids.length||!Array.isArray(s.picks)||s.picks.length<s.i||s.picks.length>s.i+1||s.picks.some((a,i)=>a!==null&&!MAP.get(s.ids[i]).choices.includes(a))||![1,2,3].includes(s.diff)||![0,1,2].includes(s.stage))){P.active=null;loadMessage='途中データを読み込めなかったため、メニューに戻りました。記録は保持しています。';}if(P.active)P.active.ms=Math.max(0,Math.min(20000,Number(P.active.ms)||0));}}
 catch(e){P=fresh();loadMessage='保存データを読み込めなかったため、初期状態で開始します。';}
-let S=P.active,view='home',diff=1,category='all',timer=null,lastTick=0,lastSave=0,audio=null;
+let S=P.active,view='home',diff=1,category='all',timer=null,lastTick=0,lastSave=0,audio=null,shot=null;
+const soundNodes=new Set();
+function silence(){for(const node of soundNodes){try{node.stop();}catch(e){}}soundNodes.clear();}
 function notify(t){$('#notice').textContent=t;$('#notice').classList.add('on');}
 function save(){P.active=S;try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){storageOK=false;notify('このブラウザでは記録を保存できません。ページを閉じると進行状況が失われます。');}}
 function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
 function cup(d){let c=P.cups[d];if(!c||![0,1,2].includes(c.stage)||!Array.isArray(c.used)||!Array.isArray(c.scores)){c={stage:0,used:[],scores:[],wins:0,best:0};P.cups[d]=c;}c.used=c.used.filter(id=>MAP.has(id));c.wins=Number.isFinite(c.wins)?c.wins:0;c.best=Number.isFinite(c.best)?c.best:0;return c;}
 function selectQuestions(d,cat,excluded=[],review=false){let pool=BANK.filter(q=>(P.flags||q.category!=='flags')&&(review?P.mistakes.includes(q.id):q.level<=d)&&(cat==='all'||q.category===cat));const block=new Set(excluded);pool=pool.filter(q=>!block.has(q.id));const seen=new Set(P.seen);const rank=new Map(pool.map(q=>[q.id,(seen.has(q.id)?0:100)+(q.level===d?4:0)+Math.random()*3]));const selected=[],groups={};for(const q of pool)(groups[q.category]??=[]).push(q);for(const g of Object.values(groups))g.sort((a,b)=>rank.get(b.id)-rank.get(a.id));while(selected.length<10){let added=false;for(const k of shuffle(Object.keys(groups))){if(selected.length===10)break;const q=groups[k].shift();if(q){selected.push(q.id);added=true;}}if(!added)break;}return shuffle(selected);}
 function stop(){if(timer){clearInterval(timer);timer=null;}}
-async function tone(ok){
+async function tone(ok,valid=()=>true){
  if(!P.sound)return;
  try{
   audio??=new(window.AudioContext||window.webkitAudioContext)();
   await audio.resume();
-  if(!P.sound)return;
+  if(!P.sound||!valid())return;
   const t=audio.currentTime+.01;
   // Correct: two clear bell notes (pin-pon). Incorrect: two low buzzer pulses (bu-bu).
   const notes=ok?[[880,0,.5],[660,.24,.75]]:[[150,0,.22],[150,.32,.26]];
@@ -157,17 +162,17 @@ async function tone(ok){
    if(ok)g.gain.exponentialRampToValueAtTime(.001,t+delay+duration);
    else{g.gain.setValueAtTime(.065,t+delay+duration-.035);g.gain.linearRampToValueAtTime(0,t+delay+duration);}
    o.connect(g).connect(audio.destination);o.start(t+delay);o.stop(t+delay+duration+.02);
-   o.onended=()=>{o.disconnect();g.disconnect();};
+   soundNodes.add(o);
+   o.onended=()=>{soundNodes.delete(o);o.disconnect();g.disconnect();};
   }
  }catch(e){P.sound=false;updateSound();save();notify('音を再生できないため、音なしで続けます。');}
 }
 function updateSound(){$('#sound').textContent='音 '+(P.sound?'ON':'OFF');$('#sound').setAttribute('aria-pressed',String(P.sound));}
-$('#sound').onclick=()=>{P.sound=!P.sound;updateSound();save();tone(true);};
+$('#sound').onclick=()=>{P.sound=!P.sound;if(!P.sound)silence();updateSound();save();tone(true);};
 function button(id,text,cls='secondary',disabled=false){return `<button id="${id}" class="${cls}" ${disabled?'disabled':''}>${text}</button>`;}
 function bind(id,fn){const el=document.getElementById(id);if(el)el.onclick=fn;}
-function set(html,name){stop();view=name;$('#app').innerHTML=html;window.scrollTo(0,0);}
-function player(keeper=false){return `<div aria-hidden="true" class="player ${keeper?'keeper':'striker'}"><i class="head"></i><i class="body"></i><i class="arm"></i><i class="arm right"></i><i class="leg"></i><i class="leg right"></i></div>`;}
-function pitch(cls='',banner=''){return `<div aria-hidden="true" class="pitch ${cls}"><div class="goal"></div>${player()}${player(true)}<div class="ball"></div><div class="pitch-label">QUIZ KING CUP</div>${banner?`<div class="banner">${banner}</div>`:''}</div>`;}
+function set(html,name){stop();if(shot){shot.cancel();shot=null;}silence();view=name;$('#app').innerHTML=html;window.scrollTo(0,0);}
+function pitch(cls=''){return `<div class="pitch ${cls}" aria-label="シュート演出">${window.SQZShot.markup()}</div>`;}
 function home(){set(`<section class="title"><h1><img class="title-logo" src="/games/sqz/assets/logo-approved-20261011.png" width="1448" height="1086" alt="目指せ！クイズ王 サッカー編 — SOCCER QUIZ" fetchpriority="high" decoding="async"></h1><p>選手も、国旗も、名勝負も。知識でゴール！</p></section><section class="screen"><div class="menu">${S?button('resume','▶ 途中から再開','primary green'):''}${button('cup','クイズ王カップ','primary')}${button('training','トレーニング','secondary')}${button('records','これまでの記録','secondary')}</div><p class="muted center space">4択をタップするだけ。${BANK.length}問を収録。<br>間違えても、覚えれば次のゴールにつながる。</p></section>`,'home');bind('cup',()=>{if(S&&!S.done){dialog('途中のラウンドがあります','「途中から再開」から続けてください。新しく始める場合は、記録画面で途中ラウンドを終了できます。');return;}story();});bind('training',training);bind('records',records);bind('resume',()=>{if(S.done)result();else question();});}
 function story(){set(`<section class="screen"><p class="eyebrow">ROAD TO THE QUIZ KING</p><h2>その知識が、<br>決勝ゴールになる。</h2>${pitch()}<div class="card space"><p>ここは、サッカーの知識で勝負する「クイズ王カップ」。</p><p>選手、大会の記録、世界の国旗。4つの答えから正解を選んで、ゴールを決めよう！</p><p><strong>予選、準決勝、そして決勝へ。<br>きみはクイズ王になれるかな？</strong></p></div>${button('go','大会を選ぶ','primary')}${button('back','タイトルへ','linkbtn space')}</section>`,'story');bind('go',()=>setup());bind('back',home);}
 function stages(d){const c=cup(d);return `<div class="stage">${STAGES.map((s,i)=>`<div class="${i===c.stage?'active':''}">${i<c.stage?'✓ ':''}${s}<small>${TARGET[i]}/10問で突破</small></div>`).join('')}</div>`;}
@@ -178,18 +183,53 @@ function current(){return MAP.get(S.ids[S.i]);}
 function correctCount(){return S.picks.reduce((n,a,i)=>n+(a===MAP.get(S.ids[i]).answer?1:0),0);}
 function streak(){let n=0;for(let i=S.picks.length-1;i>=0;i--){if(S.picks[i]!==MAP.get(S.ids[i]).answer)break;n++;}return n;}
 function completedAnswer(){return S.picks.length>S.i;}
-function question(){const q=current(),answered=completedAnswer(),ok=answered&&S.picks[S.i]===q.answer,hat=ok&&streak()%3===0;if(!S.order||typeof S.order!=='object')S.order={};let options=S.order[q.id];if(!Array.isArray(options)||options.length!==4||new Set(options).size!==4||options.some(a=>!q.choices.includes(a)))options=S.order[q.id]=shuffle(q.choices);if(!P.seen.includes(q.id))P.seen.push(q.id);const banner=answered?(ok?`GOAL!<small>${hat?'HAT TRICK!　3問連続正解':'ナイスシュート！'}</small>`:'SAVE!<small>次のゴールにつなげよう</small>'):'';set(`<section class="screen">${pitch('questionpitch '+(answered?(ok?'goal-shot':'save-shot'):''),banner)}<div class="scoreboard"><div><small>${S.kind==='cup'?DIFF[S.diff]+'・'+STAGES[S.stage]:S.kind==='review'?'間違えた問題の復習':'トレーニング'}</small><strong>${S.i+1}<small> / ${S.ids.length} 問</small></strong></div><div><small>正解</small><strong>${correctCount()}<small> GOALS</small></strong></div><div><small>残り時間</small><strong id="seconds">${S.kind==='cup'?Math.ceil(S.ms/1000):'∞'}</strong></div></div><div class="timer" id="timer"><div style="width:${S.kind==='cup'?S.ms/200:100}%"></div></div><div class="questionmeta"><span>${CATS[q.category]}</span><span>${q.flag?'FLAG QUIZ':esc(q.period)}</span></div><h2 class="question" id="question" data-id="${q.id}">${esc(q.text)}</h2>${q.flag?`<div class="flag" role="img" aria-label="出題中の国旗">${q.flag}</div>`:''}<div class="answers">${options.map((a,i)=>`<button class="answer ${answered?(a===q.answer?'correct':a===S.picks[S.i]?'wrong':''):''}" data-choice="${i}" ${answered?'disabled':''}><span>${answered&&a===q.answer?'✓':answered&&a===S.picks[S.i]?'×':'ABCD'[i]}</span>${esc(a)}</button>`).join('')}</div>${answered?`<section class="feedback" role="status" tabindex="-1"><h3>${ok?'正解！':S.picks[S.i]===null?'時間切れ！':'おしい！'}</h3><p><strong>答え：${esc(q.answer)}</strong></p><p>${esc(q.explanation)}</p><details><summary>出典と確認日</summary><a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer">公式の記録・資料を開く ↗</a><br>対象：${esc(q.period)}<br>確認日：${q.checkedAt}</details>${button('next',S.i===S.ids.length-1?'結果を見る':'次の問題へ','primary')}</section>`:''}<div class="space">${button('pause','中断してタイトルへ','linkbtn')}</div></section>`,'question');document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>answer(options[+b.dataset.choice]));bind('next',()=>{if(!completedAnswer())return;if(S.i===S.ids.length-1){S.done=true;save();result();}else{S.i++;S.ms=20000;save();question();}});bind('pause',()=>{syncTime();stop();save();home();});save();if(answered){const feedback=$('.feedback');requestAnimationFrame(()=>{if(feedback?.isConnected){feedback.focus({preventScroll:true});feedback.scrollIntoView({block:'start',behavior:'instant'});}});}else if(S.kind==='cup')startTimer();}
+function scoreboard(){return `<div class="scoreboard"><div><small>${S.kind==='cup'?DIFF[S.diff]+'・'+STAGES[S.stage]:S.kind==='review'?'間違えた問題の復習':'トレーニング'}</small><strong>${S.i+1}<small> / ${S.ids.length} 問</small></strong></div><div><small>正解</small><strong>${correctCount()}<small> GOALS</small></strong></div><div><small>残り時間</small><strong id="seconds">${S.kind==='cup'?Math.ceil(S.ms/1000):'∞'}</strong></div></div>`;}
+function questionContent(q,options,answered){return `<div class="questionmeta"><span>${CATS[q.category]}</span><span>${q.flag?'FLAG QUIZ':esc(q.period)}</span></div><h2 class="question" id="question" data-id="${q.id}">${esc(q.text)}</h2>${q.flag?`<div class="flag" role="img" aria-label="出題中の国旗">${q.flag}</div>`:''}<div class="answers">${options.map((a,i)=>`<button class="answer ${answered?(a===q.answer?'correct':a===S.picks[S.i]?'wrong':''):''}" data-choice="${i}" ${answered?'disabled':''}><span>${answered&&a===q.answer?'✓':answered&&a===S.picks[S.i]?'×':'ABCD'[i]}</span>${esc(a)}</button>`).join('')}</div>`;}
+function question(animate=false){
+ const q=current(),answered=completedAnswer(),ok=answered&&S.picks[S.i]===q.answer,hat=ok&&streak()%3===0;
+ if(!S.order||typeof S.order!=='object')S.order={};
+ let options=S.order[q.id];
+ if(!Array.isArray(options)||options.length!==4||new Set(options).size!==4||options.some(a=>!q.choices.includes(a)))options=S.order[q.id]=shuffle(q.choices);
+ if(!P.seen.includes(q.id))P.seen.push(q.id);
+ const pause=`<div class="space">${button('pause','中断してタイトルへ','linkbtn')}</div>`;
+ if(answered){
+  set(`<section class="screen answer-stage">${scoreboard()}${pitch('answer-pitch')}<div class="shot-controls"><span role="status">${hat?'3問連続正解！ スーパーシュート！':'シュート！'}</span>${button('skip','演出をスキップ','linkbtn')}</div><section class="feedback ${ok?'':'is-wrong'}" role="status" tabindex="-1" hidden><h3>${ok?'○ 正解！ GOAL!':S.picks[S.i]===null?'時間切れ！ SAVE!':'× 不正解　SAVE!'}</h3><p><strong>答え：${esc(q.answer)}</strong></p><p>${esc(q.explanation)}</p><details><summary>出典と確認日</summary><a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer">公式の記録・資料を開く ↗</a><br>対象：${esc(q.period)}<br>確認日：${q.checkedAt}</details>${button('next',S.i===S.ids.length-1?'結果を見る':'次の問題へ','primary')}</section><details class="review-question" hidden><summary>問題・選択肢を見返す</summary>${questionContent(q,options,true)}</details>${pause}</section>`,'question');
+  const stage=$('.answer-stage'),feedback=$('.feedback');
+  const controller=window.SQZShot.create($('.answer-pitch'),{ok,superShot:hat,side:S.i%2===0?'right':'left',onComplete(){
+   if(!stage.isConnected)return;
+   stage.classList.add('is-feedback');feedback.hidden=false;$('.review-question').hidden=false;
+   feedback.focus({preventScroll:true});window.scrollTo(0,0);
+  }});
+  shot=controller;
+  bind('skip',()=>{silence();controller.skip();});
+  bind('next',()=>{
+   if(!completedAnswer()||controller.active)return;
+   if(S.i===S.ids.length-1){S.done=true;save();result();}
+   else{S.i++;S.ms=20000;save();question();}
+  });
+  if(animate){
+   // Schedule the existing Web Audio pin-pon / buzzer in the tap gesture.
+   // Suspended/blocked audio cannot hold the visual sequence indefinitely.
+   Promise.race([tone(ok,()=>shot===controller&&controller.active),new Promise(resolve=>setTimeout(resolve,180))]).then(()=>controller.begin());
+  }else controller.skip(); // Reload/resume shows the saved answer, without scoring or replay.
+ }else{
+  set(`<section class="screen">${pitch('questionpitch')}${scoreboard()}<div class="timer" id="timer"><div style="width:${S.kind==='cup'?S.ms/200:100}%"></div></div>${questionContent(q,options,false)}${pause}</section>`,'question');
+  document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>answer(options[+b.dataset.choice]));
+  if(S.kind==='cup')startTimer();
+ }
+ bind('pause',()=>{syncTime();stop();save();home();});save();
+}
 function syncTime(){if(timer&&S&&!completedAnswer()){const now=performance.now();S.ms=Math.max(0,S.ms-(now-lastTick));lastTick=now;}}
 function startTimer(){if(document.hidden)return;lastTick=performance.now();lastSave=lastTick;timer=setInterval(()=>{if(view!=='question'||completedAnswer()){stop();return;}syncTime();const seconds=$('#seconds'),bar=$('#timer>div');if(seconds)seconds.textContent=Math.ceil(S.ms/1000);if(bar)bar.style.width=(S.ms/200)+'%';$('#timer')?.classList.toggle('urgent',S.ms<=5000);if(performance.now()-lastSave>1000){save();lastSave=performance.now();}if(S.ms<=0)answer(null);},100);}
-function answer(a){if(!S||view!=='question'||completedAnswer())return;syncTime();if(S.kind==='cup'&&S.ms<=0)a=null;stop();const q=current(),ok=a===q.answer;S.picks.push(a);P.total++;if(ok){P.correct++;P.mistakes=P.mistakes.filter(id=>id!==q.id);}else if(!P.mistakes.includes(q.id))P.mistakes.push(q.id);P.bestStreak=Math.max(P.bestStreak,streak());save();question();tone(ok);}
+function answer(a){if(!S||view!=='question'||completedAnswer())return;syncTime();if(S.kind==='cup'&&S.ms<=0)a=null;stop();const q=current(),ok=a===q.answer;S.picks.push(a);P.total++;if(ok){P.correct++;P.mistakes=P.mistakes.filter(id=>id!==q.id);}else if(!P.mistakes.includes(q.id))P.mistakes.push(q.id);P.bestStreak=Math.max(P.bestStreak,streak());save();question(true);}
 function result(){const n=correctCount(),isCup=S.kind==='cup',pass=isCup&&n>=TARGET[S.stage],champ=pass&&S.stage===2,c=cup(S.diff);if(!S.applied){if(pass){c.used=[...new Set([...c.used,...S.ids])];c.scores[S.stage]=n;if(champ){c.wins++;c.best=Math.max(c.best,c.scores.reduce((a,b)=>a+b,0));S.cupTotal=c.scores.reduce((a,b)=>a+b,0);c.stage=0;c.used=[];c.scores=[];}else c.stage=S.stage+1;}S.applied=true;save();}set(`<section class="screen center"><p class="eyebrow">${champ?'CHAMPION!':'ROUND RESULT'}</p>${champ?'<div class="trophy" aria-hidden="true">🏆</div>':''}<h2>${champ?'サッカークイズ王！':pass?STAGES[S.stage]+'突破！':isCup?'もう一度、挑戦！':'練習おつかれさま！'}</h2><div class="resultnum">${n}<small> / ${S.ids.length}</small></div><p>正解数</p>${n===S.ids.length?'<span class="badge">PERFECT！ 全問正解</span>':''}<div class="card space"><p>${champ?`${DIFF[S.diff]}の大会を制覇！ 合計 ${S.cupTotal??c.best}/30問正解。`:pass?`次は${STAGES[S.stage+1]}。${TARGET[S.stage+1]}問以上の正解で突破だ！`:isCup?`突破まであと${TARGET[S.stage]-n}問。${STAGES[S.stage]}から再挑戦できるよ。`:'間違えた問題は、復習からもう一度挑戦できるよ。'}</p></div><div class="menu">${button('again',champ?'もう一度大会に挑む':isCup?(pass?'次のラウンドへ':'このラウンドに再挑戦'):'もう一度練習','primary green')}${button('home','タイトルへ','secondary')}</div></section>`,'result');bind('again',()=>{diff=S.diff;const kind=S.kind;S=null;save();if(isCup){if(champ)setup();else start('cup');}else training();});bind('home',()=>{S=null;save();home();});}
 function records(){set(`<section class="screen"><div class="viewtop"><h2>これまでの記録</h2>${button('back','戻る','linkbtn')}</div><div class="stats"><div class="card"><strong>${P.total}</strong><small>答えた問題</small></div><div class="card"><strong>${P.total?Math.round(P.correct/P.total*100):0}%</strong><small>正解率</small></div><div class="card"><strong>${P.bestStreak}</strong><small>最高連続正解</small></div><div class="card"><strong>${P.mistakes.length}</strong><small>復習する問題</small></div></div><div class="card space"><h3>大会の記録</h3>${[1,2,3].map(d=>{const c=cup(d);return `<p>${DIFF[d]}：優勝 ${c.wins}回 ／ 最高 ${c.best}/30</p>`;}).join('')}</div><p class="muted">この端末・ブラウザ内に保存します。別の端末とは同期しません。</p>${S?button('end','途中ラウンドを終了する','secondary'):''}${button('reset','記録をすべて消す','linkbtn space')}</section>`,'records');bind('back',home);bind('end',()=>dialog('途中ラウンドを終了しますか？','回答済みの記録と大会の突破状況は残ります。今のラウンドは初めからになります。',()=>{S=null;save();records();},true));bind('reset',()=>dialog('記録をすべて消しますか？','優勝回数・復習問題・途中データを含め、このゲームの記録だけを消します。元には戻せません。',()=>{P=fresh();S=null;save();updateSound();home();},true));}
 let onDialogClose=null,dialogReturnFocus=null;
 function dialog(title,text,cb=null,cancel=false){dialogReturnFocus=document.activeElement;$('#dialogTitle').textContent=title;$('#dialogText').innerHTML=`<p>${esc(text)}</p>`+(cancel?button('dialogCancel','キャンセル','secondary space'):'');$('#overlay').hidden=false;onDialogClose=()=>{const fn=cb;$('#overlay').hidden=true;onDialogClose=null;if(fn)fn();else dialogReturnFocus?.focus();};$('#dialogOK').textContent=cancel?'実行する':'OK';$('#dialogOK').onclick=onDialogClose;if(cancel)bind('dialogCancel',()=>{$('#overlay').hidden=true;onDialogClose=null;dialogReturnFocus?.focus();});$('#dialogOK').focus();}
 document.addEventListener('keydown',e=>{if($('#overlay').hidden)return;if(e.key==='Tab'){const list=[...$('#overlay').querySelectorAll('button,a')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
-$('#sources').onclick=()=>{if(view==='question'&&!completedAnswer()){syncTime();stop();save();}dialog('出典・素材について','問題ごとに、日本サッカー協会、FIFA、UEFA、プレミアリーグ、Jリーグ、外務省の出典・対象年・確認日を記録しています。実在選手の写真とクラブのエンブレムは未収録です。国旗は端末の絵文字表示を使用しています。タイトルロゴは2026年10月11日確定の透過PNGを使用しています。選手のシュート演出は試作用のデザインです。',()=>{if(view==='question'&&!completedAnswer()&&S.kind==='cup')startTimer();});};
-document.addEventListener('visibilitychange',()=>{if(document.hidden){syncTime();stop();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
-window.addEventListener('pagehide',()=>{syncTime();stop();save();});
+$('#sources').onclick=()=>{if(shot?.active){silence();shot.skip();}if(view==='question'&&!completedAnswer()){syncTime();stop();save();}dialog('出典・素材について','問題ごとに、日本サッカー協会、FIFA、UEFA、プレミアリーグ、Jリーグ、外務省の出典・対象年・確認日を記録しています。実在選手の写真とクラブのエンブレムは未収録です。国旗は端末の絵文字表示を使用しています。タイトルロゴは2026年10月11日確定の透過PNGを使用しています。キーパーは提供された透過PNGのv2試作スプライトを使用しています。ストライカーは既存のCSSデザインを維持しています。正式参考画像との頭身・表情の統一は調整中です。',()=>{if(view==='question'&&!completedAnswer()&&S.kind==='cup')startTimer();});};
+document.addEventListener('visibilitychange',()=>{if(document.hidden){syncTime();stop();silence();if(shot?.active)shot.skip();save();}else if(view==='question'&&S&&!completedAnswer()&&S.kind==='cup')dialog('クイズを再開','残り時間を止めてあります。準備ができたら再開しよう。',()=>startTimer());});
+window.addEventListener('pagehide',()=>{syncTime();stop();silence();if(shot?.active)shot.skip();save();});
 window.SQZ=Object.freeze({questions:BANK,selectQuestions,allowed});
 updateSound();home();if(loadMessage)notify(loadMessage);
 </script></body></html>

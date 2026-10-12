@@ -1,0 +1,1 @@
+Goalkeeper animation prototype v2. 80x80 pixel RGBA frames, 8 frames per direction. Open preview.html to test locally. JSON atlas included. This prototype is not yet visually matched to the approved illustrated goalkeeper.

@@ -1,0 +1,123 @@
+// Run: node --test tests/sqz-shot.test.cjs (no external dependencies).
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const path=require('node:path');
+const root=path.join(__dirname,'..');
+const source=fs.readFileSync(path.join(root,'games/sqz/shot.js'),'utf8');
+function env(reduced=false){
+ const queue=new Map();let id=0;
+ const ctx=vm.createContext({setTimeout,clearTimeout,performance:{now:()=>0},matchMedia:()=>({matches:reduced}),requestAnimationFrame:fn=>{queue.set(++id,fn);return id;},cancelAnimationFrame:id=>queue.delete(id)});
+ vm.runInContext(source,ctx);
+ const nodes=new Map();
+ const element={dataset:{},isConnected:true,querySelector(s){if(!nodes.has(s))nodes.set(s,{style:{},complete:true,naturalWidth:640,addEventListener(){}});return nodes.get(s);}};
+ return {api:ctx.SQZShot,element,queue,tick(ms){for(const [id,fn] of [...queue]){queue.delete(id);fn(ms);}}};
+}
+test('both directions use all 8 frames, monotonic movement and constant frame size',()=>{
+ const {api}=env();
+ for(const side of ['left','right']){
+  const frames=new Set();let last=null;
+  for(let ms=0;ms<=1750;ms+=5){const p=api.pose(ms,false,side);frames.add(p.keeper.frame);
+   if(last!==null)assert.ok(Math.abs(p.keeper.x-last)<1, 'no travel teleport');last=p.keeper.x;
+   assert.ok(p.keeper.x>=54&&p.keeper.x<=186);
+  }
+  assert.deepEqual([...frames],[0,1,2,3,4,5,6,7]);
+ }
+});
+test('goal misses keeper, save contacts glove, only goal moves net',()=>{
+ const {api}=env();
+ for(const side of ['left','right']){
+  const before=api.pose(789.99,false,side),contact=api.pose(790,false,side);
+  assert.ok(Math.hypot(contact.ball.x-before.ball.x,contact.ball.y-before.ball.y)<.05);
+  assert.equal(contact.caught,true);assert.equal(contact.banner,false);
+  const goal=api.pose(850,true,side),save=api.pose(850,false,side);
+  assert.ok(Math.abs(goal.ball.x-(goal.keeper.x+40))>75);
+  assert.notEqual(goal.net,0);assert.equal(save.net,0);
+  assert.equal(api.pose(900,false,side).banner,true);
+ }
+});
+test('skip is idempotent and cancels all scheduled animation frames',()=>{
+ const e=env();let finished=0;
+ const c=e.api.create(e.element,{ok:true,onComplete:()=>finished++});
+ c.begin();e.tick(350);c.skip();c.skip();e.tick(2000);
+ assert.equal(finished,1);assert.equal(e.queue.size,0);assert.equal(c.active,false);
+ assert.equal(e.element.dataset.shotState,'complete');
+});
+test('screen navigation cancels without completing detached content',()=>{
+ const e=env();let finished=0;
+ const c=e.api.create(e.element,{ok:false,onComplete:()=>finished++});
+ c.begin();c.cancel();e.element.isConnected=false;c.begin();c.skip();e.tick(2000);
+ assert.equal(finished,0);assert.equal(e.queue.size,0);
+});
+test('natural end and reduced motion each complete once',()=>{
+ for(const reduced of [false,true]){const e=env(reduced);let finished=0;
+  const c=e.api.create(e.element,{ok:true,superShot:true,onComplete:()=>finished++});
+  c.begin();e.tick(900);e.tick(1750);e.tick(3000);
+  assert.equal(finished,1);assert.equal(e.queue.size,0);assert.equal(e.element.dataset.superShot,'true');
+ }
+});
+test('missing sprite cannot block feedback',()=>{
+ const e=env();e.element.querySelector('.keeper-sprite img').naturalWidth=0;let finished=0;
+ const c=e.api.create(e.element,{ok:false,onComplete:()=>finished++});c.begin();assert.equal(finished,1);
+});
+test('question bank retains 200 valid unique questions and inline scripts parse',()=>{
+ const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
+ const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
+ scripts.forEach(s=>new vm.Script(s));
+ const ctx=vm.createContext({window:{}});vm.runInContext(scripts[0],ctx);
+ const bank=ctx.window.QUIZ_BANK;
+ assert.equal(bank.length,200);assert.equal(new Set(bank.map(q=>q.id)).size,200);
+ for(const q of bank){assert.equal(q.choices.length,4);assert.equal(new Set(q.choices).size,4);assert.ok(q.choices.includes(q.answer));}
+ const atlas=JSON.parse(fs.readFileSync(path.join(root,'games/sqz/assets/keeper-v2/keeper_atlas.json')));
+ for(const side of ['left','right']){assert.equal(atlas.animations['dive_'+side].length,8);for(const key of atlas.animations['dive_'+side]){assert.equal(atlas.frames[key].frame.w,80);assert.equal(atlas.frames[key].frame.h,80);}}
+});
+
+// Executes the real game scripts with a minimal DOM adapter. This verifies
+// storage/state/event integration; it does not claim browser layout coverage.
+function game(){
+ const e=env(),nodes=new Map(),events=new Map(),storage=new Map();
+ function node(key){if(!nodes.has(key)){
+  const classes=new Set();nodes.set(key,{style:{},dataset:{},isConnected:true,complete:true,naturalWidth:640,
+   hidden:false,textContent:'',classList:{add:x=>classes.add(x),contains:x=>classes.has(x),toggle(){}},
+   setAttribute(){},addEventListener(){},focus(){},querySelector:s=>node(key+' '+s)});
+ }return nodes.get(key);}
+ const document={hidden:false,querySelector:node,getElementById:id=>node('#'+id),querySelectorAll:()=>[],addEventListener:(n,fn)=>events.set(n,fn)};
+ const calls=[];
+ class AudioContext{constructor(){this.currentTime=0;this.destination={};}async resume(){}createOscillator(){const o={frequency:{setValueAtTime:(f,t)=>calls.push({f,t})},connect:()=>({connect(){}}),start(){},stop(){},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},disconnect(){}};}}
+ const ctx=vm.createContext({document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
+ vm.runInContext('globalThis.window=globalThis',ctx);vm.runInContext(source,ctx);
+ const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
+ for(const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g))vm.runInContext(m[1],ctx);
+ return {run:s=>vm.runInContext(s,ctx),node,events,calls};
+}
+test('real game: double answer, next lock, skip, combo, wrong answer, resume and result',()=>{
+ const g=game();g.run("start('training')");
+ for(let i=0;i<3;i++){
+  g.run('answer(current().answer);answer(current().answer)');
+  assert.equal(g.run('P.total'),i+1);assert.equal(g.run('S.picks.length'),i+1);
+  g.node('#next').onclick();assert.equal(g.run('S.i'),i);
+  if(i===2)assert.equal(g.node('.answer-pitch').dataset.superShot,'true');
+  g.node('#skip').onclick();g.node('#skip').onclick();
+  assert.equal(g.node('.feedback').hidden,false);g.node('#next').onclick();
+ }
+ g.run("answer(current().choices.find(a=>a!==current().answer))");
+ assert.equal(g.run('P.correct'),3);assert.equal(g.run('P.mistakes.length'),1);
+ g.node('#pause').onclick();assert.equal(g.run('view'),'home');
+ g.node('#resume').onclick();assert.equal(g.run('P.total'),4);assert.equal(g.run('shot.active'),false);
+ g.node('#next').onclick();
+ while(g.run('!S.done')){g.run('answer(current().answer);shot.skip()');g.node('#next').onclick();}
+ assert.equal(g.run('view'),'result');assert.equal(g.run('P.total'),10);
+});
+test('real game: existing pin-pon and buzzer notes retained; cancelled audio cannot start late',async()=>{
+ const g=game();g.run('P.sound=true');await g.run('tone(true)');await g.run('tone(false)');
+ assert.deepEqual(g.calls.map(n=>n.f),[880,660,150,150]);
+ await g.run('tone(true,()=>false)');assert.equal(g.calls.length,4);
+});
+test('real game: timeout and hidden-page interruption retain one answer',()=>{
+ const g=game();g.run("start('cup');S.ms=0;answer(current().answer)");
+ assert.equal(g.run('S.picks[0]'),null);assert.equal(g.run('P.total'),1);
+ g.run('document.hidden=true');g.events.get('visibilitychange')();
+ assert.equal(g.run('shot.active'),false);assert.equal(g.node('.feedback').hidden,false);
+ assert.equal(g.run('P.total'),1);
+});
