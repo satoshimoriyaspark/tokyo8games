@@ -34,6 +34,8 @@
 @media(max-height:500px) and (orientation:landscape){#raceProgress{grid-column:1;grid-row:7}}
 /* Keep the gathering runners visible underneath the start cue. */
 .start-countdown{justify-content:flex-start;padding-top:5px;gap:2px;background:none}.start-countdown.go{background:none}#countNumber{font-size:clamp(34px,8vw,52px)}.start-countdown.lineup #countNumber{font-size:clamp(20px,4.5vw,32px)}.start-countdown.go #countNumber{font-size:clamp(26px,6vw,42px)}#countHint{padding:3px 7px;font-size:clamp(10px,2.7vw,12px);border-width:1px}
+
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.mode-grid button{padding:13px 4px;font-size:17px}.result-card{width:min(100%,560px);max-height:calc(100dvh - 32px);overflow:auto;padding:20px 18px}.result-overlay{padding:16px;align-items:center}.result-card h2{font-size:21px}#resultScene{aspect-ratio:20/9;border:2px solid var(--ink);margin:12px 0}#exchangeCanvas{aspect-ratio:8/3;margin:14px 0}.result-card .result-quote{font-size:15px;font-weight:900;margin:8px 0}.result-card #resultDetails{white-space:pre-line;margin:10px 0;font-size:12px}#resultRank{font-size:42px}.result-tabs{display:flex;gap:10px;justify-content:center;margin:10px 0}.result-tabs .quiet{width:auto;margin:0}.standings{text-align:left;margin:14px 0}.standings summary{font-weight:800;cursor:pointer;min-height:44px;padding:12px 0;font-size:13px}.table-scroll{overflow:auto;max-height:260px}.standings table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}.standings th,.standings td{padding:9px 5px;border-bottom:1px solid #c6dbe5;text-align:left}.standings caption{text-align:left;font-weight:bold;padding:8px 0}.own-result{background:#fff6b0}.result-swatch{display:inline-block;width:10px;height:12px;border:1px solid #394f65;margin-right:5px;vertical-align:middle}#resultSave{margin-bottom:12px;font-size:11px}#resumeRelay{width:100%;background:#d8f7ef;margin-top:14px}.hero-bottom #saveStatus{font-size:11px}.result-overlay #resultTitle:focus{outline:none}@media(min-width:600px){#setup #courses{grid-template-columns:repeat(2,minmax(0,1fr))}#setup #courses button{display:flex;text-align:left;min-height:84px}#setup #courses b{margin:0}}@media(max-width:380px){.mode-grid{gap:7px}.mode-grid button{font-size:15px}.result-card{padding:16px 12px}.result-card h2{font-size:18px}.standings th,.standings td{padding:8px 3px;font-size:10px}}
 </style>
 </head>
 
@@ -44,7 +46,7 @@
 <h1 class="logo"><img id="gameLogo" src="./assets/ekiden-logo.png" width="1774" height="887" alt="目指せ！駅伝王" fetchpriority="high"></h1>
 <p class="hero-copy">リズムをきざめ。風をよめ。<br>さいごの一歩で、ぬけだそう！</p>
 
-<div class="hero-bottom"><button id="enter" class="primary">はじめる ▶</button><button id="configure" class="quiet configure">コース・たすき・難易度をえらぶ</button><p id="titleSelection"></p><p class="sub">20チーム ／ 3つのコース ／ 1レース 約2〜4分</p></div>
+<div class="hero-bottom"><button id="enter" class="primary">はじめる ▶</button><button id="configure" class="quiet configure">コース・たすき・難易度をえらぶ</button><p id="titleSelection"></p><button id="resumeRelay" class="quiet" hidden disabled>つづきから</button><p id="saveStatus" class="sub"></p><p class="sub">20チーム ／ 全10区間 ／ 1区間 約2〜4分</p></div>
 </section>
 <section id="story" class="story-screen" hidden aria-label="プロローグ">
 <button id="storyBack" class="quiet">タイトルへ</button><h2 class="story-heading">PROLOGUE — 20のたすき</h2>
@@ -61,7 +63,7 @@
 <div class="setup-top"><nav class="steps" aria-label="スタートまでの手順"><span id="stepMark0">1 コース</span><span id="stepMark1">2 たすき</span><span id="stepMark2">3 準備</span></nav><button id="toTitle" class="quiet">タイトルへ</button></div>
 <p id="assetStatus" class="sub" role="status">ランナーを準備しています…</p><button id="reloadSprites" class="quiet" hidden>素材を再読み込み</button>
 <section class="panel">
-<div id="step0" class="step-panel"><span class="eyebrow">STEP 1</span><h2 id="heading0" tabindex="-1">どのコースに挑戦する？</h2><p class="intro">街道のかけひき、山上り、山下り。それぞれの走り方で勝負！</p><div id="courses" class="course-grid"></div><p id="courseRoute"></p><p id="courseTip"></p></div>
+<div id="step0" class="step-panel"><span class="eyebrow">STEP 1</span><h2 id="heading0" tabindex="-1">どのコースに挑戦する？</h2><p class="intro">1区間から全10区間まで。街・海・山をつなぐ駅伝へ！</p><div id="playModes" class="mode-grid" aria-label="遊び方"></div><p id="modeDescription" class="intro"></p><div id="courseChoices"><div id="courses" class="course-grid"></div><p id="courseRoute"></p><p id="courseTip"></p></div></div>
 <div id="step1" class="step-panel" hidden><span class="eyebrow">STEP 2</span><h2 id="heading1" tabindex="-1">きみのたすきをえらぼう！</h2><p class="intro">好きな色で、20チームの頂点をめざそう。</p><div class="team-preview"><canvas id="teamRunner" width="96" height="96" role="img" aria-label="選んだチームのランナー"></canvas><span id="selectedSwatch" class="swatch" aria-hidden="true"></span><div><strong id="selectedName" aria-live="polite"></strong><small>黄色いマークが、きみのランナー</small></div></div><div id="teams"></div><p class="sub">どの色でも、ランナーの強さは同じです。</p></div>
 <div id="step2" class="step-panel" hidden><span class="eyebrow">STEP 3</span><h2 id="heading2" tabindex="-1">準備はいい？</h2><p class="intro">はじめてなら EASY。なれたら強いライバルに挑戦！</p><div id="difficulties" class="course-grid"></div><p id="difficultyTip" aria-live="polite"></p>
 <section id="guide" class="guide"><h3>走り方は、この3つ！</h3><ol>
@@ -72,7 +74,7 @@
 <div class="setup-nav"><button id="previous" class="quiet">← もどる</button><button id="next" class="primary">たすきをえらぶ →</button><button id="start" class="primary" hidden disabled>この設定で決定 ✓</button></div>
 </section></div>
 <div id="raceArea" hidden tabindex="-1">
-<div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden>一時停止</button><button id="back" class="quiet" hidden>えらび直す</button></div></div>
+<div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden>一時停止</button><button id="back" class="quiet" hidden>タイトルへ</button></div></div>
 <div id="paused" class="paused" hidden>ひと休み中。再開ボタンで走り出そう！</div>
 <div class="hud"><span id="place">大手町</span><span id="rank">—位 / 20</span><span id="distance">あと 21.3km</span></div>
 <div id="raceStage" class="race-stage"><canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。20人が集まるスタートから、横スクロール駅伝レース"></canvas><div id="startCountdown" class="start-countdown" hidden role="status" aria-live="assertive" aria-atomic="true"><b id="countNumber">3</b><span id="countHint">左足から、リズムよく！</span></div></div>
@@ -84,8 +86,10 @@
 <div class="controls"><button id="left" disabled>左足<small id="leftHint">左からスタート</small></button><button id="sprint" disabled>スパート<small id="sprintHint">10秒ダッシュ</small></button><button id="right" disabled>右足<small id="rightHint">交互にタップ</small></button></div>
 <p id="message"></p>
 </div>
-<section id="result" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><span class="eyebrow">たすきをつないだ！</span><canvas id="resultRunner" width="96" height="96" role="img" aria-label="完走したランナー"></canvas><div id="resultRank" class="result-rank" aria-hidden="true"></div><h2 id="resultTitle" tabindex="-1"></h2><p id="resultDetails"></p><button id="retry" class="primary">もう一度、挑戦！</button><button id="selectAgain" class="quiet">コース・たすきをえらび直す</button></div></section>
-<footer>架空の大会・20チームによる作品です。実在の大学・公式大会とは無関係です。<br>距離と主な地形を参考に、勾配・風・走行時間はゲーム用に調整しています。1・5・6区をそれぞれ単独で試遊できます。</footer>
+<section id="result" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><span id="resultKind" class="eyebrow">RESULT</span><h2 id="resultTitle" tabindex="-1"></h2><canvas id="resultScene" width="320" height="144" role="img" aria-label="完走したランナーの静止画"></canvas><div id="resultRank" class="result-rank"></div><p id="resultQuote" class="result-quote"></p><p id="resultDetails"></p><div id="resultTabs" class="result-tabs" aria-label="結果の切り替え"></div><details class="standings"><summary>全20チームの順位を見る</summary><div class="table-scroll"><table><caption id="resultTableCaption"></caption><thead><tr><th>順位</th><th>チーム</th><th>記録</th><th>トップ差</th></tr></thead><tbody id="resultTable"></tbody></table></div></details><p id="resultSave" class="sub"></p><button id="retry" class="primary">次へ</button><button id="selectAgain" class="quiet">タイトルへ</button></div></section>
+<section id="exchange" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="exchangeTitle"><div class="result-card"><span class="eyebrow">TASUKI RELAY</span><h2 id="exchangeTitle"></h2><canvas id="exchangeCanvas" width="320" height="120" role="img" aria-label="同じたすき色の選手が中継所でたすきをつなぐ"></canvas><p id="exchangeText"></p><button id="exchangeSkip" class="primary">次の区間へ ▶</button></div></section>
+<section id="saveChoice" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="saveChoiceTitle"><div class="result-card"><h2 id="saveChoiceTitle">保存したリレーがあります</h2><p>新しく始めると、保存したリレーを上書きします。</p><button id="overwriteRelay" class="primary">上書きして、新しく始める</button><button id="cancelOverwrite" class="quiet">もどる</button></div></section>
+<footer>架空の大会・20チームによる作品です。実在の大学・公式大会とは無関係です。<br>距離と主な地形を参考に、勾配・風・走行時間はゲーム用に調整しています。全10区間を単独・往路・復路・総合で試遊できます。地名の通過位置と景色は概略です。</footer>
 </main>
 <script>
 (()=>{'use strict';
@@ -95,9 +99,16 @@ const teamColors=[['赤','#D83232'],['青','#2869D5'],['黄','#EAC42D'],['緑','
 // Intermediate elevations/checkpoints are simplified gameplay approximations, not survey data.
 const climb=[[0,15],[3,90],[7,260],[10,440],[13,650],[16.2,874],[19.2,730],[20.8,725]];
 const courses=[
- {id:1,title:'集団と駆け引き',route:'大手町 → 鶴見',goal:'鶴見中継所',km:21.3,wind:.14,tip:'集団で風を避け、六郷橋の先で勝負。先頭に出るタイミングがカギ。',profile:[[0,5],[16.8,5],[17.5,23],[18.1,5],[21.3,5]],marks:[[0,'大手町'],[3,'増上寺付近'],[7,'品川'],[11,'大森'],[15,'蒲田'],[17.2,'六郷橋'],[18.2,'鶴見へ'],[21.3,'鶴見中継所']]},
- {id:5,title:'山上り',route:'小田原 → 芦ノ湖',goal:'芦ノ湖',km:20.8,wind:.07,tip:'上りはスタミナを使いやすい。温存を挟み、最高点の先でペースを切り替えよう。',profile:climb,marks:[[0,'小田原中継所'],[3,'箱根湯本付近'],[9,'宮ノ下付近'],[13,'小涌谷付近'],[16.2,'国道1号最高点'],[19.2,'箱根神社大鳥居付近'],[20.8,'芦ノ湖']]},
- {id:6,title:'山下り',route:'芦ノ湖 → 小田原',goal:'小田原中継所',km:20.8,wind:.08,tip:'最初は上り、その後は長い下り。下りのスパートは脚に負担。最後の平地に力を残そう。',profile:climb.slice().reverse().map(([km,h])=>[20.8-km,h]),marks:[[0,'芦ノ湖'],[1.6,'箱根神社大鳥居付近'],[4.6,'国道1号最高点'],[7.8,'小涌谷付近'],[11.8,'宮ノ下付近'],[17.8,'箱根湯本付近'],[20.8,'小田原中継所']]}
+ {id:1,title:'集団と駆け引き',route:'大手町 → 鶴見',goal:'鶴見中継所',km:21.3,scene:'city',wind:.14,tip:'集団で風を避け、六郷橋の先で勝負。先頭に出るタイミングがカギ。',profile:[[0,5],[16.8,5],[17.5,23],[18.1,5],[21.3,5]],marks:[[0,'大手町'],[3,'増上寺付近'],[7,'品川'],[11,'大森'],[15,'蒲田'],[17.2,'六郷橋'],[18.2,'鶴見へ'],[21.3,'鶴見中継所']]},
+ {id:2,title:'長距離と坂',route:'鶴見 → 戸塚',goal:'戸塚中継所',km:23.1,scene:'city',wind:.12,tip:'権太坂と終盤の起伏に備えよう。前半の飛ばしすぎに注意！',profile:[[0,5],[8,8],[12.8,10],[15,60],[17,30],[20,25],[21.4,55],[22.2,30],[23.1,50]],marks:[[0,'鶴見中継所'],[8,'横浜駅付近'],[11,'保土ケ谷付近'],[13,'権太坂'],[17,'戸塚へ'],[20,'最後の起伏'],[23.1,'戸塚中継所']]},
+ {id:3,title:'湘南の風',route:'戸塚 → 平塚',goal:'平塚中継所',km:21.4,scene:'coast',wind:.22,tip:'前半の下りでリズムをつかもう。海沿いは強い風！ 集団を使って温存。',profile:[[0,50],[4,35],[9,8],[12,5],[17,7],[21.4,8]],marks:[[0,'戸塚中継所'],[5,'藤沢へ'],[9,'藤沢付近'],[11,'湘南海岸'],[15,'茅ヶ崎付近'],[19,'湘南大橋付近'],[21.4,'平塚中継所']]},
+ {id:4,title:'山へつなぐ',route:'平塚 → 小田原',goal:'小田原中継所',km:20.9,scene:'town',wind:.11,tip:'細かな起伏でも一定のリズムを。終盤の緩やかな上りに余力を残そう。',profile:[[0,8],[4,12],[7,23],[9,12],[12,18],[15,5],[18,7],[20.9,25]],marks:[[0,'平塚中継所'],[4,'大磯付近'],[9,'二宮付近'],[14,'国府津付近'],[18,'小田原市街'],[20.9,'小田原中継所']]},
+ {id:5,title:'山上り',route:'小田原 → 芦ノ湖',goal:'芦ノ湖',km:20.8,scene:'mountain',wind:.07,tip:'上りはスタミナを使いやすい。温存を挟み、最高点の先でペースを切り替えよう。',profile:climb,marks:[[0,'小田原中継所'],[3,'箱根湯本付近'],[9,'宮ノ下付近'],[13,'小涌谷付近'],[16.2,'国道1号最高点'],[19.2,'箱根神社大鳥居付近'],[20.8,'芦ノ湖']]},
+ {id:6,title:'山下り',route:'芦ノ湖 → 小田原',goal:'小田原中継所',km:20.8,scene:'mountain',wind:.08,tip:'最初は上り、その後は長い下り。下りのスパートは脚に負担。最後の平地に力を残そう。',profile:climb.slice().reverse().map(([km,h])=>[20.8-km,h]),marks:[[0,'芦ノ湖'],[1.6,'箱根神社大鳥居付近'],[4.6,'国道1号最高点'],[7.8,'小涌谷付近'],[11.8,'宮ノ下付近'],[17.8,'箱根湯本付近'],[20.8,'小田原中継所']]},
+ {id:7,title:'起伏のリズム',route:'小田原 → 平塚',goal:'平塚中継所',km:21.3,scene:'town',wind:.13,tip:'序盤で整え、9km過ぎからの起伏に対応。無理な加速より安定したリズム！',profile:[[0,25],[3,7],[8,5],[10,20],[12,10],[14,25],[16,12],[18,18],[21.3,8]],marks:[[0,'小田原中継所'],[6,'国府津付近'],[11,'二宮付近'],[16,'大磯付近'],[21.3,'平塚中継所']]},
+ {id:8,title:'終盤の上り',route:'平塚 → 戸塚',goal:'戸塚中継所',km:21.4,scene:'coast',wind:.16,tip:'海沿いで体力を残し、遊行寺坂へ。後半の上りで粘れるかが勝負！',profile:[[0,8],[5,5],[10,7],[12,9],[14,15],[15.5,50],[17,35],[19,45],[21.4,50]],marks:[[0,'平塚中継所'],[3,'湘南大橋付近'],[7,'茅ヶ崎付近'],[12,'藤沢へ'],[15,'遊行寺坂'],[18,'戸塚へ'],[21.4,'戸塚中継所']]},
+ {id:9,title:'追い上げの長距離',route:'戸塚 → 鶴見',goal:'鶴見中継所',km:23.1,scene:'city',wind:.12,tip:'権太坂の下りから長い市街地へ。前のたすきを目標に、着実に差を縮めよう。',profile:[[0,50],[2,30],[3.1,55],[6.1,30],[8.1,60],[10.3,10],[15.1,8],[23.1,5]],marks:[[0,'戸塚中継所'],[5,'権太坂へ'],[8,'権太坂'],[12,'保土ケ谷付近'],[15,'横浜駅付近'],[20,'鶴見へ'],[23.1,'鶴見中継所']]},
+ {id:10,title:'大手町へ！',route:'鶴見 → 大手町',goal:'大手町フィニッシュ',km:23,scene:'city',wind:.14,tip:'全員の想いを受け取る最終区。長い平地で力をため、大手町でラストスパート！',profile:[[0,5],[3,5],[3.8,23],[4.5,5],[18,5],[23,5]],marks:[[0,'鶴見中継所'],[3.8,'六郷橋'],[7,'蒲田付近'],[11,'大森付近'],[15,'品川付近'],[19,'銀座付近'],[21,'日本橋付近'],[23,'大手町フィニッシュ']]}
 ];
 const difficulties=[
  {id:'easy',label:'EASY',title:'はじめて',tip:'まずは楽しく完走！ ライバルはゆっくり、タップのリズムも合わせやすい。体力も早く回復します。',aiSpeed:.84,minBeat:.12,maxBeat:.46,recovery:1.6,attack:.6,earlyAttack:false},
@@ -109,12 +120,155 @@ const difficulty=()=>s?s.difficulty:difficulties[difficultyIndex];
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 let selected=1,courseIndex=0,s=null,last=performance.now(),hudAt=0;
 const course=()=>s?s.course:courses[courseIndex];
+const playModes=[{id:'single',label:'区間',hint:'好きな1区間に挑戦',start:0,end:9},{id:'out',label:'往路',hint:'1〜5区をつなぐ',start:0,end:4},{id:'back',label:'復路',hint:'6〜10区をつなぐ',start:5,end:9},{id:'full',label:'総合',hint:'全10区間で優勝を目指す',start:0,end:9}];
+const SAVE_KEY='tokyo8games.ekiden.relay.v1';
+let playMode='single',relay=null,resultViews=[],resultView=0,exchangeTime=null,saveError=false;
+const modeInfo=()=>playModes.find(m=>m.id===playMode);
+function readSave(){
+ try{
+  const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(!v)return null;
+  const mode=playModes.find(m=>m.id===v.mode&&m.id!=='single');
+  if(v.version!==1||!mode||!Number.isInteger(v.selected)||v.selected<0||v.selected>19||!Number.isInteger(v.difficulty)||v.difficulty<0||v.difficulty>2||!Array.isArray(v.runs)||v.runs.length>mode.end-mode.start+1||!Number.isInteger(v.view)||v.view<0||v.view>2||!['ready','results'].includes(v.stage))return null;
+  if(v.runs.some((r,i)=>r.id!==mode.start+i+1||!Number.isInteger(r.scene)||r.scene<0||r.scene>2||!Array.isArray(r.times)||r.times.length!==20||r.times.some(t=>!Number.isFinite(t)||t<=0||t>3600)))return null;
+  const leg=v.stage==='results'?mode.start+v.runs.length-1:mode.start+v.runs.length;
+  if(v.legIndex!==leg||leg<mode.start||leg>mode.end)return null;
+  return v;
+ }catch{return null;}
+}
+function saveRelay(){
+ if(!relay)return;
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify(relay));saveError=false;}catch{saveError=true;}
+ updateSaveUI();
+}
+function updateSaveUI(){
+ const saved=readSave();$('resumeRelay').hidden=!saved;$('resumeRelay').disabled=!spriteReady;
+ if(saved){const m=playModes.find(m=>m.id===saved.mode);$('resumeRelay').textContent='つづきから：'+m.label+' '+(saved.legIndex+1)+'区'+(saved.stage==='results'?'の結果':'');}
+ $('saveStatus').textContent=saveError?'このブラウザでは保存できません。画面を閉じると進行が失われます。':'リレーは区間ごとに自動保存。同じブラウザで再開できます（走行中の区間は最初から）。';
+}
+function chooseMode(id){
+ if(!playModes.some(m=>m.id===id))return;
+ playMode=id;relay=null;
+ Array.from($('playModes').children).forEach((b,i)=>{b.classList.toggle('chosen',playModes[i].id===id);b.setAttribute('aria-pressed',String(playModes[i].id===id))});
+ $('courseChoices').hidden=id!=='single';$('modeDescription').textContent=modeInfo().hint+(id==='single'?'。約2〜4分。':'。タイム差を次の区間に引き継ぎ、選手の体力は回復します。');
+ if(id!=='single')chooseCourse(modeInfo().start);
+ updateTitleSelection();
+}
+function beginRun(overwrite=false){
+ if(playMode!=='single'&&readSave()&&!overwrite){$('saveChoice').hidden=false;$('overwriteRelay').focus();return;}
+ $('saveChoice').hidden=true;
+ if(playMode!=='single'){
+  courseIndex=modeInfo().start;
+  relay={version:1,mode:playMode,selected,difficulty:difficultyIndex,legIndex:courseIndex,runs:[],stage:'ready',view:0};saveRelay();
+ }else relay=null;
+ showStory();
+}
+function resumeRelay(){
+ if(!spriteReady)return;
+ const saved=readSave();if(!saved)return;
+ s=null;chooseMode(saved.mode);chooseTeam(saved.selected);chooseDifficulty(saved.difficulty);chooseCourse(saved.legIndex);relay=saved;reset();
+ if(saved.stage==='results'){
+  s.active=false;s.counting=false;s.done=true;$('startCountdown').hidden=true;
+  const times=saved.runs[saved.runs.length-1].times;
+  for(const r of [s.player,...s.ai]){r.km=s.course.km;r.startAt=0;r.finishTime=times[teamColors.indexOf(r.team)];}
+  s.elapsed=s.player.finishTime;s.resultScene=saved.runs[saved.runs.length-1].scene;openResults(Math.min(saved.view||0,2));
+ }
+}
+function relayTotals(from=1,to=10){
+ return teamColors.map((_,i)=>relay?relay.runs.filter(r=>r.id>=from&&r.id<=to).reduce((n,r)=>n+Math.round(r.times[i]*100),0)/100:0);
+}
+function prepareRelayStart(){
+ if(!relay||!relay.runs.length||relay.stage==='results')return;
+ const totals=relayTotals(),own=totals[selected];
+ for(const r of [s.player,...s.ai])r.startAt=totals[teamColors.indexOf(r.team)]-own;
+ const earliest=Math.min(0,...s.ai.map(r=>r.startAt));
+ // Earlier teams have already left the exchange. Simulate their real positions;
+ // later teams wait until their inherited time deficit has elapsed.
+ let t=earliest;
+ while(t<0){const dt=Math.min(1/30,-t);advanceRivals(dt,t);t+=dt;}
+ s.elapsed=0;
+}
+function advanceRivals(dt,t0){
+ const all=[s.player,...s.ai];
+ for(const r of all){r.grade=terrainAt(r.km).grade;r.wind=s.course.wind+(s.course.id===1&&r.km>=17&&r.km<18.2?.07:0);r.drafting=t0>=r.startAt&&all.some(a=>a!==r&&t0>=a.startAt&&a.finishTime===null&&a.km-r.km>.004&&a.km-r.km<.13);}
+ const before=s.elapsed;s.elapsed=t0;
+ for(const a of s.ai){const begin=Math.max(t0,a.startAt),step=t0+dt-begin;if(step>0&&a.finishTime===null){a.effort=aiEffort(a);moveRunner(a,step,a.effort,begin);}}
+ s.elapsed=before;
+}
+function completeLeg(){
+ const tickEnd=s.elapsed;s.active=false;s.done=true;s.elapsed=s.player.finishTime;
+ // Finish remaining CPUs with the same simulation; no random result assignment.
+ let t=tickEnd,steps=0;
+ while(s.ai.some(a=>a.finishTime===null)&&steps<120000){advanceRivals(1/30,t);t+=1/30;steps++;}
+ if(s.ai.some(a=>a.finishTime===null))throw new Error('CPU finish limit exceeded');
+ const times=teamColors.map(team=>{const r=[s.player,...s.ai].find(a=>a.team===team);return Math.round((r.finishTime-r.startAt)*100)/100;});
+ s.legTimes=times;
+ if(relay){
+  relay.runs=relay.runs.filter(r=>r.id<s.course.id);
+  relay.runs.push({id:s.course.id,times,scene:Math.floor(Math.random()*3)});relay.stage='results';relay.view=0;saveRelay();
+ }
+ s.resultScene=relay?relay.runs[relay.runs.length-1].scene:Math.floor(Math.random()*3);
+ openResults();
+}
+function standing(times){
+ const sorted=times.map((time,team)=>({team,time})).sort((a,b)=>a.time-b.time||a.team-b.team);
+ return sorted.map((r,i)=>({...r,rank:1+sorted.filter(a=>a.time<r.time).length,gap:Math.round((r.time-sorted[0].time)*100)/100}));
+}
+function recordClock(t){const cs=Math.round(t*100);return String(Math.floor(cs/6000)).padStart(2,'0')+':'+String(Math.floor(cs/100)%60).padStart(2,'0')+'.'+String(cs%100).padStart(2,'0');}
+function openResults(view=0){
+ const times=s.legTimes||(relay&&relay.runs[relay.runs.length-1].times);
+ resultViews=[{title:s.course.id+'区の結果',times,kind:'区間'}];
+ if(relay&&s.course.id===5)resultViews.push({title:'往路の結果',times:relayTotals(1,5),kind:'往路'});
+ if(relay&&s.course.id===10){resultViews.push({title:'復路の結果',times:relayTotals(6,10),kind:'復路'});if(relay.mode==='full')resultViews.push({title:'総合結果',times:relayTotals(),kind:'総合'});}
+ resultView=Math.min(view,resultViews.length-1);$('pause').hidden=true;$('startCountdown').hidden=true;$('result').hidden=false;$('raceArea').inert=true;
+ renderResult();$('resultTitle').focus({preventScroll:true});renderHUD();
+}
+function renderResult(){
+ const v=resultViews[resultView],rows=standing(v.times),own=rows.find(r=>r.team===selected),winner=rows[0],scene=Number.isInteger(s.resultScene)?s.resultScene:0;
+ $('resultKind').textContent=v.kind+' RESULT';$('resultRank').textContent=own.rank+'位';
+ $('resultTitle').textContent=v.title+'｜'+(own.rank===1?(v.kind==='区間'?'区間賞！':v.kind+'優勝！'):'最後まで、ナイスラン！');
+ const messages=own.rank===1?['最高の走りで、たすきをつないだ！','仲間とつかんだ、いちばんの景色！','積み重ねた一歩が、実を結んだ！']:['この一歩が、次の力になる。','悔しさも誇りも、たすきにこめて。','最後まで走った！ 胸を張ろう。'];
+ $('resultQuote').textContent=messages[scene%messages.length];
+ $('resultDetails').textContent=teamColors[selected][0]+'チーム｜'+s.difficulty.label+'\n記録 '+recordClock(own.time)+' ／ トップとの差 '+(own.gap?'+'+recordClock(own.gap):'なし')+'\n'+(v.kind==='区間'?'区間賞：':'1位：')+rows.filter(r=>r.rank===1).map(r=>teamColors[r.team][0]).join('・')+'チーム';
+ $('resultTable').replaceChildren();
+ for(const row of rows){const tr=document.createElement('tr');if(row.team===selected)tr.className='own-result';const rankCell=document.createElement('td');rankCell.textContent=row.rank+'位';const name=document.createElement('th');name.scope='row';const swatch=document.createElement('i');swatch.className='result-swatch';swatch.style.background=teamColors[row.team][2]?'linear-gradient(110deg,'+teamColors[row.team][1]+' 45%,'+teamColors[row.team][2]+' 45% 60%,'+teamColors[row.team][1]+' 60%)':teamColors[row.team][1];name.appendChild(swatch);name.appendChild(document.createTextNode(teamColors[row.team][0]+(row.team===selected?' ★':'')));const time=document.createElement('td');time.textContent=recordClock(row.time);const gap=document.createElement('td');gap.textContent=row.gap?'+'+recordClock(row.gap):'—';for(const n of [rankCell,name,time,gap])tr.appendChild(n);$('resultTable').appendChild(tr);}
+ $('resultTableCaption').textContent=v.kind+'順位：全20チーム';
+ $('resultTabs').replaceChildren();resultViews.forEach((item,i)=>{const b=document.createElement('button');b.className='quiet'+(i===resultView?' chosen':'');b.textContent=item.kind;b.setAttribute('aria-pressed',String(i===resultView));b.addEventListener('click',()=>{resultView=i;renderResult()});$('resultTabs').appendChild(b)});
+ const hasNext=relay&&courseIndex<modeInfo().end;
+ $('retry').textContent=resultView<resultViews.length-1?'次へ：'+resultViews[resultView+1].title:hasNext?(s.course.id===5?'復路へ！ 6区の準備':'たすきを渡して '+(s.course.id+1)+'区へ'):'もう一度、挑戦！';
+ $('selectAgain').textContent='タイトルへ';if(relay){relay.view=resultView;saveRelay();}
+ $('resultSave').textContent=relay?(saveError?'保存できませんでした。画面を閉じずに続けてください。':'ここまで自動保存済み。タイトルから再開できます。'):'';
+ drawResultScene(own.rank,scene,v.kind);
+}
+function resultNext(){
+ if(resultView<resultViews.length-1){resultView++;renderResult();$('resultTitle').focus();return;}
+ if(relay&&courseIndex<modeInfo().end){$('result').hidden=true;$('exchange').hidden=false;exchangeTime=0;$('exchangeTitle').textContent=s.course.id===5?'往路、おつかれさま！':'想いを、次の選手へ。';$('exchangeText').textContent=(s.course.id===5?'芦ノ湖でひと休み。復路もタイム差を引き継ぎます。':'同じ色のたすきを、次の区間へつなごう。')+' 次は'+courses[courseIndex+1].id+'区 '+courses[courseIndex+1].route;$('exchangeSkip').focus();drawExchange(0);return;}
+ if(relay){opening();beginRun();}else{s=null;reset();}
+}
+function finishExchange(){
+ if(exchangeTime===null)return;
+ exchangeTime=null;$('exchange').hidden=true;courseIndex++;relay.legIndex=courseIndex;relay.stage='ready';relay.view=0;saveRelay();s=null;reset();
+}
+function drawResultScene(place,variant,kind){
+ const canvas=$('resultScene'),t=canvas.getContext('2d');t.imageSmoothingEnabled=false;
+ rect(0,0,320,144,place===1?'#fff0a5':'#c5ecfa',t);rect(0,108,320,36,'#69b794',t);
+ for(let i=0;i<10;i++){rect(i*35,0,2,30,'#20354e',t);rect(i*35+2,13+(i%2)*4,15,9,teamColors[i*2][1],t);}
+ if(place===1){rect(126,106,68,30,'#d7a834',t);rect(131,110,58,26,'#ffe475',t);t.fillStyle='#20354e';t.font='bold 17px monospace';t.fillText('1',155,129);blitRunner(t,164,106,teamColors[selected],'victory',0,1.8);for(let i=0;i<22;i++)rect(9+(i*43)%304,34+(i*17)%64,3,5,teamColors[i%20][1],t);}
+ else{blitRunner(t,164,126,teamColors[selected],'podium',0,1.9);for(const x of [86,238])blitRunner(t,x,126,teamColors[selected],variant===1?'idle':'podium',0,1.25);}
+ t.fillStyle='#20354e';t.font='bold 11px monospace';t.fillText(place===1?kind+' WINNER!':'FINISH!  また走ろう',10,141);
+ canvas.setAttribute('aria-label',place===1?'選んだたすき色の選手が表彰台で喜ぶ静止画':'選んだたすき色の選手と仲間が完走をねぎらう静止画');
+}
+function drawExchange(t){
+ const target=$('exchangeCanvas').getContext('2d');target.imageSmoothingEnabled=false;rect(0,0,320,120,'#ceeff8',target);rect(0,91,320,29,'#818997',target);rect(8,14,304,24,'#163750',target);target.fillStyle='#fff';target.font='bold 12px monospace';target.fillText(s.course.goal,20,31);
+ const progress=clamp(t/1.6,0,1);blitRunner(target,70+progress*77,108,teamColors[selected],progress<1?'jog':'idle',t*10,1.3);blitRunner(target,177+Math.max(0,t-1.6)*60,108,teamColors[selected],progress<1?'idle':'jog',t*10,1.3);
+ rect(154,65,5,21,teamColors[selected][1],target);if(teamColors[selected][2])rect(155,68,2,12,teamColors[selected][2],target);
+}
+
 let setupStep=0;
 let storyPlaying=false,readyAfterStory=false;
 function showStory(){
  if(storyPlaying)return;
  s=null;storyPlaying=true;$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;
- $('story').hidden=false;$('storyCourse').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route;
+ $('story').hidden=false;$('storyCourse').textContent=modeInfo().label+' ／ '+courses[courseIndex].id+'区 '+courses[courseIndex].route;
  $('storyRoll').classList.remove('rolling');void $('storyRoll').offsetWidth;
  $('storyRoll').classList.add('rolling');$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';
  document.body.classList.remove('racing');$('storySkip').focus({preventScroll:true});$('story').scrollIntoView({block:'start'});
@@ -125,9 +279,9 @@ function finishStory(){
  if(spriteReady)reset();else{readyAfterStory=true;$('setup').hidden=false;showStep(2);$('start').textContent='準備できたらスタート！ ▶';}
 }
 function updateTitleSelection(){
- $('titleSelection').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+' ／ '+difficulties[difficultyIndex].label;
+ $('titleSelection').textContent=modeInfo().label+' ／ '+courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+' ／ '+difficulties[difficultyIndex].label;
 }
-$('configure').addEventListener('click',()=>{$('opening').hidden=true;$('setup').hidden=false;showStep(0)});
+$('configure').addEventListener('click',()=>{relay=null;chooseMode(playMode);$('opening').hidden=true;$('setup').hidden=false;showStep(0)});
 $('storySkip').addEventListener('click',finishStory);
 $('storyBack').addEventListener('click',opening);
 $('story').addEventListener('click',e=>{if(!e.target.closest('button'))finishStory()});
@@ -137,7 +291,7 @@ function countdownView(value,go=false){
  const panel=$('startCountdown'),number=$('countNumber');
  panel.hidden=false;panel.classList.toggle('go',go);panel.classList.toggle('lineup',value==='位置について！');
  if(number.textContent!==value){number.textContent=value;number.classList.remove('count-pop');void number.offsetWidth;number.classList.add('count-pop');}
- $('countHint').textContent=go?'左 → 右、交互にタップ！':value==='位置について！'?'20チーム、スタートラインへ':'左足から、リズムよく！';
+ $('countHint').textContent=go?'左 → 右、交互にタップ！':value==='位置について！'?(relay&&relay.runs.length?'タイム差を引き継いで、次の区間へ':'20チーム、スタートラインへ'):'左足から、リズムよく！';
 }
 function advanceCountdown(t){
  if(!s)return;
@@ -152,31 +306,40 @@ function advanceCountdown(t){
  }else if(!s.counting&&s.goUntil&&t>=s.goUntil){$('startCountdown').hidden=true;s.goUntil=0;}
 }
 
-function showStep(i,focus=true){setupStep=i;for(let j=0;j<3;j++){$('step'+j).hidden=j!==i;$('stepMark'+j).classList.toggle('current',j===i);$('stepMark'+j).setAttribute('aria-current',j===i?'step':'false')}$('next').hidden=i===2;$('start').hidden=i!==2;$('next').textContent=i===0?'たすきをえらぶ →':'走る準備へ →';$('previous').textContent=i===0?'← タイトル':'← もどる';$('selectionSummary').textContent=courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+'チーム';if(focus)$('heading'+i).focus({preventScroll:true});$('setup').scrollIntoView({block:'start'});drawCharacterCards(performance.now());}
-function opening(){stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定で決定 ✓';updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
-$('enter').addEventListener('click',showStory);
+function showStep(i,focus=true){setupStep=i;for(let j=0;j<3;j++){$('step'+j).hidden=j!==i;$('stepMark'+j).classList.toggle('current',j===i);$('stepMark'+j).setAttribute('aria-current',j===i?'step':'false')}$('next').hidden=i===2;$('start').hidden=i!==2;$('next').textContent=i===0?'たすきをえらぶ →':'走る準備へ →';$('previous').textContent=i===0?'← タイトル':'← もどる';$('selectionSummary').textContent=modeInfo().label+' ／ '+courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+'チーム';if(focus)$('heading'+i).focus({preventScroll:true});$('setup').scrollIntoView({block:'start'});drawCharacterCards(performance.now());}
+function opening(){exchangeTime=null;$('exchange').hidden=true;$('saveChoice').hidden=true;stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定で決定 ✓';updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
+$('enter').addEventListener('click',()=>beginRun());
+$('resumeRelay').addEventListener('click',resumeRelay);
+$('overwriteRelay').addEventListener('click',()=>beginRun(true));
+$('cancelOverwrite').addEventListener('click',()=>{$('saveChoice').hidden=true;$('enter').focus()});
+$('exchangeSkip').addEventListener('click',finishExchange);
+playModes.forEach(m=>{const b=document.createElement('button');b.textContent=m.label;b.addEventListener('click',()=>chooseMode(m.id));$('playModes').appendChild(b)});
 $('toTitle').addEventListener('click',opening);
 $('next').addEventListener('click',()=>showStep(Math.min(2,setupStep+1)));
 $('previous').addEventListener('click',()=>setupStep===0?opening():showStep(setupStep-1));
 function chooseTeam(i){if(s&&s.active)return;selected=i;Array.from($('teams').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('selectedName').textContent=teamColors[i][0]+'チーム';$('selectedSwatch').style.background=teamColors[i][2]?'linear-gradient(110deg,'+teamColors[i][1]+' 0 44%,'+teamColors[i][2]+' 44% 60%,'+teamColors[i][1]+' 60%)':teamColors[i][1];draw();drawCharacterCards(performance.now());}
 teamColors.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span class="swatch"></span>'+item[0];b.querySelector('.swatch').style.background=item[2]?'linear-gradient(110deg,'+item[1]+' 0 44%,'+item[2]+' 44% 60%,'+item[1]+' 60%)':item[1];b.addEventListener('click',()=>chooseTeam(i));$('teams').appendChild(b)});
-courses.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<b>'+item.id+'区</b><span>'+item.title+'<small>'+item.route+'</small></span>';b.addEventListener('click',()=>chooseCourse(i));$('courses').appendChild(b)});
+courses.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<b>'+item.id+'区</b><span>'+item.title+'<small>'+item.route+' ／ '+item.km+'km</small></span>';b.addEventListener('click',()=>chooseCourse(i));$('courses').appendChild(b)});
 difficulties.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.innerHTML='<b>'+item.label+'</b><span>'+item.title+'</span>';b.addEventListener('click',()=>chooseDifficulty(i));$('difficulties').appendChild(b)});
 function chooseDifficulty(i){if(s&&s.active)return;difficultyIndex=i;Array.from($('difficulties').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('difficultyTip').textContent=difficulties[i].tip;renderHUD();}
 function chooseCourse(i){if(s&&s.active)return;courseIndex=i;s=null;Array.from($('courses').children).forEach((b,j)=>{b.classList.toggle('chosen',j===i);b.setAttribute('aria-pressed',String(j===i))});$('courseRoute').textContent=courses[i].route+'｜'+courses[i].km+'km';$('courseTip').textContent=courses[i].tip;renderHUD();draw();}
 function terrainAt(km,co=course()){let seg=co.profile.length-2;for(let i=0;i<co.profile.length-1;i++)if(km<co.profile[i+1][0]){seg=i;break}const [x,a]=co.profile[seg],[y,b]=co.profile[seg+1];return {height:a+(b-a)*clamp((km-x)/(y-x),0,1),grade:(b-a)/((y-x)*1000)};}
-function makeRunner(team,index=-1){return {team,index,paceFactor:index<0?1:.90+((index*7+4)%19)/18*.20,km:0,speed:.7,energy:100,legs:0,finishTime:null,effort:1,sprint:0,cooldown:0,drafting:false,wind:0,grade:0,phase:0};}
-function reset(){if(!spriteReady||(s&&(s.active||s.counting)))return;stopStory();readyAfterStory=false;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:false,counting:true,countdownStartedAt:performance.now()+2000,lineupElapsed:0,goUntil:0,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'位置について！ カウントダウンのあと、左足からタップ',noticeUntil:3,finalCalled:false};$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;$('message').textContent='合図が出るまで、ひと呼吸。左足から走り出そう！';last=performance.now();countdownView('位置について！');renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
-function menu(){stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('opening').hidden=true;$('setup').hidden=false;$('raceArea').hidden=true;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=true;$('back').hidden=true;$('paused').hidden=true;document.body.classList.remove('racing');chooseCourse(courseIndex);showStep(0);}
+function makeRunner(team,index=-1){return {team,index,startAt:0,paceFactor:index<0?1:.90+((index*7+4)%19)/18*.20,km:0,speed:.7,energy:100,legs:0,finishTime:null,effort:1,sprint:0,cooldown:0,drafting:false,wind:0,grade:0,phase:0};}
+function reset(){if(!spriteReady||(s&&(s.active||s.counting)))return;stopStory();readyAfterStory=false;const co=courses[courseIndex];s={course:co,difficulty:difficulties[difficultyIndex],active:false,counting:true,countdownStartedAt:performance.now()+2000,lineupElapsed:0,goUntil:0,done:false,paused:false,elapsed:0,lastTap:-999,lastInput:'',mode:'recover',player:makeRunner(teamColors[selected]),ai:teamColors.filter((_,i)=>i!==selected).map((team,i)=>makeRunner(team,i)),sprints:0,draftSeconds:0,notice:'位置について！ カウントダウンのあと、左足からタップ',noticeUntil:3,finalCalled:false};prepareRelayStart();$('opening').hidden=true;$('setup').hidden=true;$('raceArea').hidden=false;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=false;$('back').hidden=false;document.body.classList.add('racing');$('feedback').textContent=s.notice;$('message').textContent='合図が出るまで、ひと呼吸。左足から走り出そう！';last=performance.now();countdownView('位置について！');renderHUD();draw();$('raceArea').focus({preventScroll:true});$('raceArea').scrollIntoView({block:'start'});}
+function menu(){exchangeTime=null;$('exchange').hidden=true;stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('opening').hidden=true;$('setup').hidden=false;$('raceArea').hidden=true;$('raceArea').inert=false;$('result').hidden=true;$('pause').hidden=true;$('back').hidden=true;$('paused').hidden=true;document.body.classList.remove('racing');chooseCourse(courseIndex);showStep(0);}
 function notice(text,seconds=1.1){s.notice=text;s.noticeUntil=s.elapsed+seconds;$('feedback').textContent=text;}
 function tap(side){if(!s||!s.active||s.paused)return;const now=performance.now()/1000,delta=now-s.lastTap,next=side==='left'?'右':'左';if(s.lastInput===side){s.mode='stumble';s.player.energy=clamp(s.player.energy-.35,0,100);notice('同じ足が続いています。次は'+next+'足');}else if(!s.lastInput||delta>1){s.mode='cruise';notice('次は'+next+'足！ 一定のリズムで');}else if(delta<s.difficulty.minBeat){s.mode='rush';notice('速すぎ！ スタミナを使います。少しゆっくり');}else if(delta<s.difficulty.maxBeat){s.mode='cruise';notice('いいリズム！ 次は'+next+'足');}else{s.mode='save';notice('温存ペース。次は'+next+'足');}s.lastInput=side;s.lastTap=now;renderHUD();}
 function startSprint(r){if(r.sprint>0||r.cooldown>0||r.energy<30)return false;r.sprint=10;return true;}
 function dash(){if(!s||!s.active||s.paused)return;const p=s.player;if(p.sprint>0){p.sprint=0;p.cooldown=12;notice('スパート中止。12秒間、脚を整えよう',2);}else if(startSprint(p)){s.sprints++;notice('スパート！ 左右のタップを続けよう',2);}renderHUD();}
 function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();s.lineupElapsed=2;countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
 ['left','right'].forEach(id=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();tap(id)});b.addEventListener('click',e=>{if(e.detail===0)tap(id)});b.addEventListener('contextmenu',e=>e.preventDefault());});
-$('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():opening()});$('retry').addEventListener('click',reset);$('back').addEventListener('click',menu);$('selectAgain').addEventListener('click',menu);$('pause').addEventListener('click',pause);
+$('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():opening()});$('retry').addEventListener('click',resultNext);$('back').addEventListener('click',opening);$('selectAgain').addEventListener('click',opening);$('pause').addEventListener('click',pause);
 document.addEventListener('keydown',e=>{if(e.repeat||!s||(!s.active&&!s.counting))return;const keys=['ArrowLeft','a','A','ArrowRight','l','L',' ','Escape'];if(!keys.includes(e.key))return;if(e.key===' '&&e.target&&e.target.tagName==='BUTTON')return;e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))tap('left');else if(['ArrowRight','l','L'].includes(e.key))tap('right');else if(e.key===' ')dash();else pause();});
-document.addEventListener('keydown',e=>{if($('result').hidden)return;if(e.key==='Tab'){e.preventDefault();if(document.activeElement===$('retry'))$('selectAgain').focus();else $('retry').focus()}else if(e.key==='Escape')menu()});
+document.addEventListener('keydown',e=>{
+ const panel=['result','exchange','saveChoice'].map($).find(n=>!n.hidden);if(!panel)return;
+ if(e.key==='Tab'){const items=Array.from(panel.querySelectorAll('button:not([disabled]),summary'));if(!items.length)return;const i=items.indexOf(document.activeElement),next=e.shiftKey?(i<=0?items.length-1:i-1):(i+1)%items.length;e.preventDefault();items[next].focus();}
+ else if(e.key==='Escape'){e.preventDefault();if(panel===$('saveChoice')){$('saveChoice').hidden=true;$('enter').focus()}else opening();}
+});
 document.addEventListener('visibilitychange',()=>{if(storyPlaying)$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';if(document.hidden&&s&&(s.active||s.counting)&&!s.paused)pause()});
 function aiEffort(r){
  const remaining=s.course.km-r.km,progress=r.km/s.course.km,style=r.index%4;
@@ -192,18 +355,18 @@ function aiEffort(r){
  return effort-.025;
 }
 function moveRunner(r,dt,effort,t0){if(r.finishTime!==null)return;const grade=r.grade,up=Math.max(0,grade),down=Math.max(0,-grade),recover=effort<.7,saving=effort<.93;const bursting=r.sprint>0&&r.energy>0&&!recover;const fatigue=.57+.43*clamp(r.energy/40,0,1),legPenalty=1-clamp((r.legs-20)*.004,0,.32);const terrain=clamp(1-up*4.5+down*3.4,.62,1.23);const drag=r.wind*(r.drafting?.24:1);const target=(effort+(bursting?.40:0))*terrain*(1-drag)*fatigue*legPenalty*(r.index>=0?s.difficulty.aiSpeed*r.paceFactor:1);r.speed+=(target-r.speed)*Math.min(1,dt*3);const drain=recover?-4:saving?-1.15:-.04+up*6+(effort>1.07?1.2:0)+(r.drafting?-.13:.15)+r.wind*(r.drafting?.2:1);const adjustedDrain=drain<0&&r.index<0?drain*s.difficulty.recovery:drain;r.energy=clamp(r.energy-(adjustedDrain+(bursting?4:0))*dt,0,100);const strain=down>.025?(bursting?2.4:effort>1.07?.85:saving?-.12:.06):-.16;r.legs=clamp(r.legs+strain*dt,0,100);r.cooldown=Math.max(0,r.cooldown-dt);if(r.sprint>0){r.sprint=Math.max(0,r.sprint-dt);if(r.sprint===0||r.energy===0){r.sprint=0;r.cooldown=12;}}const step=r.speed*dt*.16;if(r.km+step>=s.course.km)r.finishTime=t0+dt*(s.course.km-r.km)/step;r.km=Math.min(s.course.km,r.km+step);r.phase+=r.speed*dt*9;}
-function tick(dt){if(!s||!s.active||s.paused)return;const all=[s.player,...s.ai],t0=s.elapsed;
- // Read everyone at the same instant so iteration order cannot grant a drafting advantage.
- for(const r of all){r.grade=terrainAt(r.km).grade;r.wind=s.course.wind+(s.course.id===1&&r.km>=17&&r.km<18.2?.07:0);r.drafting=all.some(a=>a!==r&&a.finishTime===null&&a.km-r.km>.004&&a.km-r.km<.13);}
- const mode=performance.now()/1000-s.lastTap>.8?'recover':s.mode;const effort={recover:.54,save:.86,cruise:1.055,rush:1.10,stumble:.72}[mode];s.player.effort=effort;s.currentMode=mode;moveRunner(s.player,dt,effort,t0);for(const a of s.ai){a.effort=aiEffort(a);moveRunner(a,dt,a.effort,t0);}s.elapsed+=dt;if(s.player.drafting)s.draftSeconds+=dt;
+function tick(dt){if(!s||!s.active||s.paused)return;const t0=s.elapsed;
+ advanceRivals(dt,t0);
+ const mode=performance.now()/1000-s.lastTap>.8?'recover':s.mode;const effort={recover:.54,save:.86,cruise:1.055,rush:1.10,stumble:.72}[mode];s.player.effort=effort;s.currentMode=mode;moveRunner(s.player,dt,effort,t0);s.elapsed+=dt;if(s.player.drafting)s.draftSeconds+=dt;
  if(s.course.km-s.player.km<=2&&!s.finalCalled){s.finalCalled=true;notice('残り2km！ 体力と脚を見て、勝負のスパート',3);}
- if(s.player.finishTime!==null){s.active=false;s.done=true;s.elapsed=s.player.finishTime;$('pause').hidden=true;$('result').hidden=false;$('resultRank').textContent=rank()+'位';$('resultTitle').textContent=rank()===1?'やったね！ 区間1位！':rank()<=3?'すごい！ 表彰台だ！':'完走！ ナイスラン！';$('raceArea').inert=true;$('retry').focus({preventScroll:true});$('resultDetails').textContent=s.difficulty.label+'｜'+s.course.goal+'に到着。記録 '+clock(s.elapsed)+'｜風よけ '+Math.round(s.draftSeconds)+'秒｜スパート '+s.sprints+'回。スタミナ '+Math.round(s.player.energy)+'%・脚への負担 '+Math.round(s.player.legs)+'%。';$('message').textContent=teamColors[selected][0]+'のたすきをつないだ！';$('feedback').textContent='ゴール！ ペース配分を変えて、もう一度挑戦しよう。';renderHUD();}
+ if(s.player.finishTime!==null)completeLeg();
 }
+
 function rank(){const p=s.player;return 1+s.ai.filter(a=>s.done?a.finishTime!==null&&a.finishTime<p.finishTime:a.km>p.km).length;}
 function clock(t){return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');}
 function currentPlace(){let name=course().marks[0][1];if(s)for(const [km,n] of s.course.marks)if(s.player.km>=km)name=n;return name;}
-function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label;$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s&&!s.counting?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中！ 体力を温存':s?'ひとり・先頭は風に注意':'風よけは近くの前走者から';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+(co.id===1?'街道':'山道');const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':s.counting?'スタート待ち':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent=s&&s.paused?'再開':'一時停止';const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
- if(active){if(s.elapsed>s.noticeUntil)$('feedback').textContent=mode==='recover'?'指を離して回復中。交互タップで再び巡航！':p.energy<25?'スタミナ残りわずか。タップを遅めにして温存しよう':p.legs>35?'脚に負担がたまっています。下りは温存ペースに':p.drafting?'風よけ中！ 集団で脚を残し、勝負どころを待とう':'風に向かって走行中。力を残して、最後に勝負！';const ahead=s.ai.filter(a=>a.km>p.km).sort((a,b)=>a.km-b.km)[0];$('message').textContent=ahead?'前のランナーまで '+Math.round((ahead.km-p.km)*1000)+'m｜'+(co.id===1?'集団で力をためよう':co.id===5?'上りは無理せず温存':'下りは脚のつかれに注意'):'先頭！ 風を受けながら逃げ切れるか？';}
+function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label+(relay?' ／ '+modeInfo().label+'リレー':' ／ 区間チャレンジ');$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s&&!s.counting?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中！ 体力を温存':s?'ひとり・先頭は風に注意':'風よけは近くの前走者から';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+({city:'街道',coast:'海沿い',town:'街道',mountain:'山道'}[co.scene]);const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':s.counting?'スタート待ち':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent=s&&s.paused?'再開':'一時停止';const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
+ if(active){if(s.elapsed>s.noticeUntil)$('feedback').textContent=mode==='recover'?'指を離して回復中。交互タップで再び巡航！':p.energy<25?'スタミナ残りわずか。タップを遅めにして温存しよう':p.legs>35?'脚に負担がたまっています。下りは温存ペースに':p.drafting?'風よけ中！ 集団で脚を残し、勝負どころを待とう':'風に向かって走行中。力を残して、最後に勝負！';const ahead=s.ai.filter(a=>a.km>p.km).sort((a,b)=>a.km-b.km)[0];$('message').textContent=ahead?'前のランナーまで '+Math.round((ahead.km-p.km)*1000)+'m｜'+(co.id===5?'上りは無理せず温存':co.id===6?'下りは脚のつかれに注意':'集団で力をためよう'):'先頭！ 風を受けながら逃げ切れるか？';}
 }
 function rect(x,y,w,h,color,target=ctx){target.fillStyle=color;target.fillRect(Math.round(x),Math.round(y),w,h);}
 // Approved 8BIT ATHLETICS v1.5 assets remain the source for the runner and palette.
@@ -308,7 +471,7 @@ async function loadSprites(){
   })));
   for(const [key,sheets] of ready){spriteSheets[key]=sheets;if(key==='jog'||key==='sprint')strideSheets[key]=sheets.map((sheet,i)=>strideSheet(sheet,key,teamColors[i]));}
   spriteReady=true;$('start').disabled=false;$('retry').disabled=false;$('assetStatus').hidden=true;
-  $('teamRunner').setAttribute('data-ready','true');draw();drawCharacterCards(performance.now());
+  $('teamRunner').setAttribute('data-ready','true');draw();drawCharacterCards(performance.now());updateSaveUI();
  }catch(error){
   $('assetStatus').textContent='ランナーを読み込めませんでした。通信を確認して、もう一度お試しください。';
   $('reloadSprites').hidden=false;
@@ -323,7 +486,7 @@ function blitRunner(target,x,feet,team,key,phase,scale=1){
  target.drawImage(sheet,frame*48,0,48,48,Math.round(x-chest*scale),Math.round(feet-46*scale),48*scale,48*scale);
 }
 function runner(x,feet,r,player=false,scale=1,walkingPhase=null){
- const key=walkingPhase!==null?'jog':r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
+ const key=s&&s.elapsed<r.startAt?'idle':walkingPhase!==null?'jog':r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
  rect(x-10*scale,feet-1,Math.round(19*scale),2,player?'#d3ba56':'#535c68');
  blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*(key==='sprint'?1.4:1.7)+(r.index>=0?r.index*.7:0):walkingPhase,scale);
  if(player){const top=feet-52*scale;rect(x-6,top,13,3,'#102137');rect(x-5,top-1,11,3,'#ffe500');rect(x-3,top+2,7,2,'#ffe500');rect(x-1,top+4,3,2,'#ffe500');}
@@ -336,15 +499,12 @@ function drawCharacterCards(t){
   blitRunner(card,50,92,teamColors[selected],'jog',reduceCharacterMotion?0:t/72,2);
   $('teamRunner').setAttribute('aria-label',teamColors[selected][0]+'のたすきのランナー');
  }
- if(s&&s.done&&!$('result').hidden){
-  const card=$('resultRunner').getContext('2d');card.clearRect(0,0,96,96);
-  blitRunner(card,54,92,s.player.team,rank()<=3?'victory':'podium',reduceCharacterMotion?0:t/350,2);
- }
+
 }
 
 function raceField(){
  if(!s)return null;
- const blend=1-Math.pow(1-clamp(s.elapsed/5,0,1),2),playerX=226-110*blend;
+ const blend=relay&&relay.runs.length&&relay.stage!=='results'?1:1-Math.pow(1-clamp(s.elapsed/5,0,1),2),playerX=226-110*blend;
  const entries=[...s.ai,s.player].map((r,slot)=>{
   const lane=Math.floor(slot/5),column=slot%5,startX=30+column*44+(lane%2?20:0),delay=column*.11+lane*.08;
   const settle=reduceCharacterMotion?1:clamp((s.lineupElapsed-delay)/.85,0,1),ease=1-Math.pow(1-settle,3);
@@ -361,14 +521,54 @@ function raceField(){
  }
  return {playerX,entries:entries.sort((a,b)=>a.lane-b.lane||a.x-b.x)};
 }
+function scenery(co,km,scroll){
+ const mountain=co.scene==='mountain',coast=co.scene==='coast'&&(co.id===3?km>=10:km<12);
+ rect(0,0,320,180,mountain?'#badde9':'#9bdaf0');rect(24,26,34,5,'#e7f9ff');rect(229,34,49,6,'#e7f9ff');rect(0,72,320,108,'#80bd77');
+ if(mountain){
+  for(let x=0;x<320;x+=4){const h=22+26*Math.sin(x/69)+15*Math.sin(x/27);rect(x,72-h,4,34+h,'#5c998f');}
+  if((co.id===5&&km>18)||(co.id===6&&km<2.5)){rect(0,62,320,14,'#4aa9d6');for(let i=0;i<10;i++)rect(i*37,68,18,2,'#b9f6ff');}
+  for(let i=-1;i<13;i++){const x=i*32-scroll%32;rect(x+6,65,4,20,'#725942');rect(x,63,16,14,'#39795e');rect(x+3,56,10,10,'#39795e');}
+ }else if(coast){
+  // Fuji silhouette, horizon and waves; original pixel scenery, no external map art.
+  for(let y=0;y<30;y+=2){rect(71-y,35+y,y*2+4,2,y<9?'#f3f7ff':'#7199b4');}
+  rect(0,61,320,17,'#318dbd');for(let i=0;i<13;i++)rect(i*29-(scroll*.2)%29,67+(i%2)*5,17,2,'#aeeaff');
+ }else{
+  const town=co.scene==='town';for(let i=-1;i<13;i++){const x=i*38-(scroll*.6)%38;rect(x,town?57:40,23,town?30:47,i%3?'#d5dce5':'#f1d2a7');for(let j=0;j<(town?2:3);j++)rect(x+5,(town?61:46)+j*10,5,6,'#638ba9');if(town)rect(x-2,53,27,5,'#ab594a');}
+ }
+ if((co.id===1&&km<1.2)||(co.id===10&&km>21.7)){rect(185,44,70,32,'#ab5a49');rect(181,40,78,5,'#714a42');rect(213,31,15,13,'#f0d19d');rect(217,34,6,6,'#f6f4d9');for(let x=190;x<255;x+=12)rect(x,51,5,12,'#fff0cf');}
+}
+function drawSpectators(co,km,scroll){
+ const near=km<.8||co.km-km<1.2,spacing=near?18:co.scene==='mountain'?54:34;
+ const wave=s&&!s.paused&&!s.counting?s.elapsed:0;
+ for(let i=-1;i<Math.ceil(320/spacing)+1;i++){
+  const world=Math.floor(scroll/spacing)+i,x=i*spacing-scroll%spacing,color=teamColors[((world%20)+20)%20][1],arm=(Math.floor(wave*3+world)%2)*3;
+  rect(x,68,7,9,'#203448');rect(x+1,69,5,6,color);rect(x+1,61,5,6,'#f4c18d');rect(x,60,7,2,'#493a36');rect(x-3,64-arm,3,7,'#f4c18d');rect(x+8,61,1,12,'#4e5460');rect(x+9,61,8,5,color);rect(x+1,77,2,3,'#203448');rect(x+5,77,2,3,'#203448');
+ }
+ rect(0,78,320,2,'#f1f4e1');
+ if(near){rect(22,31,95,17,'#fff6ce');ctx.fillStyle='#24364d';ctx.font='9px monospace';ctx.fillText(co.km-km<1.2?'あと少し！ がんばれ！':'いってらっしゃい！',27,43);}
+ else if(s&&Math.floor(s.elapsed/4)%3===0){rect(24,34,78,16,'#fff6ce');ctx.fillStyle='#24364d';ctx.font='9px monospace';ctx.fillText(['ファイト！','その調子！','たすきをつなげ！'][Math.floor(s.elapsed/12)%3],28,45);}
+}
+function drawVehicles(field){
+ if(!s||s.counting||s.elapsed<2||s.done)return;
+ const leader=[s.player,...s.ai].filter(r=>r.finishTime===null&&s.elapsed>=r.startAt).sort((a,b)=>b.km-a.km)[0];
+ if(leader){const x=field.playerX+(leader.km-s.player.km)*165+57;
+  if(x>-35&&x<350){
+   // Lead motorcycle on the far road edge, always ahead of the actual leader.
+   rect(x-17,84,9,9,'#192b3d');rect(x+7,84,9,9,'#192b3d');rect(x-15,86,5,5,'#c2cfda');rect(x+9,86,5,5,'#c2cfda');rect(x-12,80,25,5,'#f6f9fb');rect(x-3,74,18,8,'#fff');rect(x+11,70,3,9,'#d9ecf5');rect(x-5,66,7,10,'#346293');rect(x-3,60,7,7,'#fff');rect(x+2,63,3,3,'#294258');rect(x+7,76,4,3,'#e25256');
+  }
+ }
+ const phase=s.elapsed%27;
+ if(phase>9&&phase<16){const x=355-(phase-9)*62;
+  rect(x-25,68,50,17,'#eaf4f9');rect(x-18,59,34,11,'#f7f9fd');rect(x-14,62,13,7,'#327b9c');rect(x+3,62,10,7,'#327b9c');rect(x-24,79,48,3,'#3d6eaa');rect(x-17,82,8,8,'#203145');rect(x+11,82,8,8,'#203145');rect(x-3,54,3,6,'#203145');rect(x-10,52,15,3,'#e8eff5');rect(x+15,52,8,6,'#26364a');rect(x+21,51,4,8,'#26364a');rect(x+17,58,2,3,'#26364a');ctx.font='7px monospace';ctx.fillStyle='#243751';ctx.fillText('TV',x-5,78);
+ }
+}
 function draw(){
  const co=course(),p=s?s.player:null,field=raceField(),playerX=field?field.playerX:116,scroll=p?p.km*260:0,grade=terrainAt(p?p.km:0).grade;
- rect(0,0,320,180,'#9bdaf0');rect(24,26,34,5,'#e7f9ff');rect(229,34,49,6,'#e7f9ff');rect(0,72,320,108,'#80bd77');
- if(co.id===1){for(let i=-1;i<13;i++){const x=i*38-scroll%38;rect(x,40,23,49,i%3?'#d5dce5':'#f1d2a7');for(let j=0;j<3;j++)rect(x+5,46+j*13,5,7,'#638ba9');}}
- else{for(let x=0;x<320;x+=4){const h=22+26*Math.sin(x/69)+15*Math.sin(x/27);rect(x,72-h,4,34+h,'#5c998f');}for(let i=-1;i<13;i++){const x=i*32-scroll%32;rect(x+6,65,4,24,'#725942');rect(x,63,16,14,'#39795e');rect(x+3,56,10,10,'#39795e');}}
+ scenery(co,p?p.km:0,scroll);
  const roadY=x=>78-clamp(grade*2,-.09,.09)*(x-playerX);
  for(let x=0;x<320;x+=4){const y=roadY(x);rect(x,y,4,180-y,'#777b83');rect(x,y,4,3,'#ece6c9');}
  for(let i=0;i<12;i++){const x=i*34-scroll%34;rect(x,roadY(x)+76,18,2,'#e7e2ce');}
+ drawSpectators(co,p?p.km:0,scroll);if(field)drawVehicles(field);
  rect(6,6,153,19,'#1c3658');ctx.fillStyle='white';ctx.font='10px monospace';ctx.fillText(currentPlace(),12,19);rect(235,6,78,19,'#1c3658');ctx.fillStyle='#e4f5ff';ctx.fillText(s&&s.counting?'20チーム':p&&p.drafting?'風よけ中':'← 向かい風',241,19);
  if(p){
   const startX=playerX+28-p.km*165;
@@ -398,7 +598,7 @@ function progressMarkers(){
 function drawProgress(){
  const co=course(),markers=progressMarkers();
  rect(0,0,320,88,'#162c46',pc);
- const maxH=co.id===1?60:950;
+ const maxH=Math.max(60,...co.profile.map(p=>p[1]))*1.05;
  for(let x=8;x<312;x+=2){const h=terrainAt((x-8)/304*co.km).height/maxH*18;rect(x,85-h,2,h+1,'#355f60',pc);}
  pc.font='8px monospace';pc.fillStyle='#e0edf7';pc.fillText('START',8,9);pc.fillText('線の先が現在地',132,9);pc.fillText('GOAL',288,9);
  pc.fillStyle='#aac5ce';pc.fillText('高低差（概略）',115,85);
@@ -419,8 +619,8 @@ function drawProgress(){
   if(you){rect(x-2,y-10,5,1,'#ffe500',pc);rect(x-1,y-9,3,1,'#ffe500',pc);rect(x,y-8,1,1,'#ffe500',pc);}
  }
 }
-function frame(t){advanceCountdown(t);const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
-chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);updateTitleSelection();loadSprites();requestAnimationFrame(frame);
+function frame(t){advanceCountdown(t);const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;if(exchangeTime!==null&&!document.hidden){exchangeTime+=dt;drawExchange(reduceCharacterMotion?1.6:exchangeTime);if(exchangeTime>=2.4&&!reduceCharacterMotion)finishExchange();}let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
+chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);chooseMode('single');updateTitleSelection();updateSaveUI();loadSprites();requestAnimationFrame(frame);
 })();
 </script>
 </body></html>
