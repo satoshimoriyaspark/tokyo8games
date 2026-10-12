@@ -19,12 +19,15 @@ async function load(entry,probe){
  vm.createContext(context);
  const script=html.split('<script>')[1].split('</script>')[0].replace('render();requestAnimationFrame(loop);',fs.readFileSync(probe,'utf8')+'\nrender();');
  vm.runInContext(script,context);
- for(let i=0;i<100;i++){if((context.javeQA||context.qa||context.motionQA)?.ready())return context;await new Promise(r=>setTimeout(r,20));}
+ for(let i=0;i<100;i++){if((context.longJumpQA||context.javeQA||context.qa||context.motionQA)?.ready())return context;await new Promise(r=>setTimeout(r,20));}
  throw Error('PNG loading failed');
 }
 (async()=>{
  const output=path.join(__dirname,'evidence');fs.mkdirSync(output,{recursive:true});
  const current=await load(path.join(game,'index.html'),path.join(__dirname,'javeball-probe.js'));
+ const jump=await load(path.join(game,'index.html'),path.join(__dirname,'long-jump-probe.js'));
+ const jumpResult=jump.longJumpQA.checks();console.log('Long jump PASS',jumpResult.count);
+ fs.writeFileSync(path.join(output,'long-jump-checks.json'),JSON.stringify({environment:'Node + native Canvas; not a browser/device test',...jumpResult},null,2));
  const result=current.javeQA.checks();console.log('Javeball PASS',result.count);
  const prior=await load(path.join(__dirname,'javeball-baseline/index.html'),path.join(__dirname,'javeball-probe.js'));
  if(process.argv.includes('--render')){
