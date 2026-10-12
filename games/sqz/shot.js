@@ -33,7 +33,7 @@
       run:Math.sin(clamp(ms/280)*Math.PI)*4,done:ms>=END};
   }
   function markup() {
-    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div><div class="keeper-sprite"><img src="${ASSET}" width="640" height="160" alt="" draggable="false"></div><div class="player striker"><i class="head"></i><i class="body"></i><i class="arm"></i><i class="arm right"></i><i class="leg"></i><i class="leg right"></i></div><div class="shot-trail"></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
+    return `<div class="shot-world" aria-hidden="true"><div class="shot-goal"><div class="goal-net"></div></div><div class="keeper-sprite"><img src="${ASSET}" width="640" height="160" alt="" draggable="false"></div><div class="player striker"><i class="head"></i><i class="body"></i><i class="arm"></i><i class="arm right"></i><i class="leg"></i><i class="leg right"></i></div><div class="shot-trail" hidden></div><div class="ball"></div><div class="shot-banner" hidden></div><div class="shot-combo" hidden>SUPER SHOT!</div></div>`;
   }
   function create(element, options) {
     const {ok,side='right',superShot=false,onComplete=()=>{}}=options;
