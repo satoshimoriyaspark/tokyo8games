@@ -92,17 +92,17 @@ function game(speechSupported=true){
    setAttribute(){},addEventListener(){},focus(){},querySelector:s=>node(key+' '+s)});
  }return nodes.get(key);}
  const document={hidden:false,querySelector:node,getElementById:id=>node('#'+id),querySelectorAll:()=>[],addEventListener:(n,fn)=>events.set(n,fn)};
- const calls=[],spoken=[],audioEvents=[];
+ const calls=[],spoken=[],audioEvents=[],gainValues=[];
  const navigator={audioSession:{set type(value){audioEvents.push('session:'+value);}}};let speechCancels=0;
  const speechSynthesis=speechSupported?{cancel(){speechCancels++;},getVoices:()=>[{lang:"en-US"},{lang:"ja-JP"}],speak:u=>spoken.push(u)}:undefined;
  class SpeechSynthesisUtterance{constructor(text){this.text=text;}}
- class AudioContext{constructor(){audioEvents.push('context');this.currentTime=0;this.sampleRate=44100;this.destination={};}createBuffer(){return {silent:true};}async resume(){audioEvents.push('resume');}async decodeAudioData(bytes){return bytes;}createBufferSource(){const o={connect:()=>({connect(){}}),start(){if(o.buffer?.silent){audioEvents.push('unlock');return;}calls.push({buffer:o.buffer,stopped:false});o.call=calls.at(-1);},stop(){if(o.call)o.call.stopped=true;},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(){}},disconnect(){}};}}
+ class AudioContext{constructor(){audioEvents.push('context');this.currentTime=0;this.sampleRate=44100;this.destination={};}createBuffer(){return {silent:true};}async resume(){audioEvents.push('resume');}async decodeAudioData(bytes){return bytes;}createBufferSource(){const o={connect:()=>({connect(){}}),start(){if(o.buffer?.silent){audioEvents.push('unlock');return;}calls.push({buffer:o.buffer,stopped:false});o.call=calls.at(-1);},stop(){if(o.call)o.call.stopped=true;},disconnect(){}};return o;}createGain(){return{gain:{setValueAtTime(value){gainValues.push(value);}},disconnect(){}};}}
 
  const ctx=vm.createContext({navigator,speechSynthesis,SpeechSynthesisUtterance,fetch:async url=>({ok:true,arrayBuffer:async()=>url}),document,localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},performance:{now:()=>0},requestAnimationFrame:()=>1,cancelAnimationFrame(){},matchMedia:()=>({matches:false}),scrollTo(){},addEventListener:(n,fn)=>events.set(n,fn),AudioContext});
  vm.runInContext('globalThis.window=globalThis',ctx);vm.runInContext(source,ctx);
  const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
  for(const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g))vm.runInContext(m[1],ctx);
- return {run:s=>vm.runInContext(s,ctx),node,events,calls,spoken,audioEvents,get speechCancels(){return speechCancels;}};
+ return {run:s=>vm.runInContext(s,ctx),node,events,calls,spoken,audioEvents,gainValues,get speechCancels(){return speechCancels;}};
 }
 test('real game: double answer, next lock, skip, combo, wrong answer, resume and result',()=>{
  const g=game();g.run("start('training')");
@@ -124,7 +124,10 @@ test('real game: double answer, next lock, skip, combo, wrong answer, resume and
 });
 test('real game: crowd recordings, mute and cancellation during loading',async()=>{
  const g=game();g.run('P.sound=true');await g.run('tone(true)');await g.run('tone(false)');
- assert.deepEqual(g.calls.map(n=>n.buffer),['/games/sqz/assets/audio/goal-crowd.mp3?v=20261012-2','/games/sqz/assets/audio/boo.mp3?v=20261012-2']);
+ assert.deepEqual(g.calls.map(n=>n.buffer),['/games/sqz/assets/audio/goal-crowd.mp3?v=20261012-2','/games/sqz/assets/audio/boo.mp3?v=20261013-boo-1']);
+ assert.deepEqual(g.gainValues,[.65,.65]); // Balance is in the boo asset; correct-answer playback is unchanged.
+ const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
+ for(const call of g.calls)assert.ok(html.includes('href="'+call.buffer+'"'), 'preload matches runtime cache version');
  await g.run('tone(true,()=>false)');assert.equal(g.calls.length,2);
  const pending=g.run('tone(true)');g.run('silence()');await pending;
  assert.equal(g.calls.length,2);assert.ok(g.calls.every(n=>n.stopped));
@@ -172,4 +175,15 @@ test('iOS sound opt-in sets playback session and unlocks synchronously before do
  assert.deepEqual(g.audioEvents,['session:playback','context','resume','unlock']);
  assert.equal(g.calls.length,0);await pending;assert.equal(g.calls.length,1);
  g.run('navigator.audioSession=undefined');await g.run('tone(false)');assert.equal(g.calls.length,2);
+});
+
+// Guard against another nearly inaudible boo clip or a clipping replacement.
+test('boo loudness meets the balance target with headroom at the unchanged game gain',()=>{
+ const {spawnSync}=require('node:child_process');
+ const file=path.join(root,'games/sqz/assets/audio/boo.mp3');
+ const result=spawnSync('ffmpeg',['-hide_banner','-nostats','-i',file,'-af','loudnorm=print_format=json','-f','null','-'],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ const stats=JSON.parse(result.stderr.match(/\{[\s\S]*"input_i"[\s\S]*?\}/)[0]);
+ assert.ok(+stats.input_i>=-16&&+stats.input_i<=-13,'boo should stay between -16 and -13 LUFS');
+ assert.ok(+stats.input_tp<=-1.5,'boo keeps at least 1.5 dB true-peak headroom before game gain');
 });

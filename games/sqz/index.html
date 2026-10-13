@@ -19,7 +19,7 @@
 <link rel="preload" as="image" href="/games/sqz/assets/characters-v3/characters-atlas.png">
 <script src="/games/sqz/shot.js"></script>
 <link rel="preload" href="/games/sqz/assets/audio/goal-crowd.mp3?v=20261012-2" as="fetch" crossorigin>
-<link rel="preload" href="/games/sqz/assets/audio/boo.mp3?v=20261012-2" as="fetch" crossorigin>
+<link rel="preload" href="/games/sqz/assets/audio/boo.mp3?v=20261013-boo-1" as="fetch" crossorigin>
 </head>
 <body><div class="wrap"><header class="top"><a class="brand" href="/">TOKYO 8 GAMES</a><span class="beta">PLAYTEST 0.7</span><button id="sound" class="tinybtn" aria-pressed="false">音 OFF</button></header><div id="notice" class="notice" role="status"></div><main id="app"></main></div>
 <div id="overlay" class="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><div class="card"><h2 id="dialogTitle"></h2><div id="dialogText"></div><button id="dialogOK" class="primary">OK</button></div></div>
@@ -163,7 +163,8 @@ function unlockCrowd(){
 }
 async function prepareCrowd(ok){
  const resumed=unlockCrowd();
- const url='/games/sqz/assets/audio/'+(ok?'goal-crowd':'boo')+'.mp3?v=20261012-2';
+ const version=ok?'20261012-2':'20261013-boo-1';
+ const url='/games/sqz/assets/audio/'+(ok?'goal-crowd':'boo')+'.mp3?v='+version;
  if(!crowdBuffers.has(url))crowdBuffers.set(url,fetch(url).then(r=>{if(!r.ok)throw new Error('Audio unavailable');return r.arrayBuffer();}).then(bytes=>audio.decodeAudioData(bytes)).catch(e=>{crowdBuffers.delete(url);throw e;}));
  const [buffer]=await Promise.all([crowdBuffers.get(url),resumed]);return buffer;
 }
