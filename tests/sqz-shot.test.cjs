@@ -160,6 +160,40 @@ test('crowd reaction starts once at ball contact; skipping never triggers it',()
  const skip=env();skip.api.create(skip.element,{ok:true,onImpact:()=>hits++}).skip();assert.equal(hits,1);
 });
 
+test('reading controls keep live status inline and omit the extra timer explanation',()=>{
+ const g=game();
+ for(const kind of ['cup','training']){
+  g.run(`start('${kind}')`);
+  const markup=g.run('readingControls()');
+  assert.match(markup,/<div class="reading-controls">.*<button id="read-toggle".*<button id="read-again".*<span id="read-status" class="muted" role="status">.*<\/span><\/div>$/);
+  assert.doesNotMatch(markup,/<p\b|読み上げ中も制限時間は進みます/);
+ }
+ const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
+ assert.match(html,/\.reading-controls\{[^}]*align-items:center/);
+ assert.match(html,/#read-status\{margin:0\}#read-status:empty\{display:none\}/);
+});
+
+test('compact reading status preserves errors, retry, completion and unsupported-browser help',()=>{
+ const g=game();g.run("P.readAloud=true;start('training')");
+ assert.equal(g.node('#read-status').textContent,'読み上げ中');
+ g.spoken.at(-1).onerror({error:'unavailable'});
+ assert.equal(g.node('#read-status').textContent,'読み上げできませんでした。「もう一度読む」を押してください。');
+ g.node('#read-again').onclick();
+ assert.equal(g.spoken.length,2);assert.equal(g.node('#read-status').textContent,'読み上げ中');
+ g.spoken.at(-1).onend();assert.equal(g.node('#read-status').textContent,'');
+ g.node('#read-toggle').onclick();
+ assert.equal(g.node('#read-toggle').textContent,'読み上げ OFF');assert.equal(g.node('#read-again').disabled,true);
+ assert.match(g.run('readingControls()'),/aria-pressed="false"/);
+ g.node('#read-toggle').onclick();
+ assert.equal(g.node('#read-toggle').textContent,'読み上げ ON');assert.equal(g.node('#read-again').disabled,false);
+ assert.match(g.run('readingControls()'),/aria-pressed="true"/);
+ const unsupported=game(false);unsupported.run("start('training')");
+ const markup=unsupported.run('readingControls()');
+ assert.match(markup,/<button id="read-toggle"[^>]*disabled/);
+ assert.match(markup,/<button id="read-again"[^>]*disabled/);
+ assert.match(markup,/<span id="read-status" class="muted" role="status">このブラウザは読み上げに対応していません。<\/span>/);
+});
+
 test('shipped crowd MP3s contain decodable audio of the intended length',()=>{
  const {execFileSync}=require('node:child_process');
  for(const [name,min,max] of [['goal-crowd',2.7,3],['boo',1.4,1.7]]){

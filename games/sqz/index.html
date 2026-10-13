@@ -13,7 +13,7 @@
 .title p{margin:8px 0 0}
 /* The approved logo replaces the title's provisional pitch illustration. */
 .feedback{scroll-margin-top:12px}
-.reading-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.reading-controls .linkbtn{min-height:40px;padding:6px 10px;font-size:12px}#read-status:empty{display:none}
+.reading-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}.reading-controls .linkbtn{min-height:40px;padding:6px 10px;font-size:12px}#read-status{margin:0}#read-status:empty{display:none}
 </style>
 <link rel="stylesheet" href="/games/sqz/shot.css">
 <link rel="preload" as="image" href="/games/sqz/assets/characters-v3/characters-atlas.png">
@@ -199,7 +199,7 @@ function readQuestion(){
  $('#read-status').textContent='読み上げ中';
  try{window.speechSynthesis.speak(u);}catch(e){u.onerror({error:'unavailable'});}
 }
-function readingControls(){return `<div class="reading-controls"><button id="read-toggle" class="linkbtn" aria-pressed="${!!P.readAloud}" ${canRead?'':'disabled'}>読み上げ ${P.readAloud?'ON':'OFF'}</button><button id="read-again" class="linkbtn" ${canRead&&P.readAloud?'':'disabled'}>もう一度読む</button></div><p id="read-status" class="muted" role="status">${canRead?'':'このブラウザは読み上げに対応していません。'}</p>${S.kind==='cup'?'<p class="muted">読み上げ中も制限時間は進みます。</p>':''}`;}
+function readingControls(){return `<div class="reading-controls"><button id="read-toggle" class="linkbtn" aria-pressed="${!!P.readAloud}" ${canRead?'':'disabled'}>読み上げ ${P.readAloud?'ON':'OFF'}</button><button id="read-again" class="linkbtn" ${canRead&&P.readAloud?'':'disabled'}>もう一度読む</button><span id="read-status" class="muted" role="status">${canRead?'':'このブラウザは読み上げに対応していません。'}</span></div>`;}
 function bindReading(){
  bind('read-toggle',()=>{P.readAloud=!P.readAloud;save();$('#read-toggle').textContent='読み上げ '+(P.readAloud?'ON':'OFF');$('#read-toggle').setAttribute('aria-pressed',String(P.readAloud));$('#read-again').disabled=!P.readAloud;if(P.readAloud)readQuestion();else{stopReading();$('#read-status').textContent='';}});
  bind('read-again',readQuestion);
