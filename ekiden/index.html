@@ -245,7 +245,8 @@ function renderResult(){
 function continueFromFirst(overwrite=false){
  if(readSave()&&!overwrite){pendingContinuation=true;$('result').hidden=true;$('saveChoice').hidden=false;$('overwriteRelay').focus();return;}
  pendingContinuation=false;$('saveChoice').hidden=true;
- chooseMode('full');relay={version:1,mode:'full',selected,difficulty:difficultyIndex,legIndex:1,runs:[{id:1,times:s.legTimes.slice(),scene:s.resultScene||0}],stage:'ready',view:0};
+ const firstRun={id:1,times:s.legTimes.slice(),scene:s.resultScene||0};
+ chooseMode('full');relay={version:1,mode:'full',selected,difficulty:difficultyIndex,legIndex:1,runs:[firstRun],stage:'ready',view:0};
  courseIndex=1;saveRelay();s=null;reset();
 }
 function resultNext(){
