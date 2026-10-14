@@ -8,19 +8,19 @@
       "hold plays all eight approved running frames",
       "all layered PNG crops and draws are integer pixels",
       "stopped run-up returns to still carrying pose",
-      "unchanged scoring formula 0",
+      "angle distance formula 0",
       "ball stays visible through landing 0",
       "landing agrees with ground ruler and record 0",
       "wall clock cannot skip flight 0",
       "landing is held before retry 0",
       "retry clears camera and motion 0",
-      "unchanged scoring formula 12.5",
+      "angle distance formula 12.5",
       "ball stays visible through landing 12.5",
       "landing agrees with ground ruler and record 12.5",
       "wall clock cannot skip flight 12.5",
       "landing is held before retry 12.5",
       "retry clears camera and motion 12.5",
-      "unchanged scoring formula 8",
+      "angle distance formula 8",
       "ball stays visible through landing 8",
       "landing agrees with ground ruler and record 8",
       "wall clock cannot skip flight 8",
@@ -58,9 +58,9 @@
       {
         "total": 3685,
         "scores": [
-          3275,
-          3059,
-          2819
+          3344,
+          3132,
+          2925
         ]
       }
     ]
