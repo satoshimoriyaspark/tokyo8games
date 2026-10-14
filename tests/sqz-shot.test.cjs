@@ -182,9 +182,25 @@ test('deep-dive themes offer twenty unique sourced questions and honor difficult
   for(const q of qs){assert.equal(q.checkedAt,'2026-10-15');assert.match(q.source,/^https:\/\//);assert.ok(q.explanation&&q.period);}
   for(const d of [1,2,3]){
    const ids=g.run(`selectQuestions(${d},'${cat}')`);
-   assert.equal(ids.length,d===1?4:10);
+   assert.equal(ids.length,d===1?0:10);
    assert.equal(new Set(ids).size,ids.length);
    assert.ok(ids.every(id=>qs.some(q=>q.id===id&&q.level<=d)));
   }
  }
+});
+
+// The beginner cup needs 30 distinct non-flag questions across its three rounds.
+test('beginner pool excludes deep trivia and completes a cup with flags off',()=>{
+ const g=game();g.run('P.flags=false');
+ const qs=g.run('BANK.filter(q=>q.level===1)');
+ assert.equal(qs.length,43);
+ assert.ok(qs.every(q=>!q.id.startsWith('deep-')&&q.category!=='clubs'&&!/^(pl-player-|j1-mvp-)/.test(q.id)));
+ const used=[];
+ for(let round=0;round<3;round++){
+  const ids=g.run(`selectQuestions(1,'all',${JSON.stringify(used)})`);
+  assert.equal(ids.length,10);assert.ok(ids.every(id=>!used.includes(id)));used.push(...ids);
+ }
+ assert.equal(new Set(used).size,30);
+ g.run("category='jhistory';diff=1;training()");
+ assert.doesNotMatch(g.node('#app').innerHTML,/data-cat="jhistory"/);
 });
