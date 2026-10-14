@@ -3,7 +3,7 @@
 <style>body{margin:0;padding:18px;background:#172337;color:#fff4d3;font:15px/1.6 system-ui}h1{font-size:24px;margin:0}button,select{font:inherit;padding:8px;margin:4px}iframe{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1250px}canvas{width:100%;image-rendering:pixelated;display:block}h2{font-size:18px;margin:10px 0}pre{white-space:pre-wrap}a{color:#9cdefa}@media(max-width:600px){.pair{grid-template-columns:1fr}}</style>
 <h1>幅跳び｜キャラクターの跳躍と着地までの追従</h1><p>左：修正前 ／ 右：修正後。同じ踏切位置・同じ記録で実際のゲーム描画を比較。</p>
 <label>場面 <select id="scene"><option value="0">踏切</option><option value="0.25">上昇</option><option value="0.5">空中</option><option value="0.8">下降</option><option value="1">着地</option><option value="1.5">着地後</option></select></label>
-<button id="play">跳躍を再生</button><button id="checks">動作検証</button>
+<button id="play">跳躍を再生</button><button id="foul">踏切線超過</button><button id="checks">動作検証</button>
 <div class="pair"><section><h2>修正前</h2><canvas id="old" width="384" height="320"></canvas></section><section><h2>修正後</h2><canvas id="new" width="384" height="320"></canvas></section></div>
 <p><a href="../index.html">ゲームを開く</a></p><pre id="result">PNG読込中…</pre>
 <script type="module">
@@ -16,6 +16,7 @@ const apis=()=>frames.map(f=>f.contentWindow.longJumpQA);
 await new Promise((resolve,reject)=>{const start=Date.now(),timer=setInterval(()=>{if(apis().every(a=>a?.ready())){clearInterval(timer);resolve()}else if(Date.now()-start>30000){clearInterval(timer);reject(Error('PNG timeout'))}},50)});
 function paint(u){apis().forEach((a,i)=>{const ctx=$('#'+(i?'new':'old')).getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(a.scene(Math.min(1,u),Math.max(0,u-1)),0,0)});}
 let playing=false,age=0,last=0;
+$('#foul').onclick=()=>{playing=false;apis().forEach((a,i)=>{const ctx=$('#'+(i?'new':'old')).getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(a.foul(),0,0)});};
 $('#scene').onchange=()=>{playing=false;paint(+$('#scene').value)};
 $('#play').onclick=()=>{playing=true;age=0};
 $('#checks').onclick=()=>{playing=false;try{const r=apis()[1].checks();$('#result').textContent='PASS '+r.count+' assertions\n'+r.passed.join('\n')}catch(e){$('#result').textContent='FAIL '+e.stack}paint(+$('#scene').value)};
