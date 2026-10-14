@@ -16,5 +16,11 @@ window.timeQA={ready:()=>spriteReady,checks(){
  check('CPU ordering '+i,raceSeconds(i,cpuRaceTime(0,i))<raceSeconds(i,cpuRaceTime(2,i)));
  check('saved v1 best uses same conversion '+i,label(i,20)===timeText(i,raceSeconds(i,20))+(i===1?'':'秒'));
  }
+ mode='menu';selected=0;cup=false;syncUI();render();check('menu hides race pads',document.querySelector('.pads').hidden&&$('#screen').hidden&&!$('#events').hidden);
+ $('#events').children[0].click();check('event opens tutorial directly',mode==='tutorial'&&!$('#tutorial').hidden&&$('#screen').hidden);
+ $('#tutorialGo').click();check('start shows race only',mode==='ready'&&!$('#screen').hidden&&!document.querySelector('.pads').hidden&&$('#events').hidden);
+ finish(20);syncUI();check('ceremony can skip',!$('#skipCeremony').hidden);$('#skipCeremony').click();check('skip opens compact result',mode==='result'&&!$('#resultPanel').hidden&&$('#screen').hidden&&!$('#start').hidden);
+ $('#start').click();check('retry bypasses tutorial',mode==='ready'&&$('#tutorial').hidden);
+ mode='result';syncUI();$('#menuBack').click();check('return selects events',mode==='menu'&&!$('#events').hidden);
  return {count:passed.length,passed};
-},spurt(){selected=1;resetRun();showOpening('game');mode='run';pos=120;elapsed=27;spd=10;sta=55;input('B');draw(1000)},scene(i=0){selected=i;resetRun();showOpening('game');pos=i===1?150:i===2?110:100;elapsed=i===0?20:i===1?33.63:16;finishDashRecord=elapsed;mode='finishDash';draw(1000);return $('#screen')},result(i=0){this.scene(i);finish(elapsed);mode='result';$('#resultPanel').hidden=false;draw(1000)}};
+},spurt(){selected=1;resetRun();showOpening('game');mode='run';pos=120;elapsed=27;spd=10;sta=55;input('B');syncUI();draw(1000)},scene(i=0){selected=i;resetRun();showOpening('game');pos=i===1?150:i===2?110:100;elapsed=i===0?20:i===1?33.63:16;finishDashRecord=elapsed;mode='finishDash';syncUI();draw(1000);return $('#screen')},result(i=0){this.scene(i);finish(elapsed);mode='result';$('#resultPanel').hidden=false;syncUI();draw(1000)}};

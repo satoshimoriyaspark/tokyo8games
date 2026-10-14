@@ -11,7 +11,7 @@ async function load(entry,probe){
   appendChild(c){this.children.push(c);return c;} append(...c){this.children.push(...c);} replaceChildren(...c){this._text='';this.children=c;}
   setAttribute(){} addEventListener(){} focus(){} click(){this.onclick?.();}
  }
- const cv=createCanvas(384,320);nodes.set('#screen',cv);nodes.set('#openingArt',createCanvas(384,152));
+ const cv=createCanvas(384,320);cv.focus=()=>{};nodes.set('#screen',cv);nodes.set('#openingArt',createCanvas(384,152));
  const document={querySelector(s){if(!nodes.has(s))nodes.set(s,new Element());return nodes.get(s);},querySelectorAll(){return [];},createElement(tag){return tag==='canvas'?createCanvas(300,150):new Element();},addEventListener(){}};
  class LocalImage extends Image{set src(value){super.src=fs.readFileSync(path.join(game,value));}get src(){return super.src;}}
  const context={document,Image:LocalImage,console,performance:{now:()=>1000},localStorage:{getItem:()=>null,setItem(){}},requestAnimationFrame(){},setTimeout,clearTimeout};
