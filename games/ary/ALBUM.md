@@ -29,6 +29,7 @@ Character, cat and logo assets, direct PNG loading, 6-frame running, jumping/dou
 
 Run `node games/ary/tests/regression.cjs` with `@napi-rs/canvas` available. The harness decodes real gameplay PNGs, renders 10,800 frames, tests existing inputs/collisions/items/score and new record/navigation cases. Its DOM and storage are simulations, not physical device tests.
 
-`tests/album-browser.html` is an explicitly labelled development fixture. It fetches the actual entrypoint into a sandboxed iframe and substitutes test-only memory storage. Visible controls select fresh/legacy records, reload that memory snapshot, move to the goal boundary, and resize the iframe to PC or phone dimensions. It never reads or modifies normal game saves. Normal `index.html` does not load its test adapter. A test-only jump to the goal verifies the finish/result/introduction UI without claiming a full real-time run.
+`tests/album-browser.html` is an explicitly labelled development fixture. It fetches the actual entrypoint into a same-origin test iframe and substitutes test-only memory storage before
+loading any game scripts. Same-origin asset requests retain Preview authentication. Visible controls select fresh/legacy records, reload that memory snapshot, move to the goal boundary, and resize the iframe to PC or phone dimensions. It never reads or modifies normal game saves. Normal `index.html` does not load its test adapter. A test-only jump to the goal verifies the finish/result/introduction UI without claiming a full real-time run.
 
 Reference image provenance and official factual sources: `assets/landmarks/SOURCES.md`.

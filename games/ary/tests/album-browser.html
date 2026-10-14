@@ -2,7 +2,7 @@
 <style>body{font:14px system-ui;background:#eee;color:#172a46;margin:16px}header{max-width:1000px}button{padding:9px;margin:4px}iframe{display:block;border:2px solid #172a46;margin-top:12px;background:#101b30}p{line-height:1.6}#status{font-weight:bold}</style>
 <header><h1>取材アルバム・開発用表示確認</h1><p>実際のゲームファイルを、テスト用の保存領域で表示します。通常ゲームの記録には触れません。「ゴール直前」はコース末尾へ移動するテストで、通しプレイではありません。</p>
 <div><button data-record="new">未クリアで起動</button><button data-record="legacy">旧クリア記録で起動</button><button id="reload">記録を保って再読み込み</button><button id="finish">ゴール直前から確認</button></div>
-<div><button data-size="1000,760">PC 1000 × 760</button><button data-size="844,390">横 844 × 390</button><button data-size="390,844">縦 390 × 844</button><button data-size="667,375">小型横 667 × 375</button></div><p id="status" role="status">読み込み中</p></header><iframe title="テスト用ゲーム画面" sandbox="allow-scripts" width="1000" height="760"></iframe>
+<div><button data-size="1000,760">PC 1000 × 760</button><button data-size="844,390">横 844 × 390</button><button data-size="390,844">縦 390 × 844</button><button data-size="667,375">小型横 667 × 375</button></div><p id="status" role="status">読み込み中</p></header><iframe title="テスト用ゲーム画面" sandbox="allow-scripts allow-same-origin" width="1000" height="760"></iframe>
 <script>
 // Test adapter only. Never loaded by the game entrypoint. Memory storage is scoped to this page.
 const frame=document.querySelector('iframe'),status=document.querySelector('#status');let saved={},source='',boot=0;
