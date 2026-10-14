@@ -208,6 +208,7 @@ function completeLeg(){
  }
  s.resultScene=relay?relay.runs[relay.runs.length-1].scene:Math.floor(Math.random()*3);
  openResults();
+ if(![5,10].includes(s.course.id))startFinishExchange();
 }
 function standing(times){
  const sorted=times.map((time,team)=>({team,time})).sort((a,b)=>a.time-b.time||a.team-b.team);
@@ -234,33 +235,66 @@ function renderResult(){
  $('resultTableCaption').textContent=v.kind+'順位：全20チーム';
  $('resultTabs').replaceChildren();resultViews.forEach((item,i)=>{const b=document.createElement('button');b.className='quiet'+(i===resultView?' chosen':'');b.textContent=item.kind;b.setAttribute('aria-pressed',String(i===resultView));b.addEventListener('click',()=>{resultView=i;renderResult()});$('resultTabs').appendChild(b)});
  const hasNext=relay&&courseIndex<modeInfo().end;
- $('retry').textContent=resultView<resultViews.length-1?'次へ：'+resultViews[resultView+1].title:hasNext?(s.course.id===5?'復路へ！ 6区の準備':'たすきを渡して '+(s.course.id+1)+'区へ'):'もう一度、挑戦！';
+ $('retry').textContent=resultView<resultViews.length-1?'次へ：'+resultViews[resultView+1].title:hasNext?(s.course.id===5?'復路へ！ 6区の準備':'次の '+(s.course.id+1)+'区へ'):'もう一度、挑戦！';
  $('selectAgain').textContent='タイトルへ';if(relay){relay.view=resultView;saveRelay();}
  $('resultSave').textContent=relay?(saveError?'保存できませんでした。画面を閉じずに続けてください。':'ここまで自動保存済み。タイトルから再開できます。'):'';
  drawResultScene(own.rank,scene,v.kind);
 }
 function resultNext(){
  if(resultView<resultViews.length-1){resultView++;renderResult();$('resultTitle').focus();return;}
- if(relay&&courseIndex<modeInfo().end){$('result').hidden=true;$('exchange').hidden=false;exchangeTime=0;$('exchangeTitle').textContent=s.course.id===5?'往路、おつかれさま！':'想いを、次の選手へ。';$('exchangeText').textContent=(s.course.id===5?'芦ノ湖でひと休み。復路もタイム差を引き継ぎます。':'同じ色のたすきを、次の区間へつなごう。')+' 次は'+courses[courseIndex+1].id+'区 '+courses[courseIndex+1].route;$('exchangeSkip').focus();drawExchange(0);return;}
+ if(relay&&courseIndex<modeInfo().end){courseIndex++;relay.legIndex=courseIndex;relay.stage='ready';relay.view=0;saveRelay();s=null;reset();return;}
  if(relay){opening();beginRun();}else{s=null;reset();}
+}
+function startFinishExchange(){
+ $('result').hidden=true;$('exchange').hidden=false;exchangeTime=0;
+ $('exchangeTitle').textContent='つなげ！ 次の一歩へ。';
+ $('exchangeText').textContent=s.course.goal+'で、'+(s.course.id+1)+'区の仲間へたすきリレー！';
+ $('exchangeSkip').textContent='結果を見る ▶';$('exchangeSkip').focus();drawExchange(0);
 }
 function finishExchange(){
  if(exchangeTime===null)return;
- exchangeTime=null;$('exchange').hidden=true;courseIndex++;relay.legIndex=courseIndex;relay.stage='ready';relay.view=0;saveRelay();s=null;reset();
+ exchangeTime=null;$('exchange').hidden=true;openResults();
 }
 function drawResultScene(place,variant,kind){
  const canvas=$('resultScene'),t=canvas.getContext('2d');t.imageSmoothingEnabled=false;
  rect(0,0,320,144,place===1?'#fff0a5':'#c5ecfa',t);rect(0,108,320,36,'#69b794',t);
  for(let i=0;i<10;i++){rect(i*35,0,2,30,'#20354e',t);rect(i*35+2,13+(i%2)*4,15,9,teamColors[i*2][1],t);}
- if(place===1){rect(126,106,68,30,'#d7a834',t);rect(131,110,58,26,'#ffe475',t);t.fillStyle='#20354e';t.font='bold 17px monospace';t.fillText('1',155,129);blitRunner(t,164,106,teamColors[selected],'victory',0,1.8);for(let i=0;i<22;i++)rect(9+(i*43)%304,34+(i*17)%64,3,5,teamColors[i%20][1],t);}
- else{blitRunner(t,164,126,teamColors[selected],'podium',0,1.9);for(const x of [86,238])blitRunner(t,x,126,teamColors[selected],variant===1?'idle':'podium',0,1.25);}
+ if(place===1){rect(126,106,68,30,'#d7a834',t);rect(131,110,58,26,'#ffe475',t);t.fillStyle='#20354e';t.font='bold 17px monospace';t.fillText('1',155,129);blitRunner(t,164,106,teamColors[selected],'victory',0,2);for(let i=0;i<22;i++)rect(9+(i*43)%304,34+(i*17)%64,3,5,teamColors[i%20][1],t);}
+ else{blitRunner(t,164,126,teamColors[selected],'podium',0,2);for(const x of [86,238])blitRunner(t,x,126,teamColors[selected],variant===1?'idle':'podium',0,1);}
  t.fillStyle='#20354e';t.font='bold 11px monospace';t.fillText(place===1?kind+' WINNER!':'FINISH!  また走ろう',10,141);
  canvas.setAttribute('aria-label',place===1?'選んだたすき色の選手が表彰台で喜ぶ静止画':'選んだたすき色の選手と仲間が完走をねぎらう静止画');
 }
+// Dedicated handoff sprite poses, cached per team. Original PNGs remain untouched.
+const handoffSheets=[];
+function handoffSheet(team){
+ const i=teamColors.indexOf(team);if(handoffSheets[i])return handoffSheets[i];
+ const c=document.createElement('canvas');c.width=192;c.height=48;const g=c.getContext('2d');
+ for(let f=0;f<4;f++){
+  const ox=f*48;g.drawImage(spriteSheets.idle[i],ox,0);
+  // Clear the worn sash: the sash is now carried in the hand, then put on by the receiver.
+  rect(ox+23,26,7,7,'#eff3f3',g);
+  const hand=f<2?[40,27]:[8,27];
+  pixelStroke(g,[[ox+25,25],[ox+(f<2?32:17),29],[ox+hand[0],hand[1]]],5,'#203448');
+  pixelStroke(g,[[ox+25,25],[ox+(f<2?32:17),29],[ox+hand[0],hand[1]]],3,'#f4c18d');
+ }
+ return handoffSheets[i]=c;
+}
 function drawExchange(t){
- const target=$('exchangeCanvas').getContext('2d');target.imageSmoothingEnabled=false;rect(0,0,320,120,'#ceeff8',target);rect(0,91,320,29,'#818997',target);rect(8,14,304,24,'#163750',target);target.fillStyle='#fff';target.font='bold 12px monospace';target.fillText(s.course.goal,20,31);
- const progress=clamp(t/1.6,0,1);blitRunner(target,70+progress*77,108,teamColors[selected],progress<1?'jog':'idle',t*10,1.3);blitRunner(target,177+Math.max(0,t-1.6)*60,108,teamColors[selected],progress<1?'idle':'jog',t*10,1.3);
- rect(154,65,5,21,teamColors[selected][1],target);if(teamColors[selected][2])rect(155,68,2,12,teamColors[selected][2],target);
+ const target=$('exchangeCanvas').getContext('2d');target.imageSmoothingEnabled=false;
+ rect(0,0,320,120,'#ceeff8',target);rect(0,91,320,29,'#818997',target);rect(8,8,304,22,'#163750',target);target.fillStyle='#fff';target.font='bold 12px monospace';target.fillText(s.course.goal+' — たすきリレー',17,24);
+ for(let x=12;x<310;x+=22){rect(x,43,3,34,'#31495d',target);rect(x+3,43,14,9,teamColors[selected][1],target);}
+ rect(157,92,5,28,'#fff7dd',target);
+ const team=teamColors[selected],approach=clamp(t/1.4,0,1),depart=clamp((t-2.4)/1.2,0,1);
+ const giver=45+approach*81,receiver=176+depart*115,feet=116;
+ if(t<1.4)blitRunner(target,giver,feet,team,'jog',t*10,1);
+ else target.drawImage(handoffSheet(team),0,0,48,48,Math.round(giver-28),feet-46,48,48);
+ if(t<2.4)target.drawImage(handoffSheet(team),96,0,48,48,Math.round(receiver-28),feet-46,48,48);
+ else blitRunner(target,receiver,feet,team,'sprint',t*12,1);
+ // A single sash travels from the giver's hand to the receiver's hand.
+ if(t<2.4){const u=clamp((t-1.4)/1,0,1),x=t<1.4?giver+10:138+u*18,y=87-Math.sin(u*Math.PI)*5;
+  rect(x,y,4,19,team[1],target);rect(x+8,y,4,19,team[1],target);rect(x,y+16,12,3,team[1],target);if(team[2])rect(x+1,y+1,1,15,team[2],target);
+ }
+ target.fillStyle='#163750';target.font='bold 10px monospace';target.fillText(t<1.4?'あと少し！':t<2.4?'まかせた！　まかせて！':'たすきが、つながった！',85,39);
 }
 
 let setupStep=0;
@@ -381,7 +415,7 @@ let spriteReady=false,spriteLoading=false;
 const spriteSheets={};
 const spritePalette=[[249,191,28],[255,221,75],[219,160,28]];
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
-function teamSheet(img,team){
+function teamSheet(img,team,key){
  const sheet=document.createElement('canvas');sheet.width=img.naturalWidth;sheet.height=48;
  const target=sheet.getContext('2d',{willReadFrequently:true});
  target.drawImage(img,0,0);const data=target.getImageData(0,0,sheet.width,48),pixels=data.data;
@@ -404,6 +438,12 @@ function teamSheet(img,team){
    }else if(y>=32&&y<=36)col=[[35,54,78],[60,83,110],[20,33,52]][shade];
    pixels[k]=col[0];pixels[k+1]=col[1];pixels[k+2]=col[2];
   }
+ }
+ // Victory frame 0 has a three-pixel left eye and a two-pixel right eye.
+ // Restore the extra column to adjacent skin; both eyes become exactly 2 x 5 pixels.
+ if(key==='victory')for(let y=15;y<20;y++){
+  const dst=(y*sheet.width+21)*4,src=(y*sheet.width+22)*4;
+  for(let c=0;c<4;c++)pixels[dst+c]=pixels[src+c];
  }
  target.putImageData(data,0,0);return sheet;
 }
@@ -465,7 +505,7 @@ async function loadSprites(){
   const ready=await Promise.all(Object.entries(spriteDefs).map(([key,def])=>new Promise((resolve,reject)=>{
    const img=new Image();img.onload=()=>{try{
     if(img.naturalWidth!==def.frames*48||img.naturalHeight!==48)throw Error('Sprite dimensions: '+key);
-    resolve([key,teamColors.map(team=>teamSheet(img,team))]);
+    resolve([key,teamColors.map(team=>teamSheet(img,team,key))]);
    }catch(error){reject(error)}};img.onerror=()=>reject(Error('Sprite load: '+key));
    img.src='./assets/sprites/athletics-v15/'+def.file+'.png';
   })));
@@ -549,17 +589,21 @@ function drawSpectators(co,km,scroll){
  else if(s&&Math.floor(s.elapsed/4)%3===0){rect(24,34,78,16,'#fff6ce');ctx.fillStyle='#24364d';ctx.font='9px monospace';ctx.fillText(['ファイト！','その調子！','たすきをつなげ！'][Math.floor(s.elapsed/12)%3],28,45);}
 }
 function drawVehicles(field){
- if(!s||s.counting||s.elapsed<2||s.done)return;
- const leader=[s.player,...s.ai].filter(r=>r.finishTime===null&&s.elapsed>=r.startAt).sort((a,b)=>b.km-a.km)[0];
- if(leader){const x=field.playerX+(leader.km-s.player.km)*165+57;
+ if(!s||s.done)return;
+ const front=Math.max(...field.entries.map(e=>e.x));
+ {const x=front+64;
   if(x>-35&&x<350){
    // Lead motorcycle on the far road edge, always ahead of the actual leader.
    rect(x-17,84,9,9,'#192b3d');rect(x+7,84,9,9,'#192b3d');rect(x-15,86,5,5,'#c2cfda');rect(x+9,86,5,5,'#c2cfda');rect(x-12,80,25,5,'#f6f9fb');rect(x-3,74,18,8,'#fff');rect(x+11,70,3,9,'#d9ecf5');rect(x-5,66,7,10,'#346293');rect(x-3,60,7,7,'#fff');rect(x+2,63,3,3,'#294258');rect(x+7,76,4,3,'#e25256');
   }
  }
- const phase=s.elapsed%27;
- if(phase>9&&phase<16){const x=355-(phase-9)*62;
-  rect(x-25,68,50,17,'#eaf4f9');rect(x-18,59,34,11,'#f7f9fd');rect(x-14,62,13,7,'#327b9c');rect(x+3,62,10,7,'#327b9c');rect(x-24,79,48,3,'#3d6eaa');rect(x-17,82,8,8,'#203145');rect(x+11,82,8,8,'#203145');rect(x-3,54,3,6,'#203145');rect(x-10,52,15,3,'#e8eff5');rect(x+15,52,8,6,'#26364a');rect(x+21,51,4,8,'#26364a');rect(x+17,58,2,3,'#26364a');ctx.font='7px monospace';ctx.fillStyle='#243751';ctx.fillText('TV',x-5,78);
+ // Parked van uses world position; moving van stays ahead of every runner.
+ const parkedX=280-(s.player.km*260)%1100;
+ const movingX=front+125;
+ for(const [x,parked] of [[parkedX,true],[movingX,false]]){
+ if(x<-35||x>355)continue;
+ ctx.save();if(parked)ctx.translate(0,-24);
+  rect(x-25,68,50,17,'#eaf4f9');rect(x-18,59,34,11,'#f7f9fd');rect(x-14,62,13,7,'#327b9c');rect(x+3,62,10,7,'#327b9c');rect(x-24,79,48,3,'#3d6eaa');rect(x-17,82,8,8,'#203145');rect(x+11,82,8,8,'#203145');rect(x-3,54,3,6,'#203145');rect(x-10,52,15,3,'#e8eff5');rect(x+15,52,8,6,'#26364a');rect(x+21,51,4,8,'#26364a');rect(x+17,58,2,3,'#26364a');ctx.font='7px monospace';ctx.fillStyle='#243751';ctx.fillText('TV',x-5,78);ctx.restore();
  }
 }
 function draw(){
@@ -619,7 +663,7 @@ function drawProgress(){
   if(you){rect(x-2,y-10,5,1,'#ffe500',pc);rect(x-1,y-9,3,1,'#ffe500',pc);rect(x,y-8,1,1,'#ffe500',pc);}
  }
 }
-function frame(t){advanceCountdown(t);const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;if(exchangeTime!==null&&!document.hidden){exchangeTime+=dt;drawExchange(reduceCharacterMotion?1.6:exchangeTime);if(exchangeTime>=2.4&&!reduceCharacterMotion)finishExchange();}let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
+function frame(t){advanceCountdown(t);const dt=Math.min(.1,Math.max(0,(t-last)/1000));last=t;if(exchangeTime!==null&&!document.hidden){exchangeTime+=dt;drawExchange(reduceCharacterMotion?2.1:exchangeTime);if(exchangeTime>=3.8&&!reduceCharacterMotion)finishExchange();}let remaining=dt;while(remaining>0){const step=Math.min(1/60,remaining);tick(step);remaining-=step;}if(t-hudAt>80){renderHUD();hudAt=t;}draw();drawCharacterCards(t);requestAnimationFrame(frame);}
 chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);chooseMode('single');updateTitleSelection();updateSaveUI();loadSprites();requestAnimationFrame(frame);
 })();
 </script>

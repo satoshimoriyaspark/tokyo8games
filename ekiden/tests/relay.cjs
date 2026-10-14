@@ -2,7 +2,7 @@ const {makeEnv,ready}=require('./harness.cjs'),assert=require('assert'),fs=requi
 const getTimes=s=>s.legTimes;
 const click=(e,id)=>e.nodes[id].events.click({target:e.nodes[id]});
 function go(e){e.advance(5001);e.api.advanceCountdown(e.getNow());assert(e.api.state.active,JSON.stringify({mode:e.api.playMode,leg:e.api.state.course.id,counting:e.api.state.counting,elapsed:e.api.state.elapsed,now:e.getNow(),start:e.api.state.countdownStartedAt}));}
-function run(e,passive=false){let n=0;while(e.api.state.active&&n<30000){e.advance(1000/30);if(!passive&&n%9===0)e.api.tap(n%18===0?'left':'right');e.api.tick(1/30);n++;}assert(e.api.state.done);assert(e.api.state.ai.every(r=>r.finishTime!==null));assert.equal(e.api.views[0].times.length,20);assert(e.api.views[0].times.every(t=>Number.isFinite(t)&&t>0));}
+function run(e,passive=false){let n=0;while(e.api.state.active&&n<30000){e.advance(1000/30);if(!passive&&n%9===0)e.api.tap(n%18===0?'left':'right');e.api.tick(1/30);n++;}assert(e.api.state.done);if(![5,10].includes(e.api.state.course.id)){assert(!e.nodes.exchange.hidden);for(const t of [0,1.4,2.1,3.5])e.api.drawExchange(t);e.api.finishExchange();assert(!e.nodes.result.hidden);}assert(e.api.state.ai.every(r=>r.finishTime!==null));assert.equal(e.api.views[0].times.length,20);assert(e.api.views[0].times.every(t=>Number.isFinite(t)&&t>0));}
 (async()=>{
  const e=makeEnv();await ready(e);assert(e.api.ready);
  assert.equal(e.api.courses.length,10);assert.equal(e.api.courses.reduce((n,c)=>n+Math.round(c.km*10),0),2171);
@@ -28,7 +28,7 @@ function run(e,passive=false){let n=0;while(e.api.state.active&&n<30000){e.advan
    const checkpoint=makeEnv(false,e.storage);await ready(checkpoint);checkpoint.api.resumeRelay();assert(checkpoint.api.state.counting);assert.equal(checkpoint.api.state.course.id,4);assert.equal(checkpoint.api.state.player.km,0);
   }
   while(e.api.view<e.api.views.length-1)e.api.resultNext();
-  if(i<9){e.api.resultNext();assert(!e.nodes.exchange.hidden);e.api.finishExchange();assert(e.api.state.counting);}
+  if(i<9){e.api.resultNext();assert(e.api.state.counting);}
  }
  const totals=e.api.relayTotals(),returnTimes=e.api.relayTotals(6,10);
  assert.equal(e.api.views[2].times[1],totals[1]);assert.equal(e.api.views[1].times[1],returnTimes[1]);
