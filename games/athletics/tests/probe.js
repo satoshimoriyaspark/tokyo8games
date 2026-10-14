@@ -39,7 +39,7 @@ window.qa={
    step(1/60,deadline+1);check('ready to run '+ev,mode==='run');
    let n=0;
    while(mode==='run'&&n<10000){
-    if(n%6===0){input(ev===0?(n%12===0?'A':'B'):'A')}
+    if(n%(ev===1?30:6)===0){input(ev===0?(n%12===0?'A':'B'):'A')}
     if(ev===2){const h=12+Math.ceil(Math.max(0,pos-12)/10)*10;if(h-pos<2.4&&h-pos>1&&elapsed-jumpStarted>.7)input('B')}
     step(1/60,performance.now());n++;
    }
