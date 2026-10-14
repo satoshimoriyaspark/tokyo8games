@@ -34,6 +34,11 @@ function run(e,passive=false){let n=0;while(e.api.state.active&&n<30000){e.advan
  assert.equal(e.api.views[2].times[1],totals[1]);assert.equal(e.api.views[1].times[1],returnTimes[1]);
  assert.equal(e.nodes.resultTable.children.length,20);
  
+ // Single first leg can continue as a full relay, retaining all twenty records.
+ const single=makeEnv();await ready(single);single.api.beginRun();single.api.finishStory();go(single);run(single);
+ const first=Array.from(single.api.state.legTimes);assert(single.nodes.retry.textContent.includes('2区'));
+ single.api.resultNext();assert.equal(single.api.state.course.id,2);assert(single.api.state.counting);assert.equal(single.api.playMode,'full');assert.deepEqual(Array.from(single.api.relay.runs[0].times),first);
+ const continued=makeEnv(false,single.storage);await ready(continued);continued.api.resumeRelay();assert.equal(continued.api.state.course.id,2);assert.equal(continued.api.relay.runs.length,1);
  // Replay and new-game confirmations never silently erase a completed save.
  const saved=e.storage.get('tokyo8games.ekiden.relay.v1');e.api.resultNext();assert(!e.nodes.saveChoice.hidden);assert.equal(e.storage.get('tokyo8games.ekiden.relay.v1'),saved);click(e,'cancelOverwrite');assert(e.nodes.saveChoice.hidden);
  for(const mode of ['out','back']){

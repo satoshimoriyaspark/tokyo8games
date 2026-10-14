@@ -153,7 +153,9 @@ function chooseMode(id){
  if(id!=='single')chooseCourse(modeInfo().start);
  updateTitleSelection();
 }
+let pendingContinuation=false;
 function beginRun(overwrite=false){
+ pendingContinuation=false;
  if(playMode!=='single'&&readSave()&&!overwrite){$('saveChoice').hidden=false;$('overwriteRelay').focus();return;}
  $('saveChoice').hidden=true;
  if(playMode!=='single'){
@@ -234,13 +236,20 @@ function renderResult(){
  for(const row of rows){const tr=document.createElement('tr');if(row.team===selected)tr.className='own-result';const rankCell=document.createElement('td');rankCell.textContent=row.rank+'位';const name=document.createElement('th');name.scope='row';const swatch=document.createElement('i');swatch.className='result-swatch';swatch.style.background=teamColors[row.team][2]?'linear-gradient(110deg,'+teamColors[row.team][1]+' 45%,'+teamColors[row.team][2]+' 45% 60%,'+teamColors[row.team][1]+' 60%)':teamColors[row.team][1];name.appendChild(swatch);name.appendChild(document.createTextNode(teamColors[row.team][0]+(row.team===selected?' ★':'')));const time=document.createElement('td');time.textContent=recordClock(row.time);const gap=document.createElement('td');gap.textContent=row.gap?'+'+recordClock(row.gap):'—';for(const n of [rankCell,name,time,gap])tr.appendChild(n);$('resultTable').appendChild(tr);}
  $('resultTableCaption').textContent=v.kind+'順位：全20チーム';
  $('resultTabs').replaceChildren();resultViews.forEach((item,i)=>{const b=document.createElement('button');b.className='quiet'+(i===resultView?' chosen':'');b.textContent=item.kind;b.setAttribute('aria-pressed',String(i===resultView));b.addEventListener('click',()=>{resultView=i;renderResult()});$('resultTabs').appendChild(b)});
- const hasNext=relay&&courseIndex<modeInfo().end;
+ const hasNext=relay?courseIndex<modeInfo().end:courseIndex===0;
  $('retry').textContent=resultView<resultViews.length-1?'次へ：'+resultViews[resultView+1].title:hasNext?(s.course.id===5?'復路へ！ 6区の準備':'次の '+(s.course.id+1)+'区へ'):'もう一度、挑戦！';
  $('selectAgain').textContent='タイトルへ';if(relay){relay.view=resultView;saveRelay();}
  $('resultSave').textContent=relay?(saveError?'保存できませんでした。画面を閉じずに続けてください。':'ここまで自動保存済み。タイトルから再開できます。'):'';
  drawResultScene(own.rank,scene,v.kind);
 }
+function continueFromFirst(overwrite=false){
+ if(readSave()&&!overwrite){pendingContinuation=true;$('result').hidden=true;$('saveChoice').hidden=false;$('overwriteRelay').focus();return;}
+ pendingContinuation=false;$('saveChoice').hidden=true;
+ chooseMode('full');relay={version:1,mode:'full',selected,difficulty:difficultyIndex,legIndex:1,runs:[{id:1,times:s.legTimes.slice(),scene:s.resultScene||0}],stage:'ready',view:0};
+ courseIndex=1;saveRelay();s=null;reset();
+}
 function resultNext(){
+ if(!relay&&courseIndex===0){continueFromFirst();return;}
  if(resultView<resultViews.length-1){resultView++;renderResult();$('resultTitle').focus();return;}
  if(relay&&courseIndex<modeInfo().end){courseIndex++;relay.legIndex=courseIndex;relay.stage='ready';relay.view=0;saveRelay();s=null;reset();return;}
  if(relay){opening();beginRun();}else{s=null;reset();}
@@ -344,8 +353,8 @@ function showStep(i,focus=true){setupStep=i;for(let j=0;j<3;j++){$('step'+j).hid
 function opening(){exchangeTime=null;$('exchange').hidden=true;$('saveChoice').hidden=true;stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定で決定 ✓';updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
 $('enter').addEventListener('click',()=>beginRun());
 $('resumeRelay').addEventListener('click',resumeRelay);
-$('overwriteRelay').addEventListener('click',()=>beginRun(true));
-$('cancelOverwrite').addEventListener('click',()=>{$('saveChoice').hidden=true;$('enter').focus()});
+$('overwriteRelay').addEventListener('click',()=>pendingContinuation?continueFromFirst(true):beginRun(true));
+$('cancelOverwrite').addEventListener('click',()=>{$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else $('enter').focus()});
 $('exchangeSkip').addEventListener('click',finishExchange);
 playModes.forEach(m=>{const b=document.createElement('button');b.textContent=m.label;b.addEventListener('click',()=>chooseMode(m.id));$('playModes').appendChild(b)});
 $('toTitle').addEventListener('click',opening);
@@ -372,7 +381,7 @@ document.addEventListener('keydown',e=>{if(e.repeat||!s||(!s.active&&!s.counting
 document.addEventListener('keydown',e=>{
  const panel=['result','exchange','saveChoice'].map($).find(n=>!n.hidden);if(!panel)return;
  if(e.key==='Tab'){const items=Array.from(panel.querySelectorAll('button:not([disabled]),summary'));if(!items.length)return;const i=items.indexOf(document.activeElement),next=e.shiftKey?(i<=0?items.length-1:i-1):(i+1)%items.length;e.preventDefault();items[next].focus();}
- else if(e.key==='Escape'){e.preventDefault();if(panel===$('saveChoice')){$('saveChoice').hidden=true;$('enter').focus()}else opening();}
+ else if(e.key==='Escape'){e.preventDefault();if(panel===$('saveChoice')){$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else $('enter').focus()}else opening();}
 });
 document.addEventListener('visibilitychange',()=>{if(storyPlaying)$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';if(document.hidden&&s&&(s.active||s.counting)&&!s.paused)pause()});
 function aiEffort(r){
