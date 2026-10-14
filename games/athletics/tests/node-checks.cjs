@@ -19,11 +19,13 @@ async function load(entry,probe){
  vm.createContext(context);
  const script=html.split('<script>')[1].split('</script>')[0].replace('render();requestAnimationFrame(loop);',fs.readFileSync(probe,'utf8')+'\nrender();');
  vm.runInContext(script,context);
- for(let i=0;i<100;i++){if((context.longJumpQA||context.javeQA||context.qa||context.motionQA)?.ready())return context;await new Promise(r=>setTimeout(r,20));}
+ for(let i=0;i<100;i++){if((context.timeQA||context.longJumpQA||context.javeQA||context.qa||context.motionQA)?.ready())return context;await new Promise(r=>setTimeout(r,20));}
  throw Error('PNG loading failed');
 }
 (async()=>{
  const output=path.join(__dirname,'evidence');fs.mkdirSync(output,{recursive:true});
+ const time=await load(path.join(game,'index.html'),path.join(__dirname,'time-probe.js'));
+ console.log('Time conversion PASS',time.timeQA.checks().count);
  const current=await load(path.join(game,'index.html'),path.join(__dirname,'javeball-probe.js'));
  const jump=await load(path.join(game,'index.html'),path.join(__dirname,'long-jump-probe.js'));
  const jumpResult=jump.longJumpQA.checks();console.log('Long jump PASS',jumpResult.count);
@@ -49,7 +51,9 @@ async function load(entry,probe){
  const old=await load(path.join(__dirname,'baseline/index.html'),path.join(__dirname,'probe.js'));
  const updated=await load(path.join(game,'index.html'),path.join(__dirname,'probe.js'));
  const before=old.qa.checks(),after=updated.qa.checks();
- if(JSON.stringify(before.snapshots)!==JSON.stringify(after.snapshots))throw Error('Game rules regression');
+ const rulesOnly=rows=>rows.map(({display,...rules})=>rules);
+ if(JSON.stringify(rulesOnly(before.snapshots))!==JSON.stringify(rulesOnly(after.snapshots)))throw Error('Game rules regression');
+ console.log('Displayed records',after.snapshots.filter(r=>r.display).map(r=>r.display));
  console.log('Regression PASS',after.checks,'race records, points and tournament totals match baseline');
  const motion=await load(path.join(game,'index.html'),path.join(__dirname,'motion-probe.js'));
  console.log('Running/start PASS',motion.motionQA.checks().count);

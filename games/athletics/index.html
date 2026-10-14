@@ -139,11 +139,16 @@ const guides=[
 ['黄色い踏切線でジャンプ！','A連打で助走。踏切線の直前でBを押します。','黄色い線を越えるとファウル。3回挑戦できます。','助走','踏切'],
 ['角度を決めて投げよう！','A連打で助走。Bを押し続けて角度を調整し、離して投げます。','角度42°付近が狙い目。3回挑戦できます。','助走','長押し→離す']
 ];
-function guide(){const g=guides[selected];$('#help').textContent='操作：A＝'+g[3]+' ／ B＝'+g[4];$('#aLabel').textContent=g[3];$('#bLabel').textContent=g[4];$('#tutorialTitle').textContent=events[selected][0]+' の遊び方';$('#tutorialText').textContent=g[1];$('#tutorialHint').textContent=g[2]}
+function guide(){const g=guides[selected];$('#help').textContent='操作：A＝'+g[3]+' ／ B＝'+g[4];$('#aLabel').textContent=g[3];$('#bLabel').textContent=g[4];$('#tutorialTitle').textContent=events[selected][0]+' の遊び方';$('#tutorialText').textContent=g[1];$('#tutorialHint').textContent=g[2]+(selected<3?' ※タイムはゲーム内の換算記録です。':'')}
 function showGuide(){$('#resultPanel').hidden=true;ceremonyTime=0;mode='tutorial';guide();$('#tutorial').hidden=false;message('操作説明を確認してください');$('#start').textContent='START'}
 function begin(){ if(!spriteReady)return;$('#resultPanel').hidden=true;$('#tutorial').hidden=true;cpuRecords=[];resetRun();unlockStartAudio().then(()=>{if(selected<3&&mode==='ready'&&startPhase===0)playStartCue(0)});attempt=1;records=[];mode='ready';deadline=performance.now()+3000;message(selected<3?'On your marks — 位置について':'READY ...')}
 $('#tutorialGo').onclick=begin;
-const label=(i,v)=>events[i][2]==='time'?v.toFixed(2)+'秒':v.toFixed(2)+'m';
+// Bests and scoring retain simulation seconds (v1); convert only at presentation.
+// Distance-weighted offsets start at zero and keep the virtual clock continuous.
+const RACE_CLOCKS=[[12,.2],[390,4],[20,.5]];
+function raceSeconds(i,seconds,progress=1){const [course,rate]=RACE_CLOCKS[i];return course*lim(progress,0,1)+seconds*rate}
+function timeText(i,seconds){const ticks=Math.round(seconds*100);return i===1?Math.floor(ticks/6000)+':'+(Math.floor(ticks/100)%60).toString().padStart(2,'0')+'.'+(ticks%100).toString().padStart(2,'0'):(ticks/100).toFixed(2)}
+const label=(i,v)=>events[i][2]==='time'?timeText(i,raceSeconds(i,v))+(i===1?'':'秒'):v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
 function resetRun(){startPhase=0;resetRunnerMotion();jumpStarted=-10;longJumpAge=0;longJumpOrigin=0;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
 function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';resetRun();$('#resultPanel').hidden=true;$('#tutorial').hidden=true;render();message(events[i][0]+' を選択しました')}
@@ -379,7 +384,7 @@ function drawJaveField(){
  if(mode!=='between')txt('助走 '+Math.floor(pos)+' / 40m',8,305,10,'#fff4d3');
 }
 function drawFrontSprite(x,y,kind='podium',frame=0,cpuIndex=-1){blitSprite(x,y,kind==='victory'?4:5,kind==='victory'?frame:0,cpuIndex,false);}
-function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+elapsed.toFixed(2),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
+function draw(t){rect(0,0,384,320,'#24384a');rect(0,35,384,42,'#365e4d');for(let i=0;i<70;i++)rect(i*43%384,41+i%4*8,3,3,['#ffdf74','#d0ddeb','#e99a8d'][i%3]);for(let i=0;i<4;i++){rect(0,77+i*53,384,52,i%2?'#9b4038':'#b34e43');rect(0,128+i*53,384,2,'#e9c69f')}rect(0,0,384,34,'#101927');txt(events[selected][0],8,13,12,'#ffdb65');txt('TIME '+(selected<3?timeText(selected,raceSeconds(selected,Math.round(elapsed*100)/100,(['result','ceremony'].includes(mode)?1:pos/(selected===1?150:selected===2?110:100)))):elapsed.toFixed(2)),8,27);txt('SPD '+Math.floor(spd*10),272,13,10);if(selected===1)txt('STA '+Math.floor(sta),273,27,10,'#7be2a8');if(selected===4)txt('ANGLE '+Math.floor(angle),260,27,10,'#ffdb65');
 let goal=selected===1?150:selected===2?110:selected>=3?40:100;rect(8,308,368,7,'#405366');rect(8,308,368*lim(pos/goal,0,1),7,'#75df9c');txt(selected===1?Math.floor(pos*10)+'/1500m':Math.floor(pos)+'/'+goal+'m',8,303,10);
 let scale=selected===1?10:selected===2?8:6,follow=selected===1?22:selected===2?27:35,cam=selected>=3?0:Math.max(0,pos-follow),x=selected>=3?32+pos*7.1-14:54+(pos-cam)*scale-14;
 if(selected<3){let px=w=>54+(w-cam)*scale,st=px(0),ed=px(goal);if(st>=0&&st<=384){rect(st,77,4,212,'#f9f9f9');rect(st+1,77,2,212,'#fff4c9');txt('START',Math.max(2,st-42),91,10,'#ffdb65')}if(ed>=0&&ed<=384){rect(ed,77,6,212,'#f9f9f9');for(let z=0;z<20;z++)rect(ed,77+z*11,6,Math.min(11,212-z*11),z%2?'#101927':'#fff');txt('GOAL',Math.min(351,ed-28),87,11,'#ffdc64')}rivals.forEach((r,j)=>{let rx=px(r.dist)-14;if(rx>-24&&rx<398){drawRunnerSprite(rx,82+j*53,r.dist,mode,j,j);txt('CPU'+(j+1),Math.max(0,rx-8),80+j*53,9,'#fff')}});txt('YOU '+currentRank+'/4',245,67,12,'#ffdb65')}
