@@ -23,4 +23,4 @@ window.timeQA={ready:()=>spriteReady,checks(){
  $('#start').click();check('retry bypasses tutorial',mode==='ready'&&$('#tutorial').hidden);
  mode='result';syncUI();$('#menuBack').click();check('return selects events',mode==='menu'&&!$('#events').hidden);
  return {count:passed.length,passed};
-},spurt(){selected=1;resetRun();showOpening('game');mode='run';pos=120;elapsed=27;spd=10;sta=55;input('B');syncUI();draw(1000)},scene(i=0){selected=i;resetRun();showOpening('game');pos=i===1?150:i===2?110:100;elapsed=i===0?20:i===1?33.63:16;finishDashRecord=elapsed;mode='finishDash';syncUI();draw(1000);return $('#screen')},result(i=0){this.scene(i);finish(elapsed);mode='result';$('#resultPanel').hidden=false;syncUI();draw(1000)}};
+},spurt(){selected=1;guide();resetRun();showOpening('game');mode='run';pos=120;elapsed=27;spd=10;sta=55;input('B');syncUI();draw(1000)},scene(i=0){selected=i;guide();resetRun();showOpening('game');pos=i===1?150:i===2?110:100;elapsed=i===0?20:i===1?33.63:16;finishDashRecord=elapsed;mode='finishDash';syncUI();draw(1000);return $('#screen')},result(i=0){this.scene(i);finish(elapsed);$('#skipCeremony').click();syncUI();draw(1000)}};
