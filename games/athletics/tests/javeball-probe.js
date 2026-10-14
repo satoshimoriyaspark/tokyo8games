@@ -37,8 +37,8 @@ window.javeQA={
   this.scene('run');spd=0;step(1/60,0);draw(0);assert('stopped run-up returns to still carrying pose',spriteDebug.last[0].runFrame===undefined);
   for(const [speed,deg,origin] of [[0,42,0],[12.5,42,40],[8,20,10]]){
    this.start();spd=speed;angle=deg;pos=origin;finishAttempt();
-   const record=records[0],expected=lim(4+speed*3.6*Math.max(0,1-Math.abs(deg-42)/60),0,55);
-   assert('unchanged scoring formula '+speed,record===expected);
+   const record=records[0],expected=typeof throwDistance==='function'?throwDistance(speed,deg):lim(4+speed*3.6*Math.max(0,1-Math.abs(deg-42)/60),0,55);
+   assert('angle distance formula '+speed,record===expected);
    const duration=javeFlightDuration();let visible=true,forward=true,previous=-Infinity;
    for(let i=0;i<=120;i++){
     throwAge=duration*i/120;const v=javeView(),screen=v.ball.x-v.camera;

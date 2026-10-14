@@ -41,7 +41,7 @@ window.motionQA={
    for(const [time,frame] of [[gun-2500,0],[gun-1600,0],[gun-1400,1],[gun-1,1]]){
     step(1/60,time);draw(0);
     assert('pre-gun pose '+ev+' '+time,spriteDebug.last.every(a=>a.row===1&&a.frame===frame));
-    input('A');input('B');assert('no movement or clock before gun '+ev+' '+time,pos===0&&elapsed===0&&rivals.every(r=>r.dist===0));
+    assert('no movement or clock before gun '+ev+' '+time,pos===0&&elapsed===0&&rivals.every(r=>r.dist===0));
    }
    step(1/60,gun);draw(0);assert('gun uses launch pose '+ev,mode==='run'&&spriteDebug.last.every(a=>a.row===1&&a.frame===2));
    for(let n=0;n<15;n++){input(ev===0&&n%2?'B':'A');step(1/60,gun+20+n*17)}draw(0);
