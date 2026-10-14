@@ -61,13 +61,13 @@ test('missing sprite cannot block feedback',()=>{
  const e=env();e.element.querySelector('.keeper-sprite img').naturalWidth=0;let finished=0;
  const c=e.api.create(e.element,{ok:false,onComplete:()=>finished++});c.begin();assert.equal(finished,1);
 });
-test('question bank retains 200 valid unique questions and inline scripts parse',()=>{
+test('question bank contains 500 valid unique questions and inline scripts parse',()=>{
  const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
  const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
  scripts.forEach(s=>new vm.Script(s));
  const ctx=vm.createContext({window:{}});vm.runInContext(scripts[0],ctx);
  const bank=ctx.window.QUIZ_BANK;
- assert.equal(bank.length,200);assert.equal(new Set(bank.map(q=>q.id)).size,200);
+ assert.equal(bank.length,500);assert.equal(new Set(bank.map(q=>q.id)).size,500);
  for(const q of bank){assert.equal(q.choices.length,4);assert.equal(new Set(q.choices).size,4);assert.ok(q.choices.includes(q.answer));}
  const {api}=env();
  const atlas=JSON.parse(fs.readFileSync(path.join(root,'games/sqz/assets/characters-v3/frames.json')));
@@ -220,4 +220,47 @@ test('boo loudness meets the balance target with headroom at the unchanged game 
  const stats=JSON.parse(result.stderr.match(/\{[\s\S]*"input_i"[\s\S]*?\}/)[0]);
  assert.ok(+stats.input_i>=-16&&+stats.input_i<=-13,'boo should stay between -16 and -13 LUFS');
  assert.ok(+stats.input_tp<=-1.5,'boo keeps at least 1.5 dB true-peak headroom before game gain');
+});
+
+test('deep-dive themes offer twenty unique sourced questions and honor difficulty',()=>{
+ const g=game();
+ for(const cat of ['jhistory','jscorers','jforeign','japanhistory']){
+  const qs=g.run(`BANK.filter(q=>q.category==='${cat}')`);
+  assert.equal(qs.length,20);assert.equal(new Set(qs.map(q=>q.text)).size,20);
+  for(const q of qs){assert.equal(q.checkedAt,'2026-10-15');assert.match(q.source,/^https:\/\//);assert.ok(q.explanation&&q.period);}
+  for(const d of [1,2,3]){
+   const ids=g.run(`selectQuestions(${d},'${cat}')`);
+   assert.equal(ids.length,d===1?0:10);
+   assert.equal(new Set(ids).size,ids.length);
+   assert.ok(ids.every(id=>qs.some(q=>q.id===id&&q.level<=d)));
+  }
+ }
+});
+
+// The beginner cup needs 30 distinct non-flag questions across its three rounds.
+test('beginner pool excludes deep trivia and completes a cup with flags off',()=>{
+ const g=game();g.run('P.flags=false');
+ const qs=g.run('BANK.filter(q=>q.level===1)');
+ assert.equal(qs.length,174);
+ assert.ok(qs.every(q=>!q.id.startsWith('deep-')&&(q.category!=='clubs'||q.id.startsWith('pack500-'))&&!/^(pl-player-|j1-mvp-)/.test(q.id)));
+ const used=[];
+ for(let round=0;round<3;round++){
+  const ids=g.run(`selectQuestions(1,'all',${JSON.stringify(used)})`);
+  assert.equal(ids.length,10);assert.ok(ids.every(id=>!used.includes(id)));used.push(...ids);
+ }
+ assert.equal(new Set(used).size,30);
+ g.run("category='jhistory';diff=1;training()");
+ assert.doesNotMatch(g.node('#app').innerHTML,/data-cat="jhistory"/);
+});
+
+// Guard the expansion's beginner balance and source metadata.
+test('500 pack adds 220 distinct sourced questions, with 131 beginner additions',()=>{
+ const g=game();const qs=g.run("BANK.filter(q=>q.id.startsWith('pack500-'))");
+ assert.equal(qs.length,220);assert.equal(qs.filter(q=>q.level===1).length,131);
+ assert.equal(new Set(qs.map(q=>q.text)).size,220);
+ for(const q of qs){assert.ok(q.explanation&&q.period);assert.equal(q.status,'verified');assert.match(q.source,/^https:\/\//);}
+ for(const cat of ['rules','players','clubs','euro']) {
+  assert.equal(qs.filter(q=>q.category===cat).length,cat==='euro'?40:60);
+  for(const d of [1,2,3]){const ids=g.run(`selectQuestions(${d},'${cat}')`);assert.ok(ids.every(id=>g.run(`BANK.find(q=>q.id==='${id}').level`)<=d));}
+ }
 });
