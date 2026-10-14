@@ -121,7 +121,770 @@ extraFlags.forEach(([iso,a,l],i)=>{
  add(`flag-${iso}`,'flags',l,'この国旗の国はどこ？',a,rotate(flagPool,(i*3+5)%flagPool.length),`${a}の国旗だよ。色の並びや、星・紋章などの模様にも注目しよう。`,'https://www.mofa.go.jp/mofaj/kids/kokki/list.html','国旗（2026-10-12確認）',emoji);
 });
 Q.slice(extraStart).forEach(q=>q.checkedAt='2026-10-12');
-if(Q.length!==200||new Set(Q.map(q=>q.id)).size!==200)throw Error('Question bank validation failed');
+// Japan football deep-dive pack; independent review date on each question.
+Q.push(...[
+ {
+  "id": "deep-jhistory-01",
+  "category": "jhistory",
+  "level": 1,
+  "period": "1993",
+  "text": "1993年のJリーグ開幕時、参加クラブはいくつだった？",
+  "answer": "10クラブ",
+  "choices": [
+   "10クラブ",
+   "8クラブ",
+   "12クラブ",
+   "16クラブ"
+  ],
+  "explanation": "最初は10クラブ。1994年には平塚と磐田が加わり、12クラブになった。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-02",
+  "category": "jhistory",
+  "level": 1,
+  "period": "1993",
+  "text": "1993年シーズン、Jリーグの初代年間王者になったクラブは？",
+  "answer": "ヴェルディ川崎",
+  "choices": [
+   "ヴェルディ川崎",
+   "鹿島アントラーズ",
+   "横浜マリノス",
+   "清水エスパルス"
+  ],
+  "explanation": "鹿島は前半のステージ王者。年間王者はチャンピオンシップを制したヴェルディ川崎だった。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-03",
+  "category": "jhistory",
+  "level": 2,
+  "period": "1994",
+  "text": "1994年にJリーグへ新たに加わった2クラブの組み合わせは？",
+  "answer": "ベルマーレ平塚とジュビロ磐田",
+  "choices": [
+   "ベルマーレ平塚とジュビロ磐田",
+   "柏レイソルとセレッソ大阪",
+   "京都パープルサンガと福岡ブルックス",
+   "ヴィッセル神戸とコンサドーレ札幌"
+  ],
+  "explanation": "平塚と磐田が1994年に参入。柏とC大阪は翌1995年に加わった。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-04",
+  "category": "jhistory",
+  "level": 2,
+  "period": "1999",
+  "text": "J1・J2の2部制が始まり、最初のJ2リーグが行われた年は？",
+  "answer": "1999年",
+  "choices": [
+   "1999年",
+   "1995年",
+   "1997年",
+   "2001年"
+  ],
+  "explanation": "1999年のJ2は10クラブでスタート。各クラブが36試合を戦った。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-05",
+  "category": "jhistory",
+  "level": 2,
+  "period": "1999",
+  "text": "1999年、最初のJ2リーグで優勝したクラブは？",
+  "answer": "川崎フロンターレ",
+  "choices": [
+   "川崎フロンターレ",
+   "FC東京",
+   "コンサドーレ札幌",
+   "大分トリニータ"
+  ],
+  "explanation": "初代J2王者は川崎。2位のFC東京とともに翌年のJ1へ進んだ。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-06",
+  "category": "jhistory",
+  "level": 2,
+  "period": "1992",
+  "text": "リーグ戦開幕より先に行われた1992年のJリーグカップ。初代王者は？",
+  "answer": "ヴェルディ川崎",
+  "choices": [
+   "ヴェルディ川崎",
+   "清水エスパルス",
+   "鹿島アントラーズ",
+   "名古屋グランパスエイト"
+  ],
+  "explanation": "決勝は清水との対戦。三浦知良の得点でヴェルディ川崎が勝った。",
+  "source": "https://www.jleague.jp/sp/special/heisei_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-07",
+  "category": "jhistory",
+  "level": 3,
+  "period": "1993",
+  "text": "1993年のJリーグ、前半のサントリーシリーズを制したクラブは？",
+  "answer": "鹿島アントラーズ",
+  "choices": [
+   "鹿島アントラーズ",
+   "ヴェルディ川崎",
+   "横浜マリノス",
+   "サンフレッチェ広島"
+  ],
+  "explanation": "鹿島が前半、ヴェルディ川崎が後半のステージを制した。ステージ優勝と年間優勝は別の記録だ。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-08",
+  "category": "jhistory",
+  "level": 3,
+  "period": "1996",
+  "text": "1996年のJリーグで採用された大会方式は？",
+  "answer": "1ステージの2回戦総当たり",
+  "choices": [
+   "1ステージの2回戦総当たり",
+   "2ステージ制とチャンピオンシップ",
+   "全試合ノックアウト方式",
+   "東西2組のリーグ戦と決勝"
+  ],
+  "explanation": "16クラブが各30試合を戦った年。前後の年とは異なり、1ステージで年間順位を決めた。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-09",
+  "category": "jhistory",
+  "level": 3,
+  "period": "2002",
+  "text": "2002年、J1の両ステージを制して完全優勝したクラブは？",
+  "answer": "ジュビロ磐田",
+  "choices": [
+   "ジュビロ磐田",
+   "鹿島アントラーズ",
+   "横浜F・マリノス",
+   "ガンバ大阪"
+  ],
+  "explanation": "磐田が前半・後半ともに優勝。高原直泰はMVPと得点王にも輝いた。",
+  "source": "https://www.jleague.jp/sp/special/heisei_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jhistory-10",
+  "category": "jhistory",
+  "level": 3,
+  "period": "1994",
+  "text": "1994年のJリーグ、前半のサントリーシリーズを制したクラブは？",
+  "answer": "サンフレッチェ広島",
+  "choices": [
+   "サンフレッチェ広島",
+   "ヴェルディ川崎",
+   "鹿島アントラーズ",
+   "横浜マリノス"
+  ],
+  "explanation": "広島が前半を制した一方、年間王者はヴェルディ川崎。年間優勝だけでは見えないステージ制の歴史だ。",
+  "source": "https://www.jleague.jp/corporate/about_competitions/tournament_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-01",
+  "category": "jscorers",
+  "level": 1,
+  "period": "1993",
+  "text": "1993年、Jリーグ初代得点王に輝いた横浜マリノスの選手は？",
+  "answer": "ラモン・ディアス",
+  "choices": [
+   "ラモン・ディアス",
+   "三浦知良",
+   "ジーコ",
+   "福田正博"
+  ],
+  "explanation": "ディアスは32試合で28得点。初年度の得点王を獲得した。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-02",
+  "category": "jscorers",
+  "level": 1,
+  "period": "1998",
+  "text": "1998年、ジュビロ磐田で36得点を挙げて得点王になった選手は？",
+  "answer": "中山雅史",
+  "choices": [
+   "中山雅史",
+   "高原直泰",
+   "前田遼一",
+   "三浦知良"
+  ],
+  "explanation": "中山は27試合で36得点。2000年にも得点王になっている。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-03",
+  "category": "jscorers",
+  "level": 2,
+  "period": "1995",
+  "text": "1995年、32得点でJリーグ得点王になった浦和レッズの選手は？",
+  "answer": "福田正博",
+  "choices": [
+   "福田正博",
+   "三浦知良",
+   "中山雅史",
+   "武田修宏"
+  ],
+  "explanation": "福田は50試合で32得点。1993年のディアス、1994年のオッツェに続く得点王だった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-04",
+  "category": "jscorers",
+  "level": 2,
+  "period": "2013〜2015",
+  "text": "2013年から2015年まで、3年続けてJ1得点王になった選手は？",
+  "answer": "大久保嘉人",
+  "choices": [
+   "大久保嘉人",
+   "佐藤寿人",
+   "前田遼一",
+   "豊田陽平"
+  ],
+  "explanation": "川崎フロンターレで26得点、18得点、23得点と、3シーズン連続で得点王になった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-05",
+  "category": "jscorers",
+  "level": 2,
+  "period": "2006",
+  "text": "2006年のJ1で、26得点ずつを挙げて得点王を分け合った2人は？",
+  "answer": "ワシントンとマグノ・アウベス",
+  "choices": [
+   "ワシントンとマグノ・アウベス",
+   "ジュニーニョとウェズレイ",
+   "アラウージョとエメルソン",
+   "マルキーニョスとケネディ"
+  ],
+  "explanation": "浦和のワシントンとG大阪のマグノ・アウベスが同点。得点王が1人とは限らない。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-06",
+  "category": "jscorers",
+  "level": 2,
+  "period": "2010",
+  "text": "2010年のJ1で、前田遼一と17得点で並び、得点王を分け合った選手は？",
+  "answer": "ケネディ",
+  "choices": [
+   "ケネディ",
+   "ジュニーニョ",
+   "マルキーニョス",
+   "エジミウソン"
+  ],
+  "explanation": "名古屋のケネディが磐田の前田と同時受賞。ケネディは2011年にも得点王になった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-07",
+  "category": "jscorers",
+  "level": 3,
+  "period": "1994",
+  "text": "1994年のJリーグ得点王「オッツェ」は、どのクラブに所属していた？",
+  "answer": "ジェフユナイテッド市原",
+  "choices": [
+   "ジェフユナイテッド市原",
+   "横浜マリノス",
+   "浦和レッズ",
+   "サンフレッチェ広島"
+  ],
+  "explanation": "オッツェは市原で40試合30得点。当時のクラブ名は「市原」だった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-08",
+  "category": "jscorers",
+  "level": 3,
+  "period": "1999",
+  "text": "1999年、セレッソ大阪で24得点を挙げてJ1得点王になった選手は？",
+  "answer": "黄善洪（ファン・ソンホン）",
+  "choices": [
+   "黄善洪（ファン・ソンホン）",
+   "崔龍洙（チェ・ヨンス）",
+   "柳想鐵（ユ・サンチョル）",
+   "洪明甫（ホン・ミョンボ）"
+  ],
+  "explanation": "黄善洪は25試合で24得点。C大阪のストライカーとして得点王になった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-09",
+  "category": "jscorers",
+  "level": 3,
+  "period": "2001",
+  "text": "2001年、コンサドーレ札幌からJ1得点王に輝いた選手は？",
+  "answer": "ウィル",
+  "choices": [
+   "ウィル",
+   "エメルソン",
+   "ウェズレイ",
+   "エムボマ"
+  ],
+  "explanation": "ウィルは26試合で24得点。当時の所属はコンサドーレ札幌だった。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jscorers-10",
+  "category": "jscorers",
+  "level": 3,
+  "period": "2003",
+  "text": "2003年、名古屋グランパスエイトで22得点を挙げてJ1得点王になった選手は？",
+  "answer": "ウェズレイ",
+  "choices": [
+   "ウェズレイ",
+   "ストイコビッチ",
+   "ケネディ",
+   "マルケス"
+  ],
+  "explanation": "ウェズレイが27試合で22得点。当時のクラブ名は「名古屋グランパスエイト」。",
+  "source": "https://aboutj.jleague.jp/corporate/pressrelease/article/15361",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-01",
+  "category": "jforeign",
+  "level": 1,
+  "period": "1993",
+  "text": "1993年、鹿島のJリーグ開幕戦でハットトリックを達成した選手は？",
+  "answer": "ジーコ",
+  "choices": [
+   "ジーコ",
+   "ドゥンガ",
+   "ジョルジーニョ",
+   "ビスマルク"
+  ],
+  "explanation": "ジーコは開幕戦で3得点。のちに2002〜2006年の日本代表監督も務めた。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-02",
+  "category": "jforeign",
+  "level": 1,
+  "period": "2010・2018",
+  "text": "2010年W杯決勝で決勝点を決め、2018年に神戸へ加入したスペインの選手は？",
+  "answer": "アンドレス・イニエスタ",
+  "choices": [
+   "アンドレス・イニエスタ",
+   "シャビ",
+   "ダビド・シルバ",
+   "セスク・ファブレガス"
+  ],
+  "explanation": "イニエスタはスペインの初優勝を決めるゴールを記録。その後、ヴィッセル神戸でプレーした。",
+  "source": "https://www.jleague.jp/j-tano/2744/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-03",
+  "category": "jforeign",
+  "level": 2,
+  "period": "1994〜2010",
+  "text": "選手として名古屋で活躍し、監督として2010年のJ1優勝に導いた人物は？",
+  "answer": "ドラガン・ストイコビッチ",
+  "choices": [
+   "ドラガン・ストイコビッチ",
+   "アーセン・ベンゲル",
+   "ズデンコ・ベルデニック",
+   "ネルシーニョ"
+  ],
+  "explanation": "ストイコビッチは名古屋で選手と監督を経験。「ピクシー」の愛称でも知られる。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-04",
+  "category": "jforeign",
+  "level": 2,
+  "period": "1994〜2006",
+  "text": "浦和でDFとしてプレーし、監督として2006年のJ1優勝に導いた人物は？",
+  "answer": "ギド・ブッフバルト",
+  "choices": [
+   "ギド・ブッフバルト",
+   "ホルガー・オジェック",
+   "ハンス・オフト",
+   "ゲルト・エンゲルス"
+  ],
+  "explanation": "ブッフバルトは1994年から浦和でプレー。2004〜2006年には監督を務めた。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-05",
+  "category": "jforeign",
+  "level": 2,
+  "period": "1990・1994〜1997",
+  "text": "1990年W杯の得点王で、1994〜1997年にジュビロ磐田でプレーした選手は？",
+  "answer": "サルヴァトーレ・スキラッチ",
+  "choices": [
+   "サルヴァトーレ・スキラッチ",
+   "ロベルト・バッジョ",
+   "ジャンルカ・ヴィアリ",
+   "ジュゼッペ・シニョーリ"
+  ],
+  "explanation": "スキラッチは1990年大会で6得点。日本では「トト」の愛称でも親しまれた。",
+  "source": "https://www.jleague.jp/j-tano/2744/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-06",
+  "category": "jforeign",
+  "level": 2,
+  "period": "2014〜2015",
+  "text": "ウルグアイ代表のフォルランが、2014〜2015年に所属したJクラブは？",
+  "answer": "セレッソ大阪",
+  "choices": [
+   "セレッソ大阪",
+   "ガンバ大阪",
+   "ヴィッセル神戸",
+   "名古屋グランパス"
+  ],
+  "explanation": "フォルランは2014年から2015年夏までC大阪に在籍した。",
+  "source": "https://www.jleague.jp/j-tano/2744/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-07",
+  "category": "jforeign",
+  "level": 3,
+  "period": "1993〜2003",
+  "text": "ヴェルディ川崎、鹿島、神戸の順に所属したブラジル人MFは？",
+  "answer": "ビスマルク",
+  "choices": [
+   "ビスマルク",
+   "ジーコ",
+   "ジョルジーニョ",
+   "レオナルド"
+  ],
+  "explanation": "ビスマルクは1993〜1996年にV川崎、1997〜2001年に鹿島、2003年に神戸でプレーした。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-08",
+  "category": "jforeign",
+  "level": 3,
+  "period": "2009〜2018",
+  "text": "広島で3度のJ1優勝に貢献し、2018年には湘南でルヴァンカップを獲得した選手は？",
+  "answer": "ミキッチ",
+  "choices": [
+   "ミキッチ",
+   "ムジリ",
+   "ストヤノフ",
+   "ダヴィ"
+  ],
+  "explanation": "ミキッチは2009〜2017年に広島、2018年に湘南に所属したMF。複数のクラブでタイトルを手にした。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-09",
+  "category": "jforeign",
+  "level": 3,
+  "period": "2022",
+  "text": "2022年W杯のチュニジア戦で決勝点を決めたデューク。当時の所属Jクラブは？",
+  "answer": "ファジアーノ岡山",
+  "choices": [
+   "ファジアーノ岡山",
+   "清水エスパルス",
+   "FC町田ゼルビア",
+   "アルビレックス新潟"
+  ],
+  "explanation": "ミッチェル・デュークは岡山所属のオーストラリア代表として出場。所属は大会当時のものだ。",
+  "source": "https://www.jleague.jp/j-tano/2744/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-jforeign-10",
+  "category": "jforeign",
+  "level": 3,
+  "period": "2019〜2021",
+  "text": "2019〜2021年に神戸でプレーし、クラブ初の天皇杯優勝に貢献したDFは？",
+  "answer": "トーマス・フェルマーレン",
+  "choices": [
+   "トーマス・フェルマーレン",
+   "ダンクレー",
+   "マテウス・トゥーレル",
+   "マウリシオ"
+  ],
+  "explanation": "フェルマーレンは神戸の守備を支えた。2019年度の天皇杯はクラブ初タイトルだった。",
+  "source": "https://www.jleague.jp/j-tano/2898/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-01",
+  "category": "japanhistory",
+  "level": 1,
+  "period": "1997",
+  "text": "1997年の「ジョホールバルの歓喜」。W杯初出場を決めるゴールを挙げた選手は？",
+  "answer": "岡野雅行",
+  "choices": [
+   "岡野雅行",
+   "中山雅史",
+   "三浦知良",
+   "呂比須ワグナー"
+  ],
+  "explanation": "延長後半、中田英寿のシュートのこぼれ球を岡野が押し込み、イランに3対2で勝った。",
+  "source": "https://www.jfa.jp/samuraiblue/worldcup_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-02",
+  "category": "japanhistory",
+  "level": 1,
+  "period": "1993",
+  "text": "1993年の「ドーハの悲劇」。日本が最終戦で2対2と引き分けた相手は？",
+  "answer": "イラク",
+  "choices": [
+   "イラク",
+   "イラン",
+   "サウジアラビア",
+   "韓国"
+  ],
+  "explanation": "日本は終盤まで2対1とリードしていたが、追加時間に追いつかれ、W杯出場を逃した。",
+  "source": "https://www.jfa.jp/samuraiblue/worldcup_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-03",
+  "category": "japanhistory",
+  "level": 2,
+  "period": "1968",
+  "text": "1968年のメキシコ五輪で7得点を挙げ、得点王になった日本の選手は？",
+  "answer": "釜本邦茂",
+  "choices": [
+   "釜本邦茂",
+   "杉山隆一",
+   "八重樫茂生",
+   "森孝慈"
+  ],
+  "explanation": "釜本は7得点で得点王。日本はこの大会で銅メダルを獲得した。",
+  "source": "https://www.jfa.jp/national_team/jerseys/timeline.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-04",
+  "category": "japanhistory",
+  "level": 2,
+  "period": "1992",
+  "text": "1992年アジアカップ決勝で、日本の初優勝につながる唯一の得点を決めた選手は？",
+  "answer": "高木琢也",
+  "choices": [
+   "高木琢也",
+   "三浦知良",
+   "福田正博",
+   "中山雅史"
+  ],
+  "explanation": "サウジアラビアとの決勝で高木が得点。日本は1対0で勝利した。",
+  "source": "https://www.jfa.jp/samuraiblue/asiancup2019/history.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-05",
+  "category": "japanhistory",
+  "level": 2,
+  "period": "1996",
+  "text": "1996年アトランタ五輪のブラジル戦。「マイアミの奇跡」の決勝点を決めた選手は？",
+  "answer": "伊東輝悦",
+  "choices": [
+   "伊東輝悦",
+   "前園真聖",
+   "中田英寿",
+   "城彰二"
+  ],
+  "explanation": "伊東の得点で日本が1対0の勝利。当時の日本を率いたのは西野朗監督だった。",
+  "source": "https://www.jfa.jp/national_team/paris_olympic_2024/history_men_detail.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-06",
+  "category": "japanhistory",
+  "level": 2,
+  "period": "1936",
+  "text": "1936年の「ベルリンの奇跡」で、日本が0対2から逆転勝ちした相手は？",
+  "answer": "スウェーデン",
+  "choices": [
+   "スウェーデン",
+   "イタリア",
+   "ドイツ",
+   "ハンガリー"
+  ],
+  "explanation": "日本は後半に3得点して3対2で勝利。準々決勝ではイタリアと対戦した。",
+  "source": "https://www.jfa.jp/national_team/paris_olympic_2024/history_men_detail.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-07",
+  "category": "japanhistory",
+  "level": 3,
+  "period": "1936",
+  "text": "1936年ベルリン五輪のスウェーデン戦で、3対2とする決勝点を決めた選手は？",
+  "answer": "松永行",
+  "choices": [
+   "松永行",
+   "川本泰三",
+   "右近徳太郎",
+   "竹内悌三"
+  ],
+  "explanation": "川本、右近の得点で追いついた日本。最後は松永行が逆転のゴールを決めた。",
+  "source": "https://www.jfa.jp/national_team/paris_olympic_2024/history_men_detail.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-08",
+  "category": "japanhistory",
+  "level": 3,
+  "period": "1968",
+  "text": "1968年メキシコ五輪で、日本が銅メダルをかけた3位決定戦で破った国は？",
+  "answer": "メキシコ",
+  "choices": [
+   "メキシコ",
+   "フランス",
+   "ハンガリー",
+   "ブラジル"
+  ],
+  "explanation": "日本は開催国メキシコとの3位決定戦を制して、銅メダルを獲得した。",
+  "source": "https://jfa.jp/about_jfa/hall_of_fame/member/team02.html",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-09",
+  "category": "japanhistory",
+  "level": 3,
+  "period": "1997",
+  "text": "1997年のイラン戦。岡野雅行の決勝点の直前にシュートを放った選手は？",
+  "answer": "中田英寿",
+  "choices": [
+   "中田英寿",
+   "名波浩",
+   "山口素弘",
+   "北澤豪"
+  ],
+  "explanation": "中田のミドルシュートのこぼれ球を岡野が決めた。当時は延長で得点した時点で勝利するルールだった。",
+  "source": "https://www.jfa.jp/samuraiblue/worldcup_history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ },
+ {
+  "id": "deep-japanhistory-10",
+  "category": "japanhistory",
+  "level": 3,
+  "period": "2000",
+  "text": "2000年アジアカップで、日本の優勝に貢献し大会MVPになった選手は？",
+  "answer": "名波浩",
+  "choices": [
+   "名波浩",
+   "中村俊輔",
+   "中田英寿",
+   "稲本潤一"
+  ],
+  "explanation": "名波は2000年大会のMVPを獲得。所属クラブ・磐田の年表にもこの受賞が記録されている。",
+  "source": "https://jubilo-iwata.co.jp/30th/history/",
+  "checkedAt": "2026-10-15",
+  "status": "verified",
+  "flag": null
+ }
+]);
+if(Q.length!==240||new Set(Q.map(q=>q.id)).size!==240)throw Error('Question bank validation failed');
 return Q;
 })();
 </script>
@@ -130,7 +893,7 @@ return Q;
 // All question sources are stored with the question. No runtime API or external assets.
 const DB=window.QUIZ_BANK;
 const ASSETS=Object.freeze({}); // Emblems: add only after evidence of game-use permission is recorded.
-const CATS={players:'この選手はだれ？',world:'ワールドカップ',clubs:'リーグ・クラブ',flags:'国旗で国名当て',emblems:'エンブレム'};
+const CATS={players:'この選手はだれ？',world:'ワールドカップ',clubs:'リーグ・クラブ',flags:'国旗で国名当て',emblems:'エンブレム',jhistory:'Jリーグの歴史',jscorers:'Jリーグ得点王',jforeign:'Jリーグ外国人選手',japanhistory:'日本代表の歴史'};
 const DIFF=['','初級','中級','上級'],STAGES=['予選','準決勝','決勝'],TARGET=[6,7,8],KEY='tokyo8games.sqz.v1';
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function allowed(q){if(q.status!=='verified')return false;if(q.category!=='emblems')return true;const a=ASSETS[q.assetId];return !!(a&&a.status==='approved'&&a.gameUse===true&&a.evidence&&a.checkedAt&&(!a.expiresAt||a.expiresAt>=new Date().toISOString().slice(0,10)));}
@@ -214,7 +977,7 @@ function home(){set(`<section class="title"><h1><img class="title-logo" src="/ga
 function story(){set(`<section class="screen"><p class="eyebrow">ROAD TO THE QUIZ KING</p><h2>その知識が、<br>決勝ゴールになる。</h2>${pitch()}<div class="card space"><p>ここは、サッカーの知識で勝負する「クイズ王カップ」。</p><p>選手、大会の記録、世界の国旗。4つの答えから正解を選んで、ゴールを決めよう！</p><p><strong>予選、準決勝、そして決勝へ。<br>きみはクイズ王になれるかな？</strong></p></div>${button('go','大会を選ぶ','primary')}${button('back','タイトルへ','linkbtn space')}</section>`,'story');bind('go',()=>setup());bind('back',home);}
 function stages(d){const c=cup(d);return `<div class="stage">${STAGES.map((s,i)=>`<div class="${i===c.stage?'active':''}">${i<c.stage?'✓ ':''}${s}<small>${TARGET[i]}/10問で突破</small></div>`).join('')}</div>`;}
 function setup(){const c=cup(diff);set(`<section class="screen"><div class="viewtop"><h2>クイズ王カップ</h2>${button('back','戻る','linkbtn')}</div><p>1問20秒、各ラウンド10問。<br>最後の問題まで、あきらめずに挑もう。</p><div class="difficulty">${[1,2,3].map(d=>`<button data-diff="${d}" class="${d===diff?'selected':''}" aria-pressed="${d===diff}">${DIFF[d]}<small>${['','基本から挑戦','記録にも挑戦','細かな記録へ'][d]}</small></button>`).join('')}</div>${stages(diff)}<div class="card"><p><strong>${DIFF[diff]}・${STAGES[c.stage]}からスタート</strong></p><p class="muted">正解でゴール！ 3問連続正解でハットトリック。<br>途中で中断しても、この端末から再開できます。</p></div><label class="check"><input type="checkbox" id="flags" ${P.flags?'checked':''}>国旗問題を出す（国旗が文字に見える端末ではOFF）</label>${button('start',`${STAGES[c.stage]}に挑む`,'primary green')}<p class="muted center space">難易度は問題の内容で調整。制限時間は共通です。</p></section>`,'setup');document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{diff=+b.dataset.diff;setup();});$('#flags').onchange=e=>{P.flags=e.target.checked;save();};bind('start',()=>start('cup'));bind('back',home);}
-function training(){if(S&&!S.done){dialog('途中のラウンドがあります','先に「途中から再開」から続けるか、記録画面で途中ラウンドを終了してください。');return;}set(`<section class="screen"><div class="viewtop"><h2>トレーニング</h2>${button('back','戻る','linkbtn')}</div><p>時間制限なしで10問。<br>気になるジャンルを、じっくり覚えよう。</p><div class="difficulty">${[1,2,3].map(d=>`<button data-diff="${d}" class="${d===diff?'selected':''}">${DIFF[d]}</button>`).join('')}</div><div class="categories">${[['all','全部ミックス'],...Object.entries(CATS).filter(([k])=>BANK.some(q=>q.category===k))].map(([k,n])=>`<button data-cat="${k}" class="${category===k?'selected':''}">${n}<small>${BANK.filter(q=>q.level<=diff&&(k==='all'||q.category===k)).length}問から出題</small></button>`).join('')}</div><label class="check"><input type="checkbox" id="flags" ${P.flags?'checked':''}>国旗問題を出す</label><div class="menu space">${button('start','練習スタート','primary green')}${button('review',`間違えた問題を復習（${P.mistakes.length}問）`,'secondary',!P.mistakes.length)}</div><p class="muted center space">問題が10問未満のときは、ある問題だけで練習します。</p></section>`,'training');document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{diff=+b.dataset.diff;training();});document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;training();});$('#flags').onchange=e=>{P.flags=e.target.checked;save();};bind('start',()=>start('training'));bind('review',()=>start('review'));bind('back',home);}
+function training(){if(S&&!S.done){dialog('途中のラウンドがあります','先に「途中から再開」から続けるか、記録画面で途中ラウンドを終了してください。');return;}set(`<section class="screen"><div class="viewtop"><h2>トレーニング</h2>${button('back','戻る','linkbtn')}</div><p>時間制限なしで10問。<br>気になるジャンルを、じっくり覚えよう。<br>深掘り4テーマは「上級」で各10問を楽しめます。</p><div class="difficulty">${[1,2,3].map(d=>`<button data-diff="${d}" class="${d===diff?'selected':''}">${DIFF[d]}</button>`).join('')}</div><div class="categories">${[['all','全部ミックス'],...Object.entries(CATS).filter(([k])=>BANK.some(q=>q.category===k))].map(([k,n])=>`<button data-cat="${k}" class="${category===k?'selected':''}">${n}<small>${BANK.filter(q=>q.level<=diff&&(k==='all'||q.category===k)).length}問から出題</small></button>`).join('')}</div><label class="check"><input type="checkbox" id="flags" ${P.flags?'checked':''}>国旗問題を出す</label><div class="menu space">${button('start','練習スタート','primary green')}${button('review',`間違えた問題を復習（${P.mistakes.length}問）`,'secondary',!P.mistakes.length)}</div><p class="muted center space">問題が10問未満のときは、ある問題だけで練習します。</p></section>`,'training');document.querySelectorAll('[data-diff]').forEach(b=>b.onclick=()=>{diff=+b.dataset.diff;training();});document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;training();});$('#flags').onchange=e=>{P.flags=e.target.checked;save();};bind('start',()=>start('training'));bind('review',()=>start('review'));bind('back',home);}
 function start(kind){const c=cup(diff),ids=selectQuestions(diff,kind==='training'?category:'all',kind==='cup'?c.used:[],kind==='review');if(!ids.length||(kind==='cup'&&ids.length<10)){dialog('出題できる問題が足りません','国旗問題をONにするか、別の難易度・ジャンルを選んでください。');return;}S={kind,diff,stage:kind==='cup'?c.stage:0,ids,i:0,picks:[],ms:20000,done:false,applied:false,order:{}};save();question();}
 function current(){return MAP.get(S.ids[S.i]);}
 function correctCount(){return S.picks.reduce((n,a,i)=>n+(a===MAP.get(S.ids[i]).answer?1:0),0);}
