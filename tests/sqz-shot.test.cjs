@@ -61,13 +61,13 @@ test('missing sprite cannot block feedback',()=>{
  const e=env();e.element.querySelector('.keeper-sprite img').naturalWidth=0;let finished=0;
  const c=e.api.create(e.element,{ok:false,onComplete:()=>finished++});c.begin();assert.equal(finished,1);
 });
-test('question bank contains 240 valid unique questions and inline scripts parse',()=>{
+test('question bank contains 280 valid unique questions and inline scripts parse',()=>{
  const html=fs.readFileSync(path.join(root,'games/sqz/index.html'),'utf8');
  const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
  scripts.forEach(s=>new vm.Script(s));
  const ctx=vm.createContext({window:{}});vm.runInContext(scripts[0],ctx);
  const bank=ctx.window.QUIZ_BANK;
- assert.equal(bank.length,240);assert.equal(new Set(bank.map(q=>q.id)).size,240);
+ assert.equal(bank.length,280);assert.equal(new Set(bank.map(q=>q.id)).size,280);
  for(const q of bank){assert.equal(q.choices.length,4);assert.equal(new Set(q.choices).size,4);assert.ok(q.choices.includes(q.answer));}
  const {api}=env();
  const atlas=JSON.parse(fs.readFileSync(path.join(root,'games/sqz/assets/characters-v3/frames.json')));
@@ -174,15 +174,15 @@ test('iOS sound opt-in sets playback session and unlocks synchronously before do
  g.run('navigator.audioSession=undefined');await g.run('tone(false)');assert.equal(g.calls.length,2);
 });
 
-test('deep-dive themes offer ten unique sourced questions and honor difficulty',()=>{
+test('deep-dive themes offer twenty unique sourced questions and honor difficulty',()=>{
  const g=game();
  for(const cat of ['jhistory','jscorers','jforeign','japanhistory']){
   const qs=g.run(`BANK.filter(q=>q.category==='${cat}')`);
-  assert.equal(qs.length,10);assert.equal(new Set(qs.map(q=>q.text)).size,10);
+  assert.equal(qs.length,20);assert.equal(new Set(qs.map(q=>q.text)).size,20);
   for(const q of qs){assert.equal(q.checkedAt,'2026-10-15');assert.match(q.source,/^https:\/\//);assert.ok(q.explanation&&q.period);}
   for(const d of [1,2,3]){
    const ids=g.run(`selectQuestions(${d},'${cat}')`);
-   assert.equal(ids.length,d===1?2:d===2?6:10);
+   assert.equal(ids.length,d===1?4:10);
    assert.equal(new Set(ids).size,ids.length);
    assert.ok(ids.every(id=>qs.some(q=>q.id===id&&q.level<=d)));
   }
