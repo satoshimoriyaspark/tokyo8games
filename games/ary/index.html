@@ -5,7 +5,7 @@
 <canvas id="game" width="960" height="540" aria-label="亀有商店街を走る横スクロールゲーム"></canvas>
 <section id="title-screen" class="entry-screen" aria-label="タイトル画面">
 <div class="title-brand"><div class="brand-mark"><img id="brand-logo" src="/games/ary/assets/katsucolle-logo-system-fix.png" alt="カツコレ！ Re:Discovery" draggable="false"></div><p id="brand-fallback" hidden>カツコレ！</p></div>
-<h2>アリィのスクーターRUN</h2><p class="title-tagline">謎の猫を追って、街の「？」を集めよう。</p>
+<h2>アリィのスクーターRUN</h2><p class="title-tagline">謎の猫を追って、葛飾の名所を見つけよう。</p>
 <p class="title-course">STAGE 01 <span>亀有</span></p>
 </section>
 <section id="opening-screen" class="entry-screen" aria-label="オープニングストーリー" hidden>
@@ -13,10 +13,23 @@
 </section>
 <button id="story-back" class="entry-nav" hidden>← 戻る</button><button id="skip-story" class="entry-nav" hidden>スキップ →</button>
 <button id="title-return" class="entry-nav" hidden>タイトルへ</button>
+<button id="album-open" class="entry-nav">取材アルバム</button>
 <button id="pause" aria-label="一時停止" title="一時停止 / Esc" hidden>Ⅱ</button>
 <div class="controls"><button id="slide" aria-label="スライディング" hidden><b aria-hidden="true">↓</b><span>スライド<small>SLIDE</small></span></button><button id="jump" aria-label="ジャンプ・二段ジャンプ" hidden><b aria-hidden="true">↑</b><span>ジャンプ<small>JUMP</small></span></button></div>
 <button id="action">はじめる</button>
 <div class="asset-panel"><div id="asset-status" role="status" aria-live="polite">アリィの画像を読み込み中…</div><button id="retry-assets" hidden>画像を再読み込み</button></div>
 </div>
+<section id="collection-screen" aria-label="取材アルバム・名所紹介" hidden>
+<header class="collection-header"><div><span class="collection-eyebrow">KATSUSHIKA DISCOVERY</span><h2 id="collection-heading" tabindex="-1">アリィの取材アルバム</h2></div><button id="collection-back">← タイトルへ</button></header>
+<div id="album-overview"><p id="album-count"></p><p class="album-lead">走って見つけた、葛飾のたからもの。<br>クリアした街の紹介を、ここで読み返せます。</p><div id="album-list"></div></div>
+<article id="album-detail" hidden>
+<figure class="landmark-art"><img id="landmark-image" width="1448" height="1086" alt="" decoding="async"><div id="landmark-image-error" role="status" hidden><p>紹介の絵を読み込めませんでした。</p><button id="landmark-image-retry">絵を再読み込み</button></div><figcaption>2021年の実景写真をもとにしたイラスト</figcaption></figure>
+<div class="landmark-info"><p id="landmark-number" class="collection-eyebrow"></p><p id="landmark-reading"></p><h3 id="landmark-name"></h3><div id="landmark-copy"></div>
+<aside class="ary-comment"><span class="ary-portrait" role="img" aria-label="アリィ"></span><div><strong>アリィのひとこと</strong><p id="landmark-quote"></p></div></aside>
+<div class="collection-actions"><button id="collection-retry">もう一度遊ぶ</button><button id="collection-title">タイトルへ</button></div>
+<details id="source-details"><summary>出典・画像について</summary><ul id="landmark-sources"></ul><p>参考写真・イラストの制作情報は<a href="/games/ary/assets/landmarks/SOURCES.md" target="_blank" rel="noopener noreferrer">出典記録</a>にまとめています。</p><p>情報確認：2026年10月12日。紹介イラストは写真撮影時点の風景をもとにしています。</p></details>
+</div></article>
+<p id="collection-save-note" role="status"></p>
+</section>
 <p class="help"><strong>タップでジャンプ ／ 下スワイプでスライド</strong>　空中でもう一度タップすると二段ジャンプ。<br>六角形の「？チップ（ハテナチップ）」を集めよう。コーンはジャンプ、カラスはスライド！<br>PC：Space / ↑ ジャンプ・↓ スライド・Esc 一時停止</p>
-</main><script src="/games/ary/sprites.js" defer></script><script src="/games/ary/game.js" defer></script></body></html>
+</main><script src="/games/ary/sprites.js" defer></script><script src="/games/ary/places.js" defer></script><script src="/games/ary/game.js" defer></script></body></html>

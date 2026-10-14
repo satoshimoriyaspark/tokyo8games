@@ -1,0 +1,22 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>取材アルバム・開発用表示確認</title>
+<style>body{font:14px system-ui;background:#eee;color:#172a46;margin:16px}header{max-width:1000px}button{padding:9px;margin:4px}iframe{display:block;border:2px solid #172a46;margin-top:12px;background:#101b30}p{line-height:1.6}#status{font-weight:bold}</style>
+<header><h1>取材アルバム・開発用表示確認</h1><p>実際のゲームファイルを、テスト用の保存領域で表示します。通常ゲームの記録には触れません。「ゴール直前」はコース末尾へ移動するテストで、通しプレイではありません。</p>
+<div><button data-record="new">未クリアで起動</button><button data-record="legacy">旧クリア記録で起動</button><button id="reload">記録を保って再読み込み</button><button id="finish">ゴール直前から確認</button></div>
+<div><button data-size="1000,760">PC 1000 × 760</button><button data-size="844,390">横 844 × 390</button><button data-size="390,844">縦 390 × 844</button><button data-size="667,375">小型横 667 × 375</button></div><p id="status" role="status">読み込み中</p></header><iframe title="テスト用ゲーム画面" sandbox="allow-scripts" width="1000" height="760"></iframe>
+<script>
+// Test adapter only. Never loaded by the game entrypoint. Memory storage is scoped to this page.
+const frame=document.querySelector('iframe'),status=document.querySelector('#status');let saved={},source='',boot=0;
+const root=new URL('../',location.href).href;
+function start(){
+ const generation=++boot;
+ const adapter=`<base href="${root}"><script>const memory=${JSON.stringify(saved).replace(/</g,'\\u003c')};Object.defineProperty(window,'localStorage',{value:{getItem:k=>memory[k]??null,setItem:(k,v)=>{memory[k]=String(v);parent.postMessage({type:'ary-test-save',generation:${generation},key:k,value:String(v)},'*')}}});<\/script>`;
+ const hooks=`<script>addEventListener('message',event=>{if(event.source!==parent||event.data!=='ary-test-finish')return;if(!ArySprites.ready())return;reset();scroll=STAGE.length-1;items=[];update();render();});parent.postMessage({type:'ary-test-ready',generation:${generation}},'*');<\/script>`;
+ frame.srcdoc=source.replace('<head>','<head>'+adapter).replace('</body>',hooks+'</body>');
+ status.textContent='テスト用保存記録 '+(saved['ary-stage-kameari-v1']||'なし');
+}
+addEventListener('message',event=>{if(event.source!==frame.contentWindow||event.data?.generation!==boot)return;const d=event.data;if(d.type==='ary-test-save'){saved[d.key]=d.value;status.textContent='テスト用保存記録 '+d.value}});
+document.querySelectorAll('[data-record]').forEach(b=>b.onclick=()=>{saved=b.dataset.record==='legacy'?{'ary-stage-kameari-v1':JSON.stringify({cleared:true,best:23456})}:{};start()});
+document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{const [w,h]=b.dataset.size.split(',');frame.width=w;frame.height=h});
+document.querySelector('#reload').onclick=start;document.querySelector('#finish').onclick=()=>frame.contentWindow.postMessage('ary-test-finish','*');
+fetch(root+'index.html').then(r=>{if(!r.ok)throw Error(r.status);return r.text()}).then(t=>{source=t;start()}).catch(e=>status.textContent='読み込み失敗: '+e.message);
+</script></html>

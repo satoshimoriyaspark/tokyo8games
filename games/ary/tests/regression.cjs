@@ -10,13 +10,14 @@ const {createCanvas, Image: NativeImage} = require('@napi-rs/canvas');
 const root = path.resolve(__dirname, '../../..');
 const captureDir = process.env.ARY_QA_OUTPUT;
 if(captureDir) fs.mkdirSync(captureDir,{recursive:true});
-async function harness(failFile = '') {
+async function harness(failFile = '', saved = {}, storageFault = '') {
   const canvas = createCanvas(960,540), ctx = canvas.getContext('2d');
   const elements = new Map(), documentEvents={}, windowEvents={}, frames=[], timers=new Map();
-  const images=[], draws=[], errors=[], pending=[];
+  const images=[], draws=[], errors=[], pending=[], writes=[];
   let fail = failFile, timer=0;
   function el(id) {
-    if(!elements.has(id))elements.set(id,{textContent:'',hidden:false,disabled:false,events:{},
+    if(!elements.has(id))elements.set(id,{textContent:'',hidden:false,disabled:false,events:{},children:[],
+      append(...nodes){this.children.push(...nodes)},replaceChildren(...nodes){this.children=nodes},focus(){document.activeElement=this},
       addEventListener(name,fn){this.events[name]=fn},setPointerCapture(){},setAttribute(name,value){this[name]=value},
       getContext(){return ctx}});
     return elements.get(id);
@@ -43,15 +44,18 @@ async function harness(failFile = '') {
       })));
     }
   }
-  const document={hidden:false,fullscreenElement:null,querySelector:el,
+  let nodeId=0;
+  const document={hidden:false,fullscreenElement:null,querySelector:el,createElement(tag){const n=el('node-'+(++nodeId));n.tagName=tag.toUpperCase();return n},
     addEventListener(name,fn){documentEvents[name]=fn}};
-  const sandbox={Image,document,console:{error(...args){errors.push(args.join(' '))}},
+  const localStorage={getItem(key){if(storageFault==='read')throw Error('blocked');return saved[key]??null},setItem(key,value){if(storageFault==='write')throw Error('quota');saved[key]=value;writes.push({key,value})}};
+  const sandbox={Image,document,localStorage,console:{error(...args){errors.push(args.join(' '))}},
     requestAnimationFrame(fn){frames.push(fn)},setTimeout(fn){timers.set(++timer,fn);return timer},
     clearTimeout(id){timers.delete(id)},addEventListener(name,fn){windowEvents[name]=fn}};
   sandbox.window=sandbox;
   const context=vm.createContext(sandbox);
   const run=code=>vm.runInContext(code,context);
   run(fs.readFileSync(path.join(root,'games/ary/sprites.js'),'utf8'));
+  run(fs.readFileSync(path.join(root,'games/ary/places.js'),'utf8'));
   run(fs.readFileSync(path.join(root,'games/ary/game.js'),'utf8'));
   const flush=async()=>{await Promise.all(pending);};
   const capture=name=>{if(captureDir)fs.writeFileSync(path.join(captureDir,name+'.png'),canvas.toBuffer('image/png'));};
@@ -60,7 +64,7 @@ async function harness(failFile = '') {
     for(let i=0;i<pixels.length;i+=4)if(pixels[i]>160&&pixels[i+1]<155&&pixels[i+2]>95&&pixels[i]-pixels[i+1]>45)pink++;
     return pink;
   };
-  return {run,flush,el,draws,errors,frames,timers,document,documentEvents,images,capture,canvas,pinkPixels,
+  return {run,flush,el,draws,errors,frames,timers,document,documentEvents,windowEvents,images,capture,canvas,pinkPixels,saved,writes,
     recover(){fail=''},diagnostics:()=>sandbox.aryDiagnostics()};
 }
 async function main(){
@@ -164,10 +168,11 @@ async function main(){
   input.pointercancel();input.pointerup({pointerId:4,clientX:100,clientY:100});assert.equal(h.diagnostics().player.j,0);
   h.el('#slide').onpointerdown({button:0,preventDefault(){}});assert.equal(h.diagnostics().player.slide,42,'button reacts on press');
   h.run('update()');h.el('#slide').onclick({detail:1});assert.equal(h.diagnostics().player.slide,41,'click does not retrigger pointer press');
-  h.run('reset();scroll=STAGE.length-1;items=[];update()');assert.equal(h.diagnostics().state,'finish');h.run('for(let i=0;i<90;i++)updateFinish()');assert.equal(h.diagnostics().state,'story');
+  h.run('reset();scroll=STAGE.length-1;items=[];update()');assert.equal(h.diagnostics().state,'finish');h.run('for(let i=0;i<90;i++)updateFinish()');assert.equal(h.diagnostics().state,'result');
   const finalScore=h.diagnostics().score;h.run('update();update()');assert.equal(h.diagnostics().score,finalScore,'clear awarded only once');
-  h.run('next();render()');h.capture('05-clear');assert.equal(h.diagnostics().state,'result');
-  h.run('next()');assert.equal(h.diagnostics().tick,0);
+  h.run('render()');h.capture('05-clear');assert.equal(h.diagnostics().state,'result');
+  h.el('#action').onclick();assert.equal(h.diagnostics().state,'landmark');
+  h.el('#collection-retry').onclick();assert.equal(h.diagnostics().tick,0);
   h.run("hits=4;items=[{k:'cone',x:62,y:119}];update()");assert.equal(h.diagnostics().state,'fail');
   h.run('next()');assert.equal(h.diagnostics().hits,0);
   h.run('reset()');assert.equal(h.diagnostics().life,5);assert.equal(h.diagnostics().maxLife,5);
@@ -213,8 +218,8 @@ async function main(){
   h.run('scroll=STAGE.length-1;update();render()');assert.equal(h.diagnostics().stage.progress,1);
   const award=h.diagnostics().score;
   h.run('beginFinish();paused=true;updateFinish()');assert.equal(h.diagnostics().score,award);assert.equal(h.diagnostics().stage.finishAge,0);
-  h.run('paused=false;for(let i=0;i<90;i++)updateFinish();render()');assert.equal(h.diagnostics().state,'story');h.capture('11-arrival');
-  h.run('next();next()');assert.equal(h.diagnostics().stage.progress,0);assert.equal(h.diagnostics().life,5);
+  h.run('paused=false;for(let i=0;i<90;i++)updateFinish();render()');assert.equal(h.diagnostics().state,'result');h.capture('11-arrival');
+  h.run('next()');h.el('#collection-retry').onclick();assert.equal(h.diagnostics().stage.progress,0);assert.equal(h.diagnostics().life,5);
   h.run('reset();boostUntil=300;for(let i=0;i<60;i++){items=[];update()}');assert(h.diagnostics().stage.progress>135/h.diagnostics().stage.length,'boost advances distance faster');
   // Render failure is injected only in the VM and must not hide the avatar.
   h.run("var savedDrawItems=drawItems;drawItems=()=>{throw Error('injected item failure')};render()");
@@ -223,7 +228,7 @@ async function main(){
   h.run('drawItems=savedDrawItems;reset()');
   // 180 seconds at 60Hz: real collisions, collects, retries, and renders every frame.
   for(let t=0;t<10800;t++){
-    h.run("if(state==='finish')updateFinish();else if(state!=='play')next();if(tick%87===20)jump();if(tick%131===35)slide();update();render()");
+    h.run("if(state==='finish')updateFinish();else if(state==='landmark')reset();else if(state!=='play')next();if(tick%87===20)jump();if(tick%131===35)slide();update();render()");
     assert.equal(h.diagnostics().runtimeError,'');
     if(h.diagnostics().state==='play')assert(h.pinkPixels()>200,'avatar remains visibly rendered');
   }
@@ -238,6 +243,61 @@ async function main(){
   failed.recover();failed.el('#retry-assets').onclick();await failed.flush();
   failed.run('reset();slide();render()');assert.equal(failed.diagnostics().pose.key,'slide');
   assert.equal(failed.diagnostics().assets.slide,'ready');assert.equal(failed.timers.size,0);
+  // Album: old records, real clear -> result -> introduction, read-only revisits and reloads.
+  const key='ary-stage-kameari-v1';
+  const locked=await harness();await locked.flush();
+  locked.el('#album-open').onclick();assert.equal(locked.diagnostics().state,'album');
+  assert(locked.el('#album-list').children[0].disabled);
+  locked.run("openLandmark('kameari-katori','album')");assert.equal(locked.diagnostics().state,'album');
+  locked.el('#collection-back').onclick();assert.equal(locked.diagnostics().state,'intro');
+  locked.run('reset();scroll=STAGE.length-1;items=[];update();for(let i=0;i<90;i++)updateFinish();render()');
+  assert.equal(locked.diagnostics().state,'result');
+  assert.equal(locked.el('#action').textContent,'名所紹介を見る');
+  assert(JSON.parse(locked.saved[key]).cleared);assert.equal(locked.writes.length,1);
+  const awarded=locked.diagnostics().score, awardedTick=locked.diagnostics().tick;
+  locked.el('#action').onclick();assert.equal(locked.diagnostics().state,'landmark');
+  assert(!locked.el('#collection-retry').hidden);assert(locked.el('.stage').hidden);
+  assert.equal(locked.el('#landmark-copy').children.length,3);
+  locked.run('for(let i=0;i<120;i++){update();render()}');
+  assert.equal(locked.diagnostics().tick,awardedTick);assert.equal(locked.diagnostics().score,awarded);
+  locked.el('#landmark-image').events.error();assert(!locked.el('#landmark-image-error').hidden);
+  locked.el('#landmark-image-retry').onclick();assert(locked.el('#landmark-image-error').hidden);
+  locked.el('#collection-back').onclick();assert.equal(locked.diagnostics().state,'result');
+  locked.el('#action').onclick();locked.el('#collection-title').onclick();assert.equal(locked.diagnostics().state,'intro');
+  locked.el('#album-open').onclick();assert(!locked.el('#album-list').children[0].disabled);
+  const savedBefore=locked.saved[key];
+  for(let i=0;i<3;i++){
+    locked.el('#album-list').children[0].onclick();assert.equal(locked.diagnostics().state,'landmark');
+    assert(locked.el('#collection-retry').hidden,'rereading has no reward or replay action');
+    locked.el('#collection-retry').onclick();assert.equal(locked.diagnostics().state,'landmark','hidden action is guarded');
+    locked.documentEvents.keydown({code:'Escape',repeat:false,preventDefault(){}});
+    assert.equal(locked.diagnostics().state,'album');
+  }
+  assert.equal(locked.diagnostics().score,awarded);assert.equal(locked.writes.length,1);assert.equal(locked.saved[key],savedBefore);
+  const reloaded=await harness('',locked.saved);await reloaded.flush();
+  reloaded.el('#album-open').onclick();assert(!reloaded.el('#album-list').children[0].disabled);
+  assert.equal(reloaded.diagnostics().album.record.best,awarded);assert.equal(reloaded.writes.length,0);
+  const old={ [key]:JSON.stringify({cleared:true,best:23456,extra:'keep'}) };
+  const legacy=await harness('',old);await legacy.flush();
+  legacy.el('#album-open').onclick();legacy.el('#album-list').children[0].onclick();
+  assert.equal(legacy.diagnostics().state,'landmark');assert.equal(legacy.writes.length,0);
+  legacy.el('#collection-title').onclick();legacy.run('reset();scroll=STAGE.length-1;items=[];update()');
+  assert.equal(JSON.parse(old[key]).best,23456);assert.equal(JSON.parse(old[key]).extra,'keep');
+  old[key]=JSON.stringify({cleared:true,best:99999});legacy.windowEvents.storage();
+  assert.equal(legacy.diagnostics().album.record.best,99999);
+  const corrupt=await harness('',{[key]:'invalid JSON'});await corrupt.flush();
+  corrupt.el('#album-open').onclick();assert(corrupt.el('#album-list').children[0].disabled);
+  assert.equal(corrupt.writes.length,0,'reading malformed data never overwrites it');
+  for(const mode of ['read','write']){
+    const blocked=await harness('',{},mode);await blocked.flush();
+    blocked.run('reset();scroll=STAGE.length-1;items=[];update();for(let i=0;i<90;i++)updateFinish();next()');
+    assert.equal(blocked.diagnostics().state,'landmark');assert(blocked.diagnostics().album.storageWarning);
+    assert(!blocked.el('#collection-retry').hidden,'failed save never blocks navigation');
+  }
+  const assetFailure=await harness('ary_slide.png',{[key]:JSON.stringify({cleared:true,best:123})});await assetFailure.flush();
+  assetFailure.el('#album-open').onclick();assetFailure.el('#album-list').children[0].onclick();
+  assert.equal(assetFailure.diagnostics().state,'landmark','album is readable even if gameplay sprite fails');
+  console.log('PASS: clear/result/introduction/retry/title, locked album, old-record unlock, reload persistence, back/Escape, image error/retry, read-only revisits, best preservation, cross-tab record refresh, malformed/blocked storage, gameplay asset failure isolation.');
   console.log('PASS: title/story/play, manual story pages/back/skip, frozen opening clock, direct retry/title return, logo failure, PNG load/retry, 6 run frames at 12fps, 5 jump phases, double-jump limit, 3 slide phases, chips/memos/score, collisions/crow avoidance, pause/resume, touch input, clear/retry, isolated render failure, 10,800 rendered simulation frames (180s).');
   console.log('LIMIT: Node Canvas + simulated DOM; not iPhone Safari / Android Chrome / PC browser or real-time endurance.');
   if(captureDir){

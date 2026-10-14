@@ -6,7 +6,8 @@ actions remain stopped while reading. Skip starts a fresh run from any opening
 page. Back revisits the previous page or title. Retry goes directly into a new
 run; game over and results also provide a title button.
 
-The existing post-clear conversation (`story`) remains separate from the opening.
+After the goal animation, results lead to the landmark introduction (`landmark`).
+The title also opens the read-only collection (`album`); see ALBUM.md.
 The duration, collisions, stage distance and rewards are unchanged.
 
 ## Approved logo
