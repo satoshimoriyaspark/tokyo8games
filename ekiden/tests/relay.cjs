@@ -17,7 +17,9 @@ function run(e,passive=false){let n=0;while(e.api.state.active&&n<30000){e.advan
  const relay=[];
  for(let i=0;i<10;i++){
   assert.equal(e.api.state.course.id,i+1);assert.equal(e.api.state.player.energy,100);
-  if(i){const totals=e.api.relayTotals(),p=totals[1];for(const a of e.api.state.ai)assert(Math.abs(a.startAt-(totals[e.api.teams.indexOf(a.team)]-p))<1e-7);}
+  if(i&&i!==5){const totals=e.api.relayTotals(i>=6?6:1),p=totals[1];for(const a of e.api.state.ai)assert(Math.abs(a.startAt-(totals[e.api.teams.indexOf(a.team)]-p))<1e-7);}
+  if(i===5)assert(e.api.state.ai.every(a=>a.startAt===0&&a.km===0));
+  if(i&&i!==5){const before=e.api.state.ai.map(a=>[a.km,a.phase]);e.api.tick(1);assert.deepEqual(e.api.state.ai.map(a=>[a.km,a.phase]),before);const previous=e.api.relay.runs.at(-1);for(const a of e.api.state.ai)if(a.startAt>0)assert.equal(a.km,previous.carry[e.api.teams.indexOf(a.team)].km);}
   go(e);run(e);assert.equal(e.api.relay.runs.length,i+1);
   const legTimes=Array.from(e.api.views[0].times);relay.push({leg:i+1,time:legTimes[1],rank:e.api.standing(legTimes).find(r=>r.team===1).rank});
   assert.deepEqual(e.api.views.map(v=>v.kind).join(','),i===4?'区間,往路':i===9?'区間,復路,総合':'区間');
