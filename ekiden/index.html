@@ -5,37 +5,154 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>目指せ！駅伝王｜TOKYO 8 GAMES 試遊版</title>
 <style>
-:root{--ink:#102137;--cyan:#00bee7;--yellow:#ffe500;--paper:#fff;--line:#d7e6ed}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;color:var(--ink);background:repeating-linear-gradient(135deg,transparent 0 26px,#dceef755 26px 29px),#eefaff;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif}button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:2px solid var(--ink);border-radius:5px;background:white;font-weight:800;box-shadow:3px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s}button:active:not(:disabled){transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}button:focus-visible,summary:focus-visible{outline:3px solid #0075d5;outline-offset:4px}button:disabled{cursor:default;opacity:.45;box-shadow:none}main{max-width:780px;margin:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}.brand{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:900;letter-spacing:.08em;margin:0 0 18px}.badge{background:var(--ink);color:var(--yellow);padding:5px 8px;font-size:10px;letter-spacing:.04em}h1,h2,p{margin:0}h2{font-size:24px;line-height:1.45}.sub,small{font-size:12px;color:#425a6c;line-height:1.6}.quiet{font-size:12px;padding:9px 12px;min-height:42px;box-shadow:2px 3px 0 var(--ink)}.primary{background:var(--yellow);min-height:56px;padding:12px;font-size:18px;width:100%}.panel{background:white;border:2px solid var(--ink);border-radius:6px;padding:24px;box-shadow:6px 7px 0 var(--cyan)}.eyebrow{display:inline-block;background:var(--yellow);padding:5px 9px;font-size:12px;font-weight:900;margin-bottom:12px}.opening{text-align:center;background:repeating-linear-gradient(135deg,transparent 0 27px,#ffffff16 27px 30px),linear-gradient(125deg,#008edb,#00c9e5);border:3px solid var(--ink);box-shadow:6px 7px 0 var(--ink);border-radius:6px;overflow:hidden;padding:34px 28px 24px}.opening .eyebrow{transform:rotate(-4deg);margin-bottom:16px}.logo{margin:8px auto 22px;max-width:680px}.logo img{display:block;width:100%;height:auto}.hero-copy{font-weight:900;font-size:16px;line-height:1.65;color:white;text-shadow:1px 2px 0 #12658d}.opening canvas{margin:20px auto 0;border:3px solid var(--ink);border-bottom:0;max-width:520px;aspect-ratio:16/9}.hero-bottom{max-width:520px;margin:24px auto 0;background:white;border:3px solid var(--ink);padding:16px}.hero-bottom .sub{margin-top:12px;font-weight:700}.opening .primary{font-size:22px}.setup-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:8px}.steps{display:flex;gap:7px;font-size:11px;font-weight:800}.steps span{padding:7px 9px;background:#dcedf4;border:1px solid #bed3df;border-radius:3px}.steps .current{background:var(--cyan);border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}.step-panel h2{margin-bottom:6px}.intro{font-size:13px;color:#425a6c;margin-bottom:20px;line-height:1.7}.course-grid{display:grid;gap:10px}.course-grid button{text-align:left;padding:15px 16px;display:flex;gap:14px;align-items:center;min-height:72px}.course-grid b{font-size:27px;min-width:56px;line-height:1.1}.course-grid span{font-size:15px}.course-grid small{display:block;font-size:11px;margin-top:3px}.chosen{background:#c9f4fd!important;border-color:var(--ink)!important;box-shadow:3px 4px 0 var(--cyan)!important}.course-grid .chosen:after{content:'✓';margin-left:auto;color:#006a86;font-size:25px}#courseRoute{font-weight:800;margin:18px 0 6px;font-size:14px}#courseTip,#difficultyTip{padding:12px;background:#e5faff;border-left:4px solid var(--cyan);font-size:13px;line-height:1.7;margin-top:12px;min-height:68px}.setup-nav{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-top:22px}.setup-nav .quiet{height:54px}.team-preview{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0;padding:12px;background:#e8faff;border:1px solid #bddce7}.team-preview .swatch{width:32px;height:44px;margin:0;transform:skew(-15deg);border:2px solid var(--ink)}#selectedName{font-size:20px;font-weight:900}.team-preview small{display:block}.team-preview strong{display:block}#teams{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:16px 0 6px}#teams button{padding:9px 1px;font-size:11px;min-height:66px;box-shadow:2px 3px 0 #b6c5cf}.swatch{display:block;width:19px;height:26px;margin:0 auto 6px;border:1px solid var(--ink);transform:skew(-18deg)}#teams .chosen{outline:2px solid var(--cyan);outline-offset:2px}.guide{margin-top:20px;border-top:2px solid var(--line);padding-top:18px}.guide h3{font-size:16px;margin:0 0 12px}.guide ol{padding:0;list-style:none;display:grid;gap:10px;margin:0}.guide li{font-size:12px;line-height:1.65;padding-left:32px;position:relative}.guide li b{display:block;font-size:14px}.guide li:before{position:absolute;left:0;top:0;width:24px;height:24px;background:var(--cyan);border:1px solid var(--ink);text-align:center;font-weight:900;content:counter(list-item);border-radius:3px}.guide details{font-size:12px;line-height:1.7;margin-top:12px}.guide summary{padding:10px 0;cursor:pointer;font-weight:800;min-height:40px}.guide details p{margin-bottom:8px}.selection-summary{font-size:12px;font-weight:800;margin-top:18px;color:#425a6c}.race-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}.race-head strong{font-size:14px}.race-head .tag{font-size:10px;font-weight:900;color:#48667a}.race-actions{display:flex;gap:7px}.race-actions .quiet{padding:7px 8px;min-height:38px;font-size:11px}.hud{display:grid;grid-template-columns:1fr auto;gap:4px;background:var(--ink);color:white;padding:10px 14px;border-radius:5px 5px 0 0;font-size:13px;font-weight:800}.hud #rank{font-size:22px;grid-column:2;grid-row:1/3;align-self:center;color:var(--yellow)}.hud #distance{font-size:11px;font-weight:600;color:#c3eefa}#clock{font-variant-numeric:tabular-nums;font-size:11px;font-weight:800}canvas{width:100%;aspect-ratio:16/9;display:block;image-rendering:pixelated;border:3px solid var(--ink)}#profile{aspect-ratio:8/1;max-height:55px;border-top:0}.meters{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin:12px 0}.meter-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;gap:4px;font-weight:700}.meter-label b{font-size:13px}.bar{height:12px;background:#dce5ec;border:1px solid var(--ink);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:#31c782;width:100%}#legBar{width:0;background:#fb955d}.tactics{display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;font-weight:700}.tactics span{padding:6px 8px;background:white;border:1px solid #bccfda;border-radius:3px}.tactics .sheltered{background:#c9f4df;border-color:#23895d;color:#12623f}#pace{background:#d7f6fd}#feedback{min-height:44px;padding:10px 12px;background:#fff8b0;border:2px solid var(--ink);border-radius:4px;font-size:13px;font-weight:900;line-height:1.6;margin:10px 0 7px}.rhythm-row{display:flex;justify-content:space-between;gap:8px;align-items:center;margin:6px 0 10px}#rhythmHint{font-size:10px;font-weight:700;line-height:1.5}.controls{display:grid;grid-template-columns:1fr .85fr 1fr;gap:10px;margin:8px 0}.controls button{min-height:80px;font-size:24px;line-height:1.2;background:var(--cyan);padding:10px 3px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.controls button small{display:block;font-size:10px;margin-top:6px;color:inherit;font-weight:700}.controls #right{background:#ff8198}.controls #sprint{background:var(--yellow);font-size:16px}.controls #sprint.running{background:#ffad39}.controls .next{outline:3px solid var(--ink);outline-offset:3px}.controls .pressed{transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}#message{font-size:11px;line-height:1.5;color:#425a6c;min-height:18px;margin:12px 0 0}.paused{background:var(--yellow);padding:12px;margin:8px 0;border:2px solid var(--ink);text-align:center;font-size:13px;font-weight:800}.result-overlay{position:fixed;inset:0;background:#102137cc;z-index:10;display:grid;place-items:center;padding:20px;overflow:auto}.result-card{width:min(100%,440px);text-align:center;padding:28px 22px;background:white;border:3px solid var(--ink);border-radius:6px;box-shadow:7px 8px 0 var(--cyan)}.result-card h2{font-size:25px;margin:10px 0}.result-card p{font-size:13px;line-height:1.8;margin-bottom:20px}.result-card .quiet{margin-top:12px;width:100%}.result-rank{font-size:70px;font-weight:1000;line-height:1.3;color:#007ec8;text-shadow:3px 3px 0 #b6eefa}.result-card .eyebrow{margin:0}footer{font-size:10px;line-height:1.8;color:#536e80;margin:22px 0 0}body.racing main{max-width:620px;padding-top:10px}body.racing .brand,body.racing footer{display:none}body.racing .result-overlay~footer{display:none}@media(min-width:600px){#setup .course-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#setup .course-grid button{display:block;text-align:center;min-height:110px}#setup .course-grid b{display:block;margin-bottom:9px}#setup .course-grid .chosen:after{display:none}.step-panel{min-height:370px}#teams{gap:12px}#teams button{min-height:78px}#teams .swatch{width:23px;height:31px}}
-@media(max-width:420px){main{padding:12px 12px calc(18px + env(safe-area-inset-bottom))}.brand{margin-bottom:14px}.panel{padding:18px 14px}.opening{padding:27px 14px 18px}.opening canvas{margin-top:18px}.hero-bottom{padding:14px}.hero-copy{font-size:14px}.steps{gap:4px}.steps span{padding:6px 7px;font-size:10px}.setup-top .quiet{padding:7px;font-size:10px}h2{font-size:22px}.intro{margin-bottom:15px}#teams{gap:7px}#teams button{font-size:10px}.meters{margin:10px 0}.controls{gap:9px}.controls button{min-height:75px}.race-head{margin-bottom:8px}.tactics span{padding:5px 6px}#feedback{font-size:12px;margin:8px 0 6px;min-height:41px;padding:8px 10px}body.racing main{padding:8px 10px calc(12px + env(safe-area-inset-bottom))}}
-@media(max-height:720px) and (orientation:portrait){body.racing #profile{max-height:30px}body.racing .meters{margin:8px 0}body.racing .controls button{min-height:64px}body.racing #message{display:none}body.racing .tactics span{padding:4px 6px}}
-@media(max-height:500px) and (orientation:landscape){body.racing main{max-width:960px}#raceArea{display:grid;grid-template-columns:1.05fr 1fr;column-gap:18px}.race-head,.hud,#game,#profile{grid-column:1}.race-head{grid-row:1}.hud{grid-row:2}#game{grid-row:3/7}#profile{grid-row:7}.meters{grid-column:2;grid-row:1}.tactics{grid-column:2;grid-row:2}#feedback{grid-column:2;grid-row:3}.rhythm-row{grid-column:2;grid-row:4}.controls{grid-column:2;grid-row:5}#message{grid-column:2;grid-row:6}#paused{grid-column:1/-1}.controls button{min-height:68px}}
-@media(prefers-reduced-motion:reduce){button{transition:none}}
-#teamRunner,#resultRunner{width:96px;height:96px;aspect-ratio:1;border:0;flex-shrink:0}#resultRunner{margin:8px auto 0}.team-preview{gap:12px}.team-preview .swatch{width:20px;height:32px}.result-rank{font-size:58px;line-height:1.1}#assetStatus{margin:0 0 10px}#reloadSprites{margin:0 0 14px}@media(max-width:360px){.team-preview{gap:8px}#selectedName{font-size:17px}}
-.opening .configure{margin-top:12px;width:100%;background:#d9f7ff;font-size:13px;min-height:44px}
-#titleSelection{font-size:11px;margin-top:13px;line-height:1.8;font-weight:800}
-.story-screen{position:relative;min-height:calc(100svh - 75px);padding:22px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,transparent 0 27px,#ffffff0c 27px 30px),linear-gradient(160deg,#0566b0,#00a4cc);border:3px solid var(--ink);border-radius:6px;box-shadow:6px 7px 0 var(--ink);color:white;overflow:hidden}
-.story-heading{text-align:center;font-size:13px;letter-spacing:.12em;color:#ffe500;margin:18px 0 8px}
-#storyBack{position:absolute;right:10px;top:10px;z-index:2;background:white;color:var(--ink);font-size:11px;min-height:38px}
-.story-box{position:relative;width:min(100%,620px);height:60vh;height:60svh;max-height:600px;overflow:hidden;border-top:2px solid #ffe500;border-bottom:2px solid #ffe500;background:#102137dd;box-shadow:0 0 0 6px #ffffff0b}
-.story-roll{position:absolute;top:100%;left:0;width:100%;padding:0 14px;text-align:center;font-size:20px;line-height:1.8;font-weight:800;text-shadow:1px 2px #08172a}
-.story-roll p{margin:0 0 1.55em}.story-roll strong{font-size:clamp(24px,6vw,35px);color:#ffe500}.story-roll .story-route{font-size:13px;color:#a6efff;margin-bottom:2em}.story-roll.rolling{animation:storyScroll 23s linear forwards}
-@keyframes storyScroll{from{top:100%;transform:translateY(0)}to{top:0;transform:translateY(-100%)}}
-#storySkip{color:var(--ink);margin-top:18px;max-width:320px;min-height:48px;font-size:15px}.story-screen>small{color:#e2f7ff;margin-top:10px;font-size:11px}
-.race-stage{position:relative}.start-countdown{position:absolute;inset:3px;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#10213770;pointer-events:none;color:white;text-align:center}
-#countNumber{font-size:clamp(70px,20vw,128px);font-weight:1000;line-height:1;color:#ffe500;text-shadow:4px 5px 0 #102137,-2px -2px 0 #102137;white-space:nowrap}
-.start-countdown.go{background:#10213725}.start-countdown.go #countNumber{font-size:clamp(32px,9vw,60px)}
-#countHint{padding:6px 12px;background:#102137e6;border:2px solid #fff;font-size:clamp(11px,3vw,15px);font-weight:900}
+:root{--ink:#102137;--cyan:#00bee7;--yellow:#ffe500;--paper:#fff;--line:#d7e6ed}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;color:var(--ink);background:repeating-linear-gradient(135deg,transparent 0 26px,#dceef755 26px 29px),#eefaff;font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:2px solid var(--ink);border-radius:7px;background:white;font-weight:800;box-shadow:3px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s;min-height:44px}
+button:active:not(:disabled){transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
+button:focus-visible,summary:focus-visible{outline:3px solid #0075d5;outline-offset:4px}
+button:disabled{cursor:default;opacity:.45;box-shadow:none}
+summary{cursor:pointer;min-height:44px;padding:12px 0;font-weight:800}
+main{max-width:780px;margin:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}
+h1,h2,p{margin:0}h2{font-size:24px;line-height:1.4}
+.sub,small{font-size:12px;color:#425a6c;line-height:1.6}
+.brand{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:900;letter-spacing:.08em;margin-bottom:14px}
+.badge{border:1px solid #a7c4d4;border-radius:4px;padding:4px 7px;font-size:9px;letter-spacing:.04em;color:#425a6c}
+.quiet{font-size:12px;padding:9px 12px;box-shadow:2px 3px 0 var(--ink)}
+.primary{background:var(--yellow);min-height:56px;padding:12px;font-size:18px;width:100%}
+.panel{background:white;border:2px solid var(--ink);border-radius:8px;padding:24px;box-shadow:5px 6px 0 var(--cyan)}
+.eyebrow{display:inline-block;background:var(--yellow);padding:5px 9px;font-size:11px;font-weight:900;margin-bottom:10px;letter-spacing:.05em}
+.opening{text-align:center;background:repeating-linear-gradient(135deg,transparent 0 27px,#ffffff16 27px 30px),linear-gradient(125deg,#008edb,#00c9e5);border:3px solid var(--ink);box-shadow:5px 6px 0 var(--ink);border-radius:8px;overflow:hidden;padding:28px 24px 24px}
+.opening>.eyebrow{transform:rotate(-3deg)}
+.logo{margin:6px auto 12px;max-width:620px}.logo img{display:block;width:100%;height:auto}
+.hero-copy{font-weight:900;font-size:16px;line-height:1.65;color:white;text-shadow:1px 2px 0 #12658d}
+.hero-bottom{max-width:500px;margin:20px auto 0;background:white;border:3px solid var(--ink);border-radius:8px;padding:18px}
+.game-facts{font-size:11px;font-weight:800}.game-facts span{color:#547487;padding:0 5px}
+#titleSelection{font-size:11px;margin:8px 0 14px;line-height:1.7;color:#425a6c;font-weight:700}
+.opening .primary{font-size:20px}.opening .configure{margin-top:12px;width:100%;background:#e4f8ff;font-size:12px}
+#resumeRelay{width:100%;background:#d8f7ef;margin-top:12px}
+#saveStatus{font-size:11px;margin-top:12px}#saveStatus:empty{display:none}
+.title-help{text-align:left;margin-top:12px;border-top:1px solid var(--line);font-size:12px;line-height:1.7}
+.title-help summary{text-align:center}.title-help p+p{margin-top:8px}
+.setup-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px}
+.steps{display:flex;gap:6px;font-size:11px;font-weight:800}.steps span{padding:8px 9px;background:#dcedf4;border:1px solid #bed3df;border-radius:4px}
+.steps .current{background:var(--cyan);border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.step-panel h2{margin-bottom:6px}.intro{font-size:13px;color:#425a6c;margin-bottom:14px;line-height:1.65}
+.mode-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0 12px}
+.mode-grid button{padding:10px 2px;font-size:17px}.mode-grid small{display:block;font-size:10px;margin-top:3px;color:inherit;font-weight:600}
+.course-grid{display:grid;gap:10px}.course-grid button{text-align:left;padding:13px 12px;display:flex;gap:10px;align-items:center;min-height:76px}
+.course-grid b{font-size:25px;min-width:43px;line-height:1.1}.course-grid span{font-size:14px}.course-grid small{display:block;font-size:10px;margin-top:5px}
+#courses{grid-template-columns:repeat(2,minmax(0,1fr))}#courses button{position:relative;padding-right:14px}
+.chosen{background:#d5f7ff!important;border-color:#007eae!important;box-shadow:3px 4px 0 var(--cyan)!important}
+#courses .chosen:after{content:'✓';position:absolute;right:4px;top:2px;color:#007eae;font-size:12px}
+#courseRoute{font-weight:800;margin:18px 0 6px;font-size:13px}
+#courseTip,#difficultyTip{padding:11px 12px;background:#ecfaff;border-left:4px solid var(--cyan);font-size:12px;line-height:1.65;margin-top:12px}
+#difficulties{grid-template-columns:repeat(3,minmax(0,1fr))}#difficulties button{display:block;text-align:center;padding:14px 3px;min-height:84px}
+#difficulties b{display:block;min-width:0;font-size:18px;margin-bottom:7px}#difficulties span{font-size:12px}
+.setup-nav{position:sticky;bottom:0;z-index:3;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-top:20px;padding:12px 0 max(4px,env(safe-area-inset-bottom));background:white;border-top:2px solid var(--line)}
+.setup-nav .quiet{height:54px}.setup-nav .primary{font-size:16px}
+.team-preview{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0;padding:8px;background:#e8faff;border:1px solid #bddce7;border-radius:6px}
+.team-preview .swatch{width:20px;height:32px;margin:0;transform:skew(-15deg);border:2px solid var(--ink)}
+#selectedName{font-size:20px;font-weight:900}.team-preview small,.team-preview strong{display:block}
+canvas{width:100%;aspect-ratio:16/9;display:block;image-rendering:pixelated;border:3px solid var(--ink)}
+#teamRunner{width:96px;height:96px;aspect-ratio:1;border:0;flex-shrink:0}
+#teams{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:16px 0 10px}
+#teams button{padding:9px 1px;font-size:11px;min-height:66px;box-shadow:2px 3px 0 #b6c5cf}
+.swatch{display:block;width:19px;height:26px;margin:0 auto 6px;border:1px solid var(--ink);transform:skew(-18deg)}
+#teams .chosen{outline:2px solid var(--cyan);outline-offset:2px}
+.guide{margin-top:18px;border-top:2px solid var(--line);padding-top:14px}.guide h3{font-size:15px;margin:0 0 12px}
+.guide ol{padding:0;list-style:none;display:grid;gap:10px;margin:0}.guide li{font-size:12px;line-height:1.65;padding-left:32px;position:relative}.guide li b{display:block;font-size:13px}
+.guide li:before{position:absolute;left:0;top:0;width:24px;height:24px;background:var(--cyan);border:1px solid var(--ink);text-align:center;font-weight:900;content:counter(list-item);border-radius:4px}
+.guide details{font-size:12px;line-height:1.7;margin-top:8px}.guide details p{margin-bottom:8px}
+.selection-summary{font-size:11px;font-weight:800;margin-top:12px;color:#425a6c}
+#assetStatus{margin-bottom:10px}#reloadSprites{margin-bottom:14px}
+body.racing main{max-width:620px;padding-top:8px}body.racing .brand,body.racing footer{display:none}
+#raceArea:focus{outline:none}.race-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.race-head strong{font-size:13px}.race-head .tag{font-size:10px;font-weight:800;color:#48667a}.race-actions .quiet{padding:7px 10px;font-size:11px;min-height:44px}
+.hud{display:grid;grid-template-columns:1fr auto;gap:1px 10px;background:var(--ink);color:white;padding:8px 12px;border-radius:7px 7px 0 0;font-size:13px;font-weight:800}
+.hud #rank{font-size:24px;grid-column:2;grid-row:1/3;color:var(--yellow);line-height:1.3;align-self:center}
+.hud #distance{font-size:11px;color:#c3eefa}.hud #clock{grid-column:2;grid-row:3;text-align:right;color:#c3eefa;font-size:10px;line-height:1;font-variant-numeric:tabular-nums}
+.race-stage{position:relative}.race-stage canvas{border-top:0;border-bottom:0}
+.start-countdown{position:absolute;inset:3px;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;gap:2px;pointer-events:none;color:white;text-align:center}
+#countNumber{font-size:clamp(34px,8vw,52px);font-weight:1000;line-height:1;color:var(--yellow);text-shadow:3px 4px 0 var(--ink),-2px -2px 0 var(--ink);white-space:nowrap}
+.start-countdown.lineup #countNumber{font-size:clamp(20px,4.5vw,32px)}.start-countdown.go #countNumber{font-size:clamp(26px,6vw,42px)}
+#countHint{padding:3px 7px;background:#102137e6;border:1px solid white;font-size:clamp(10px,2.7vw,12px);font-weight:900}
 .count-pop{animation:countPop .65s ease-out both}@keyframes countPop{from{transform:scale(1.35);opacity:.3}35%,to{transform:scale(1);opacity:1}}
-@media(max-width:420px){.story-screen{padding:16px 10px}.story-heading{margin-top:34px}.story-roll{font-size:16px;line-height:1.75;padding:0 8px}.story-roll .story-route{font-size:11px}.story-box{height:57svh}.story-screen>small{font-size:10px}}
-@media(max-height:500px) and (orientation:landscape){#raceStage{grid-column:1;grid-row:3/7}.story-screen{min-height:90svh;padding:10px 20px}.story-heading{margin-top:0}.story-box{height:48svh}.story-roll{font-size:16px}.story-screen>small{display:none}#storySkip{margin-top:10px;min-height:40px}}
-@media(prefers-reduced-motion:reduce){.story-box{overflow:auto}.story-roll,.story-roll.rolling{position:static;transform:none;animation:none;padding:18px 10px}.count-pop{animation:none}}
-
-.race-progress{background:#162c46;color:#e0edf7;border:3px solid var(--ink);border-top:0}.progress-caption{display:flex;justify-content:space-between;gap:8px;padding:6px 9px 0;font-size:10px;font-weight:700}.progress-caption b{color:#ffe500}body.racing #raceProgress #profile{aspect-ratio:320/88;max-height:none;border:0}
-@media(max-height:500px) and (orientation:landscape){#raceProgress{grid-column:1;grid-row:7}}
-/* Keep the gathering runners visible underneath the start cue. */
-.start-countdown{justify-content:flex-start;padding-top:5px;gap:2px;background:none}.start-countdown.go{background:none}#countNumber{font-size:clamp(34px,8vw,52px)}.start-countdown.lineup #countNumber{font-size:clamp(20px,4.5vw,32px)}.start-countdown.go #countNumber{font-size:clamp(26px,6vw,42px)}#countHint{padding:3px 7px;font-size:clamp(10px,2.7vw,12px);border-width:1px}
-
-.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.mode-grid button{padding:13px 4px;font-size:17px}.result-card{width:min(100%,560px);max-height:calc(100dvh - 32px);overflow:auto;padding:20px 18px}.result-overlay{padding:16px;align-items:center}.result-card h2{font-size:21px}#resultScene{aspect-ratio:20/9;border:2px solid var(--ink);margin:12px 0}#exchangeCanvas{aspect-ratio:8/3;margin:14px 0}.result-card .result-quote{font-size:15px;font-weight:900;margin:8px 0}.result-card #resultDetails{white-space:pre-line;margin:10px 0;font-size:12px}#resultRank{font-size:42px}.result-tabs{display:flex;gap:10px;justify-content:center;margin:10px 0}.result-tabs .quiet{width:auto;margin:0}.standings{text-align:left;margin:14px 0}.standings summary{font-weight:800;cursor:pointer;min-height:44px;padding:12px 0;font-size:13px}.table-scroll{overflow:auto;max-height:260px}.standings table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}.standings th,.standings td{padding:9px 5px;border-bottom:1px solid #c6dbe5;text-align:left}.standings caption{text-align:left;font-weight:bold;padding:8px 0}.own-result{background:#fff6b0}.result-swatch{display:inline-block;width:10px;height:12px;border:1px solid #394f65;margin-right:5px;vertical-align:middle}#resultSave{margin-bottom:12px;font-size:11px}#resumeRelay{width:100%;background:#d8f7ef;margin-top:14px}.hero-bottom #saveStatus{font-size:11px}.result-overlay #resultTitle:focus{outline:none}@media(min-width:600px){#setup #courses{grid-template-columns:repeat(2,minmax(0,1fr))}#setup #courses button{display:flex;text-align:left;min-height:84px}#setup #courses b{margin:0}}@media(max-width:380px){.mode-grid{gap:7px}.mode-grid button{font-size:15px}.result-card{padding:16px 12px}.result-card h2{font-size:18px}.standings th,.standings td{padding:8px 3px;font-size:10px}}
+.race-progress{background:#162c46;color:#e0edf7;border:3px solid var(--ink);border-top:1px solid #45617c}
+.progress-caption{display:flex;justify-content:space-between;gap:8px;padding:4px 8px 0;font-size:9px;font-weight:700}.progress-caption b{color:var(--yellow)}
+#profile{aspect-ratio:320/70;border:0}
+.meters{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin:9px 0}
+.meter-label{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;gap:4px;font-weight:700}.meter-label b{font-size:12px;font-variant-numeric:tabular-nums}
+.bar{height:10px;background:#dce5ec;border:1px solid var(--ink);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:#31c782;width:100%}#legBar{width:0;background:#fb955d}
+.tactics{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;font-weight:700}
+.tactics span{padding:5px 7px;background:white;border:1px solid #bccfda;border-radius:4px;line-height:1.4}
+.tactics .sheltered{background:#c9f4df;border-color:#23895d;color:#12623f}#pace{background:#d7f6fd}
+#feedback{min-height:40px;padding:8px 10px;background:#fff8b0;border:2px solid var(--ink);border-radius:5px;font-size:12px;font-weight:900;line-height:1.5;margin:8px 0}
+.control-dock{padding:6px 2px 4px;background:#eefaff}
+#rhythmHint{font-size:10px;font-weight:700;text-align:center;margin:0 0 7px;line-height:1.4;color:#425a6c}
+.controls{display:grid;grid-template-columns:1fr .86fr 1fr;gap:10px;margin:0}
+.controls button{min-height:76px;font-size:24px;line-height:1.2;background:var(--cyan);padding:10px 3px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.controls button small{display:block;font-size:10px;margin-top:6px;color:inherit;font-weight:700}.controls #right{background:#ff8198}.controls #sprint{background:var(--yellow);font-size:15px}.controls #sprint.running{background:#ffad39}
+.controls .next{outline:3px solid var(--ink);outline-offset:2px}.controls .pressed{transform:translate(2px,3px);box-shadow:1px 1px 0 var(--ink)}
+#message{font-size:11px;line-height:1.5;color:#425a6c;min-height:18px;margin:10px 0 0}
+.result-overlay{position:fixed;inset:0;background:#102137d9;z-index:10;display:grid;place-items:center;padding:16px;overflow:auto;overscroll-behavior:contain}
+.result-card{width:min(100%,540px);max-height:calc(100svh - 32px);overflow:auto;text-align:center;padding:22px 20px;background:white;border:3px solid var(--ink);border-radius:9px;box-shadow:6px 7px 0 var(--cyan)}
+.result-card h2{font-size:22px;margin:8px 0 12px;line-height:1.4}.result-card p{font-size:13px;line-height:1.7;margin-bottom:16px}.result-card .eyebrow{margin:0}
+.result-card .quiet{margin-top:10px;width:100%}.result-card h2:focus{outline:none}
+.result-layout{display:flex;flex-direction:column;overflow:hidden;padding:0}
+.result-body{min-height:0;overflow:auto;padding:18px 18px 0;overscroll-behavior:contain}
+#resultScene{aspect-ratio:20/9;border:2px solid var(--ink);margin:10px auto;max-height:180px;width:auto;max-width:100%}
+.result-metrics{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;background:#edfaff;border:1px solid #bcdde9;border-radius:7px;padding:10px}
+.result-metrics>div{display:flex;flex-direction:column;justify-content:center;gap:3px}.result-metrics>div+div{border-left:1px solid #bcdde9}
+.result-metrics span{font-size:10px;color:#425a6c;font-weight:800}#resultRank{font-size:38px;line-height:1.1;color:#007ec8;font-weight:1000}#resultTime{font-size:23px;line-height:1.2;font-variant-numeric:tabular-nums}#resultGap{font-size:10px}
+.result-card .result-quote{font-size:13px;font-weight:900;margin:10px 0 6px}.result-card #resultDetails{white-space:pre-line;margin:6px 0;font-size:11px;line-height:1.7}
+.result-tabs{display:flex;gap:10px;justify-content:center;margin:12px 0}.result-tabs .quiet{width:auto;margin:0;min-width:72px}
+.standings{text-align:left;margin:8px 0}.standings summary{font-size:12px}.table-scroll{overflow:auto;max-height:260px}
+.standings table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.standings th,.standings td{padding:9px 5px;border-bottom:1px solid #c6dbe5;text-align:left}.standings caption{text-align:left;font-weight:bold;padding:8px 0}.own-result{background:#fff6b0}
+.result-swatch{display:inline-block;width:10px;height:12px;border:1px solid #394f65;margin-right:5px;vertical-align:middle}
+.result-actions{flex-shrink:0;padding:10px 18px 16px;border-top:2px solid var(--line);background:white}
+#resultSave{margin:0 0 8px;font-size:10px}#resultSave:empty{display:none}.result-actions .quiet{box-shadow:none;border-color:#aac4d4;background:#f1f8fb}
+#exchangeCanvas{aspect-ratio:8/3;margin:14px 0}.pause-card{max-width:420px}.pause-card>small{display:block;font-size:10px;margin-top:12px}
+.pause-help{text-align:left;margin-top:14px;border-top:1px solid var(--line);font-size:12px}.pause-help p{font-size:12px;margin:0 0 12px}
+.story-screen{position:relative;min-height:calc(100svh - 75px);padding:22px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,transparent 0 27px,#ffffff0c 27px 30px),linear-gradient(160deg,#0566b0,#00a4cc);border:3px solid var(--ink);border-radius:8px;box-shadow:5px 6px 0 var(--ink);color:white;overflow:hidden}
+.story-heading{text-align:center;font-size:13px;letter-spacing:.12em;color:var(--yellow);margin:26px 0 12px}
+#storyBack{position:absolute;right:10px;top:10px;z-index:2;background:white;font-size:11px}
+.story-box{position:relative;width:min(100%,620px);height:60svh;max-height:600px;overflow:hidden;border-top:2px solid var(--yellow);border-bottom:2px solid var(--yellow);background:#102137dd;box-shadow:0 0 0 6px #ffffff0b}
+.story-roll{position:absolute;top:100%;left:0;width:100%;padding:0 14px;text-align:center;font-size:20px;line-height:1.8;font-weight:800;text-shadow:1px 2px #08172a}
+.story-roll p{margin:0 0 1.55em}.story-roll strong{font-size:clamp(24px,6vw,35px);color:var(--yellow)}.story-roll .story-route{font-size:13px;color:#a6efff;margin-bottom:2em}.story-roll.rolling{animation:storyScroll 23s linear forwards}
+@keyframes storyScroll{from{top:100%;transform:translateY(0)}to{top:0;transform:translateY(-100%)}}
+#storySkip{margin-top:18px;max-width:320px;min-height:48px;font-size:15px}.story-screen>small{color:#e2f7ff;margin-top:10px;font-size:11px}
+footer{font-size:10px;line-height:1.8;color:#536e80;margin-top:20px}footer summary{font-size:11px}footer p+p{margin-top:8px}.credits{text-align:center;margin-top:8px;font-weight:800;letter-spacing:.08em}
+@media(min-width:600px){#teams{gap:12px}#teams button{min-height:78px}#teams .swatch{width:23px;height:31px}.step-panel{min-height:360px}}
+@media(max-width:600px) and (orientation:portrait){
+ body.racing main{padding-bottom:calc(134px + env(safe-area-inset-bottom))}
+ body.racing .control-dock{position:fixed;bottom:0;left:0;right:0;z-index:4;padding:10px 12px calc(12px + env(safe-area-inset-bottom));border-top:2px solid #b3d5e6;box-shadow:0 -6px 18px #10213714}
+ body.racing #message{display:none}
+}
+@media(max-width:420px){
+ main{padding:12px 12px calc(18px + env(safe-area-inset-bottom))}.brand{margin-bottom:12px}.panel{padding:18px 12px 8px}.opening{padding:20px 12px 16px}.hero-bottom{padding:14px;margin-top:16px}.hero-copy{font-size:14px}
+ .steps{gap:4px}.steps span{padding:7px 6px;font-size:10px}.setup-top .quiet{padding:7px;font-size:10px}h2{font-size:21px}.intro{font-size:12px}
+ .mode-grid{gap:7px}.mode-grid button{font-size:15px}.mode-grid small{font-size:9px}
+ #courses{gap:9px}#courses button{display:block;padding:10px 7px;min-height:99px}#courses b{display:block;font-size:22px;margin-bottom:5px}#courses span{font-size:12px}#courses small{font-size:9px;margin-top:3px}
+ #teams{gap:7px}#teams button{font-size:10px}#selectedName{font-size:18px}.team-preview small{font-size:10px}
+ .setup-nav{gap:10px}.setup-nav .primary{font-size:14px}.setup-nav .quiet{padding:8px;font-size:11px}
+ body.racing main{padding-top:6px;padding-left:10px;padding-right:10px}.race-head{margin-bottom:6px}.race-head strong{font-size:12px}.hud{padding:6px 10px}.hud #rank{font-size:22px}
+ .result-overlay{padding:12px}.result-card{max-height:calc(100svh - 24px);padding:18px 14px}.result-layout{padding:0}.result-body{padding:14px 12px 0}.result-actions{padding:10px 12px 12px}.result-card h2{font-size:19px}#resultScene{max-height:145px}.result-card .result-quote{font-size:12px}
+ .story-screen{padding:16px 10px}.story-heading{margin-top:38px}.story-roll{font-size:16px;line-height:1.75;padding:0 8px}.story-roll .story-route{font-size:11px}.story-box{height:57svh}.story-screen>small{font-size:10px}
+}
+@media(max-width:350px){#selectedName{font-size:16px}.team-preview{gap:8px}#teams button{font-size:9px}.tactics{font-size:9px}.standings th,.standings td{padding:8px 3px;font-size:10px}.game-facts{font-size:10px}}
+@media(max-height:720px) and (orientation:portrait){
+ .meters{margin:6px 0}.tactics span{padding:4px 6px}#feedback{margin:6px 0;font-size:11px;min-height:36px;padding:6px 8px}.controls button{min-height:66px}#rhythmHint{font-size:9px}
+ body.racing main{padding-bottom:calc(120px + env(safe-area-inset-bottom))}.hud #clock{grid-row:2;align-self:end;line-height:1}.hud #rank{grid-row:1;font-size:20px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ body.racing main{max-width:980px;padding:6px 14px}#raceArea{display:grid;grid-template-columns:1.1fr 1fr;gap:6px 18px;align-items:start}
+ .race-head{grid-column:1;grid-row:1;margin:0}.hud{grid-column:1;grid-row:2}#raceStage{grid-column:1;grid-row:3/5}#raceProgress{grid-column:1;grid-row:5}
+ .meters{grid-column:2;grid-row:1;margin:2px 0}.tactics{grid-column:2;grid-row:2}#feedback{grid-column:2;grid-row:3;margin:0}.control-dock{grid-column:2;grid-row:4/6}#message{display:none}.controls button{min-height:70px}
+ .story-screen{min-height:90svh;padding:10px 20px}.story-heading{margin-top:0}.story-box{height:48svh}.story-roll{font-size:16px}.story-screen>small{display:none}#storySkip{margin-top:10px}
+}
+@media(prefers-reduced-motion:reduce){button{transition:none}.story-box{overflow:auto}.story-roll,.story-roll.rolling{position:static;transform:none;animation:none;padding:18px 10px}.count-pop{animation:none}}
 </style>
 </head>
 
@@ -46,7 +163,7 @@
 <h1 class="logo"><img id="gameLogo" src="./assets/ekiden-logo.png" width="1774" height="887" alt="目指せ！駅伝王" fetchpriority="high"></h1>
 <p class="hero-copy">リズムをきざめ。風をよめ。<br>さいごの一歩で、ぬけだそう！</p>
 
-<div class="hero-bottom"><button id="enter" class="primary">はじめる ▶</button><button id="configure" class="quiet configure">コース・たすき・難易度をえらぶ</button><p id="titleSelection"></p><button id="resumeRelay" class="quiet" hidden disabled>つづきから</button><p id="saveStatus" class="sub"></p><p class="sub">20チーム ／ 全10区間 ／ 1区間 約2〜4分</p></div>
+<div class="hero-bottom"><p class="game-facts">20チーム <span>×</span> 全10区間 <span>／</span> 1区間 約2〜4分</p><p id="titleSelection"></p><button id="enter" class="primary">レースをはじめる ▶</button><button id="resumeRelay" class="quiet" hidden disabled>つづきから</button><button id="configure" class="quiet configure">コース・たすき・難易度を変更</button><p id="saveStatus" class="sub" role="status"></p><details class="title-help"><summary>あそび方</summary><p><b>左 → 右を交互にタップ。</b>1秒に3〜4回が目安。指を休めると体力が回復します。</p><p><b>集団で温存、最後にスパート。</b>前のランナーに近づくと風よけに。残り2kmで勝負！</p></details></div>
 </section>
 <section id="story" class="story-screen" hidden aria-label="プロローグ">
 <button id="storyBack" class="quiet">タイトルへ</button><h2 class="story-heading">PROLOGUE — 20のたすき</h2>
@@ -71,25 +188,24 @@
 <li><b>前の人を風よけに！</b>近づくと自動で体力を温存。指を休めると、ゆっくり走って回復。</li>
 <li><b>最後はスパート！</b>ボタンを押すと10秒加速。その間も交互タップ！ 残り2kmがねらい目。</li>
 </ol><details><summary>もっとくわしいコツを見る</summary><p>少し遅いタップ（1秒に約2回）は温存ペース。速すぎる連打はスタミナを多く使います。先頭やひとりで走ると、向かい風で進みにくくなります。</p><p>スパートは体力30以上で使え、10秒で約40を消費。終了後は12秒の休みが必要です。もう一度押すと中止できます。</p><p>1区：集団で脚を残し、六郷橋の先で勝負。5区：上りは無理せず、最高点の先で切り替えよう。6区：下りのスパートは脚に負担。最後の平地に力を残そう。</p><p>PCでは A / L または ← / → で交互タップ、スペースでスパート、Escで一時停止。</p></details></section><p id="selectionSummary" class="selection-summary"></p></div>
-<div class="setup-nav"><button id="previous" class="quiet">← もどる</button><button id="next" class="primary">たすきをえらぶ →</button><button id="start" class="primary" hidden disabled>この設定で決定 ✓</button></div>
+<div class="setup-nav"><button id="previous" class="quiet">← もどる</button><button id="next" class="primary">たすきをえらぶ →</button><button id="start" class="primary" hidden disabled>この設定でスタート ▶</button></div>
 </section></div>
 <div id="raceArea" hidden tabindex="-1">
-<div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden>一時停止</button><button id="back" class="quiet" hidden>タイトルへ</button></div></div>
-<div id="paused" class="paused" hidden>ひと休み中。再開ボタンで走り出そう！</div>
-<div class="hud"><span id="place">大手町</span><span id="rank">—位 / 20</span><span id="distance">あと 21.3km</span></div>
+<div class="race-head"><div><strong id="courseLabel"></strong><br><span id="difficultyLabel" class="tag"></span></div><div class="race-actions"><button id="pause" class="quiet" hidden aria-label="レースを一時停止">Ⅱ 一時停止</button></div></div>
+<div class="hud"><span id="place">大手町</span><span id="rank">—位 / 20</span><span id="distance">あと 21.3km</span><span id="clock" aria-label="区間経過時間">00:00</span></div>
 <div id="raceStage" class="race-stage"><canvas id="game" width="320" height="180" aria-label="黄色い印のランナーがあなた。20人が集まるスタートから、横スクロール駅伝レース"></canvas><div id="startCountdown" class="start-countdown" hidden role="status" aria-live="assertive" aria-atomic="true"><b id="countNumber">3</b><span id="countHint">左足から、リズムよく！</span></div></div>
-<div id="raceProgress" class="race-progress"><div class="progress-caption"><strong>20チームの位置</strong><span><b aria-hidden="true">▼</b> きみのたすき</span></div><canvas id="profile" width="320" height="88" role="img" aria-label="20チームの進捗と区間の高低差。四角はたすき色、黄色い印はあなた。集団は重ならないよう上下に並べて表示します。"></canvas></div>
+<div id="raceProgress" class="race-progress"><div class="progress-caption"><strong>20チームの位置・高低差</strong><span><b aria-hidden="true">▼</b> きみ</span></div><canvas id="profile" width="320" height="70" role="img" aria-label="20チームの進捗と区間の高低差。四角はたすき色、黄色い印はあなた。"></canvas></div>
 <div class="meters"><div><div class="meter-label"><span>スタミナ</span><b id="energy">100%</b></div><div class="bar"><i id="bar"></i></div></div><div><div class="meter-label"><span>脚のつかれ</span><b id="legs">0%</b></div><div class="bar"><i id="legBar"></i></div></div></div>
 <div class="tactics"><span id="shelter">風よけ —</span><span id="pace">ペース 待機中</span><span id="wind">向かい風</span><span id="terrain">平地</span></div>
 <p id="feedback" role="status" aria-live="off">左足からタップしてみよう！</p>
-<div class="rhythm-row"><p id="rhythmHint">交互で走る ／ ゆっくりで温存 ／ 指を休めて回復</p><span id="clock">00:00</span></div>
-<div class="controls"><button id="left" disabled>左足<small id="leftHint">左からスタート</small></button><button id="sprint" disabled>スパート<small id="sprintHint">10秒ダッシュ</small></button><button id="right" disabled>右足<small id="rightHint">交互にタップ</small></button></div>
+<div id="raceControls" class="control-dock"><p id="rhythmHint">左 → 右、リズムよく。指を休めると回復。</p><div class="controls"><button id="left" disabled>左足<small id="leftHint">左からスタート</small></button><button id="sprint" disabled>スパート<small id="sprintHint">10秒ダッシュ</small></button><button id="right" disabled>右足<small id="rightHint">交互にタップ</small></button></div></div>
 <p id="message"></p>
 </div>
-<section id="result" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card"><span id="resultKind" class="eyebrow">RESULT</span><h2 id="resultTitle" tabindex="-1"></h2><canvas id="resultScene" width="320" height="144" role="img" aria-label="完走したランナーの静止画"></canvas><div id="resultRank" class="result-rank"></div><p id="resultQuote" class="result-quote"></p><p id="resultDetails"></p><div id="resultTabs" class="result-tabs" aria-label="結果の切り替え"></div><details class="standings"><summary>全20チームの順位を見る</summary><div class="table-scroll"><table><caption id="resultTableCaption"></caption><thead><tr><th>順位</th><th>チーム</th><th>記録</th><th>トップ差</th></tr></thead><tbody id="resultTable"></tbody></table></div></details><p id="resultSave" class="sub"></p><button id="retry" class="primary">次へ</button><button id="selectAgain" class="quiet">タイトルへ</button></div></section>
+<section id="paused" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle"><div class="result-card pause-card"><span class="eyebrow">PAUSE</span><h2 id="pauseTitle">ひと休みしよう</h2><p>レースの時間は止まっています。</p><button id="pauseResume" class="primary">レースに戻る ▶</button><details class="pause-help"><summary>走り方を確認</summary><p><b>左 → 右を交互にタップ</b><br>1秒に3〜4回が目安。ゆっくりなら温存、指を休めると回復します。</p><p><b>前のランナーを風よけに</b><br>集団で体力を残し、残り2kmで10秒のスパート！ 加速中も交互タップを続けよう。</p><p>PC：A / L または ← / →、スペースでスパート、Escで一時停止。</p></details><button id="back" class="quiet" hidden>タイトルへ戻る</button><small>この区間の途中経過は保存されません。<br>リレーは区間の最初から再開できます。</small></div></section>
+<section id="result" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle"><div class="result-card result-layout"><div class="result-body"><span id="resultKind" class="eyebrow">RESULT</span><h2 id="resultTitle" tabindex="-1"></h2><canvas id="resultScene" width="320" height="144" role="img" aria-label="完走したランナーの静止画"></canvas><div class="result-metrics"><div><span>順位</span><b id="resultRank" class="result-rank"></b></div><div><span>記録</span><b id="resultTime"></b><small id="resultGap"></small></div></div><p id="resultQuote" class="result-quote"></p><p id="resultDetails"></p><div id="resultTabs" class="result-tabs" aria-label="結果の切り替え"></div><details class="standings"><summary>全20チームの順位を見る</summary><div class="table-scroll"><table><caption id="resultTableCaption"></caption><thead><tr><th>順位</th><th>チーム</th><th>記録</th><th>トップ差</th></tr></thead><tbody id="resultTable"></tbody></table></div></details></div><div class="result-actions"><p id="resultSave" class="sub"></p><button id="retry" class="primary">次へ</button><button id="selectAgain" class="quiet">タイトルへ</button></div></div></section>
 <section id="exchange" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="exchangeTitle"><div class="result-card"><span class="eyebrow">TASUKI RELAY</span><h2 id="exchangeTitle"></h2><canvas id="exchangeCanvas" width="320" height="120" role="img" aria-label="同じたすき色の選手が中継所でたすきをつなぐ"></canvas><p id="exchangeText"></p><button id="exchangeSkip" class="primary">次の区間へ ▶</button></div></section>
 <section id="saveChoice" class="result-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="saveChoiceTitle"><div class="result-card"><h2 id="saveChoiceTitle">保存したリレーがあります</h2><p>新しく始めると、保存したリレーを上書きします。</p><button id="overwriteRelay" class="primary">上書きして、新しく始める</button><button id="cancelOverwrite" class="quiet">もどる</button></div></section>
-<footer>架空の大会・20チームによる作品です。実在の大学・公式大会とは無関係です。<br>距離と主な地形を参考に、勾配・風・走行時間はゲーム用に調整しています。全10区間を単独・往路・復路・総合で試遊できます。地名の通過位置と景色は概略です。</footer>
+<footer><details><summary>ゲームについて・セーブの説明</summary><p>架空の大会・20チームによる作品です。実在の大学・公式大会とは無関係です。距離と主な地形を参考に、勾配・風・走行時間はゲーム用に調整しています。</p><p>リレーは区間ごとに自動保存。同じブラウザで再開できます。走行中の区間は最初からとなります。</p></details><p class="credits">TOKYO 8 GAMES · StudioTokyo8</p></footer>
 </main>
 <script>
 (()=>{'use strict';
@@ -144,7 +260,7 @@ function saveRelay(){
 function updateSaveUI(){
  const saved=readSave();$('resumeRelay').hidden=!saved;$('resumeRelay').disabled=!spriteReady;
  if(saved){const m=playModes.find(m=>m.id===saved.mode);$('resumeRelay').textContent='つづきから：'+m.label+' '+(saved.legIndex+1)+'区'+(saved.stage==='results'?'の結果':'');}
- $('saveStatus').textContent=saveError?'このブラウザでは保存できません。画面を閉じると進行が失われます。':'リレーは区間ごとに自動保存。同じブラウザで再開できます（走行中の区間は最初から）。';
+ $('saveStatus').textContent=saveError?'保存できません。画面を閉じると進行が失われます。':saved?'リレーの記録があります。つづきから再開できます。':'';
 }
 function chooseMode(id){
  if(!playModes.some(m=>m.id===id))return;
@@ -240,14 +356,17 @@ function openResults(view=0){
 function renderResult(){
  const v=resultViews[resultView],rows=standing(v.times),own=rows.find(r=>r.team===selected),winner=rows[0],scene=Number.isInteger(s.resultScene)?s.resultScene:0;
  $('resultKind').textContent=v.kind+' RESULT';$('resultRank').textContent=own.rank+'位';
- $('resultTitle').textContent=v.title+'｜'+(own.rank===1?(v.kind==='区間'?'区間賞！':v.kind+'優勝！'):'最後まで、ナイスラン！');
+ $('resultTitle').textContent=v.title+(own.rank===1?(v.kind==='区間'?'｜区間賞！':'｜優勝！'):'');
  const messages=own.rank===1?['最高の走りで、たすきをつないだ！','仲間とつかんだ、いちばんの景色！','積み重ねた一歩が、実を結んだ！']:['この一歩が、次の力になる。','悔しさも誇りも、たすきにこめて。','最後まで走った！ 胸を張ろう。'];
  $('resultQuote').textContent=messages[scene%messages.length];
- $('resultDetails').textContent=teamColors[selected][0]+'チーム｜'+s.difficulty.label+'\n記録 '+recordClock(own.time)+' ／ トップとの差 '+(own.gap?'+'+recordClock(own.gap):'なし')+'\n'+(v.kind==='区間'?'区間賞：':'1位：')+rows.filter(r=>r.rank===1).map(r=>teamColors[r.team][0]).join('・')+'チーム';
+ $('resultTime').textContent=recordClock(own.time);
+ $('resultGap').textContent=own.gap?'トップ差 +'+recordClock(own.gap):'トップとの差なし';
+ $('resultDetails').textContent=teamColors[selected][0]+'チーム ／ '+s.difficulty.label+'\n'+(v.kind==='区間'?'区間賞：':'1位：')+rows.filter(r=>r.rank===1).map(r=>teamColors[r.team][0]).join('・')+'チーム';
  $('resultTable').replaceChildren();
  for(const row of rows){const tr=document.createElement('tr');if(row.team===selected)tr.className='own-result';const rankCell=document.createElement('td');rankCell.textContent=row.rank+'位';const name=document.createElement('th');name.scope='row';const swatch=document.createElement('i');swatch.className='result-swatch';swatch.style.background=teamColors[row.team][2]?'linear-gradient(110deg,'+teamColors[row.team][1]+' 45%,'+teamColors[row.team][2]+' 45% 60%,'+teamColors[row.team][1]+' 60%)':teamColors[row.team][1];name.appendChild(swatch);name.appendChild(document.createTextNode(teamColors[row.team][0]+(row.team===selected?' ★':'')));const time=document.createElement('td');time.textContent=recordClock(row.time);const gap=document.createElement('td');gap.textContent=row.gap?'+'+recordClock(row.gap):'—';for(const n of [rankCell,name,time,gap])tr.appendChild(n);$('resultTable').appendChild(tr);}
  $('resultTableCaption').textContent=v.kind+'順位：全20チーム';
  $('resultTabs').replaceChildren();resultViews.forEach((item,i)=>{const b=document.createElement('button');b.className='quiet'+(i===resultView?' chosen':'');b.textContent=item.kind;b.setAttribute('aria-pressed',String(i===resultView));b.addEventListener('click',()=>{resultView=i;renderResult()});$('resultTabs').appendChild(b)});
+ $('resultTabs').hidden=resultViews.length===1;
  const hasNext=relay?courseIndex<modeInfo().end:courseIndex===0;
  $('retry').textContent=resultView<resultViews.length-1?'次へ：'+resultViews[resultView+1].title:hasNext?(s.course.id===5?'復路へ！ 6区の準備':'次の '+(s.course.id+1)+'区へ'):'もう一度、挑戦！';
  $('selectAgain').textContent='タイトルへ';if(relay){relay.view=resultView;saveRelay();}
@@ -365,13 +484,13 @@ function advanceCountdown(t){
 }
 
 function showStep(i,focus=true){setupStep=i;for(let j=0;j<3;j++){$('step'+j).hidden=j!==i;$('stepMark'+j).classList.toggle('current',j===i);$('stepMark'+j).setAttribute('aria-current',j===i?'step':'false')}$('next').hidden=i===2;$('start').hidden=i!==2;$('next').textContent=i===0?'たすきをえらぶ →':'走る準備へ →';$('previous').textContent=i===0?'← タイトル':'← もどる';$('selectionSummary').textContent=modeInfo().label+' ／ '+courses[courseIndex].id+'区 '+courses[courseIndex].route+' ／ '+teamColors[selected][0]+'チーム';if(focus)$('heading'+i).focus({preventScroll:true});$('setup').scrollIntoView({block:'start'});drawCharacterCards(performance.now());}
-function opening(){exchangeTime=null;$('exchange').hidden=true;$('saveChoice').hidden=true;stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定で決定 ✓';updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
+function opening(){exchangeTime=null;$('exchange').hidden=true;$('saveChoice').hidden=true;stopStory();readyAfterStory=false;s=null;$('startCountdown').hidden=true;$('start').textContent='この設定でスタート ▶';$('paused').hidden=true;updateTitleSelection();$('opening').hidden=false;$('setup').hidden=true;$('raceArea').hidden=true;$('result').hidden=true;$('raceArea').inert=false;document.body.classList.remove('racing');$('enter').focus({preventScroll:true});$('opening').scrollIntoView({block:'start'});}
 $('enter').addEventListener('click',()=>beginRun());
 $('resumeRelay').addEventListener('click',resumeRelay);
 $('overwriteRelay').addEventListener('click',()=>pendingContinuation?continueFromFirst(true):beginRun(true));
-$('cancelOverwrite').addEventListener('click',()=>{$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else $('enter').focus()});
+$('cancelOverwrite').addEventListener('click',()=>{$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else ($('setup').hidden?$('enter'):$('start')).focus()});
 $('exchangeSkip').addEventListener('click',finishExchange);
-playModes.forEach(m=>{const b=document.createElement('button');b.textContent=m.label;b.addEventListener('click',()=>chooseMode(m.id));$('playModes').appendChild(b)});
+playModes.forEach(m=>{const b=document.createElement('button');b.textContent=m.label;const sub=document.createElement('small');sub.textContent=m.id==='single'?'好きな1区間':m.id==='out'?'1〜5区':m.id==='back'?'6〜10区':'全10区間';b.appendChild(sub);b.addEventListener('click',()=>chooseMode(m.id));$('playModes').appendChild(b)});
 $('toTitle').addEventListener('click',opening);
 $('next').addEventListener('click',()=>showStep(Math.min(2,setupStep+1)));
 $('previous').addEventListener('click',()=>setupStep===0?opening():showStep(setupStep-1));
@@ -389,14 +508,15 @@ function notice(text,seconds=1.1){s.notice=text;s.noticeUntil=s.elapsed+seconds;
 function tap(side){if(!s||!s.active||s.paused)return;const now=performance.now()/1000,delta=now-s.lastTap,next=side==='left'?'右':'左';if(s.lastInput===side){s.mode='stumble';s.player.energy=clamp(s.player.energy-.35,0,100);notice('同じ足が続いています。次は'+next+'足');}else if(!s.lastInput||delta>1){s.mode='cruise';notice('次は'+next+'足！ 一定のリズムで');}else if(delta<s.difficulty.minBeat){s.mode='rush';notice('速すぎ！ スタミナを使います。少しゆっくり');}else if(delta<s.difficulty.maxBeat){s.mode='cruise';notice('いいリズム！ 次は'+next+'足');}else{s.mode='save';notice('温存ペース。次は'+next+'足');}s.lastInput=side;s.lastTap=now;renderHUD();}
 function startSprint(r){if(r.sprint>0||r.cooldown>0||r.energy<30)return false;r.sprint=10;return true;}
 function dash(){if(!s||!s.active||s.paused)return;const p=s.player;if(p.sprint>0){p.sprint=0;p.cooldown=12;notice('スパート中止。12秒間、脚を整えよう',2);}else if(startSprint(p)){s.sprints++;notice('スパート！ 左右のタップを続けよう',2);}renderHUD();}
-function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();s.lineupElapsed=2;countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();}
+function pause(){if(!s||(!s.active&&!s.counting))return;s.paused=!s.paused;if(s.counting){$('startCountdown').hidden=s.paused;if(!s.paused){s.countdownStartedAt=performance.now();s.lineupElapsed=2;countdownView('3')}}s.lastTap=-999;s.lastInput='';last=performance.now();renderHUD();(s.paused?$('pauseResume'):$('pause')).focus({preventScroll:true});}
 ['left','right'].forEach(id=>{const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();tap(id)});b.addEventListener('click',e=>{if(e.detail===0)tap(id)});b.addEventListener('contextmenu',e=>e.preventDefault());});
-$('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():opening()});$('retry').addEventListener('click',resultNext);$('back').addEventListener('click',opening);$('selectAgain').addEventListener('click',opening);$('pause').addEventListener('click',pause);
+$('pauseResume').addEventListener('click',pause);
+$('sprint').addEventListener('click',dash);$('start').addEventListener('click',()=>{readyAfterStory?reset():beginRun()});$('retry').addEventListener('click',resultNext);$('back').addEventListener('click',opening);$('selectAgain').addEventListener('click',opening);$('pause').addEventListener('click',pause);
 document.addEventListener('keydown',e=>{if(e.repeat||!s||(!s.active&&!s.counting))return;const keys=['ArrowLeft','a','A','ArrowRight','l','L',' ','Escape'];if(!keys.includes(e.key))return;if(e.key===' '&&e.target&&e.target.tagName==='BUTTON')return;e.preventDefault();if(['ArrowLeft','a','A'].includes(e.key))tap('left');else if(['ArrowRight','l','L'].includes(e.key))tap('right');else if(e.key===' ')dash();else pause();});
 document.addEventListener('keydown',e=>{
- const panel=['result','exchange','saveChoice'].map($).find(n=>!n.hidden);if(!panel)return;
+ const panel=['result','exchange','saveChoice','paused'].map($).find(n=>!n.hidden);if(!panel)return;
  if(e.key==='Tab'){const items=Array.from(panel.querySelectorAll('button:not([disabled]),summary'));if(!items.length)return;const i=items.indexOf(document.activeElement),next=e.shiftKey?(i<=0?items.length-1:i-1):(i+1)%items.length;e.preventDefault();items[next].focus();}
- else if(e.key==='Escape'){e.preventDefault();if(panel===$('saveChoice')){$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else $('enter').focus()}else opening();}
+ else if(e.key==='Escape'){if(panel===$('paused'))return;e.preventDefault();if(panel===$('saveChoice')){$('saveChoice').hidden=true;if(pendingContinuation){pendingContinuation=false;openResults();}else ($('setup').hidden?$('enter'):$('start')).focus()}else opening();}
 });
 document.addEventListener('visibilitychange',()=>{if(storyPlaying)$('storyRoll').style.animationPlayState=document.hidden?'paused':'running';if(document.hidden&&s&&(s.active||s.counting)&&!s.paused)pause()});
 function aiEffort(r){
@@ -423,7 +543,7 @@ function tick(dt){if(!s||!s.active||s.paused)return;const t0=s.elapsed;
 function rank(){const p=s.player;return 1+s.ai.filter(a=>s.done?a.finishTime!==null&&a.finishTime<p.finishTime:a.km>p.km).length;}
 function clock(t){return String(Math.floor(t/60)).padStart(2,'0')+':'+String(Math.floor(t%60)).padStart(2,'0');}
 function currentPlace(){let name=course().marks[0][1];if(s)for(const [km,n] of s.course.marks)if(s.player.km>=km)name=n;return name;}
-function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label+(relay?' ／ '+modeInfo().label+'リレー':' ／ 区間チャレンジ');$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s&&!s.counting?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中！ 体力を温存':s?'ひとり・先頭は風に注意':'風よけは近くの前走者から';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+({city:'街道',coast:'海沿い',town:'街道',mountain:'山道'}[co.scene]);const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':s.counting?'スタート待ち':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent=s&&s.paused?'再開':'一時停止';const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
+function renderHUD(){const co=course(),p=s?s.player:makeRunner(teamColors[selected]),active=!!(s&&s.active&&!s.paused);$('courseLabel').textContent=co.id+'区｜'+co.route;$('difficultyLabel').textContent=difficulty().label+(relay?' ／ '+modeInfo().label+'リレー':' ／ 区間チャレンジ');$('place').textContent=currentPlace();$('distance').textContent='あと '+Math.max(0,co.km-p.km).toFixed(1)+'km ／ '+co.km+'km';$('rank').textContent=(s&&!s.counting?rank():'—')+'位 / 20';$('clock').textContent=clock(s?s.elapsed:0);$('energy').textContent=Math.round(p.energy)+'%';$('bar').style.width=p.energy+'%';$('bar').style.background=p.energy<30?'#f59b65':'#57d57c';$('legs').textContent=Math.round(p.legs)+'%';$('legBar').style.width=p.legs+'%';$('wind').textContent='向かい風 '+((p.wind||co.wind)>.18?'強':(p.wind||co.wind)>.1?'中':'弱');$('shelter').textContent=p.drafting?'風よけ中・体力を温存':'風よけなし';$('shelter').classList.toggle('sheltered',p.drafting);const g=terrainAt(p.km).grade;$('terrain').textContent=(g>.01?'上り坂':g<-.01?'下り坂':'平地')+'｜'+({city:'街道',coast:'海沿い',town:'街道',mountain:'山道'}[co.scene]);const mode=s?s.currentMode:'waiting';$('pace').textContent='ペース '+(!s?'待機中':s.done?'ゴール':s.paused?'一時停止':s.counting?'スタート待ち':p.sprint>0&&mode!=='recover'?'スパート':{recover:'回復',save:'温存',cruise:'巡航',rush:'力みすぎ',stumble:'リズムを戻そう'}[mode]||'スタート');$('left').disabled=!active;$('right').disabled=!active;$('sprint').disabled=!active||(p.sprint===0&&(p.energy<30||p.cooldown>0));$('sprint').classList.toggle('running',p.sprint>0);$('sprintHint').textContent=p.sprint>0?'あと'+Math.ceil(p.sprint)+'秒・中止可':p.cooldown>0?'あと'+Math.ceil(p.cooldown)+'秒':p.energy<30?'体力30以上で発動':'10秒ダッシュ';$('paused').hidden=!(s&&s.paused);$('pause').textContent='Ⅱ 一時停止';$('raceArea').inert=!!(s&&(s.paused||s.done));const next=s&&s.lastInput==='left'?'right':'left';for(const id of ['left','right']){$(id).classList.toggle('next',active&&next===id);$(id+'Hint').textContent=active&&next===id?'次はこっち！':'交互にタップ';}
  if(active){if(s.elapsed>s.noticeUntil)$('feedback').textContent=mode==='recover'?'指を離して回復中。交互タップで再び巡航！':p.energy<25?'スタミナ残りわずか。タップを遅めにして温存しよう':p.legs>35?'脚に負担がたまっています。下りは温存ペースに':p.drafting?'風よけ中！ 集団で脚を残し、勝負どころを待とう':'風に向かって走行中。力を残して、最後に勝負！';const ahead=s.ai.filter(a=>a.km>p.km).sort((a,b)=>a.km-b.km)[0];$('message').textContent=ahead?'前のランナーまで '+Math.round((ahead.km-p.km)*1000)+'m｜'+(co.id===5?'上りは無理せず温存':co.id===6?'下りは脚のつかれに注意':'集団で力をためよう'):'先頭！ 風を受けながら逃げ切れるか？';}
 }
 function rect(x,y,w,h,color,target=ctx){target.fillStyle=color;target.fillRect(Math.round(x),Math.round(y),w,h);}
@@ -708,18 +828,18 @@ function progressMarkers(){
  const markers=[s.player,...s.ai].map(r=>({runner:r,teamIndex:teamColors.indexOf(r.team),position:8+clamp(r.km/s.course.km,0,1)*304}));
  for(let lane=0;lane<4;lane++){
   const row=markers.filter(m=>m.teamIndex%4===lane).sort((a,b)=>a.position-b.position||a.teamIndex-b.teamIndex);
-  row.forEach((m,i)=>{m.x=Math.max(m.position,i?row[i-1].x+14:8);m.y=30+lane*15;});
+  row.forEach((m,i)=>{m.x=Math.max(m.position,i?row[i-1].x+14:8);m.y=24+lane*11;});
   if(row.length&&row[row.length-1].x>312){row[row.length-1].x=312;for(let i=row.length-2;i>=0;i--)row[i].x=Math.min(row[i].x,row[i+1].x-14);}
  }
  return markers;
 }
 function drawProgress(){
  const co=course(),markers=progressMarkers();
- rect(0,0,320,88,'#162c46',pc);
+ rect(0,0,320,70,'#162c46',pc);
  const maxH=Math.max(60,...co.profile.map(p=>p[1]))*1.05;
- for(let x=8;x<312;x+=2){const h=terrainAt((x-8)/304*co.km).height/maxH*18;rect(x,85-h,2,h+1,'#355f60',pc);}
+ for(let x=8;x<312;x+=2){const h=terrainAt((x-8)/304*co.km).height/maxH*12;rect(x,68-h,2,h+1,'#355f60',pc);}
  pc.font='8px monospace';pc.fillStyle='#e0edf7';pc.fillText('START',8,9);pc.fillText('線の先が現在地',132,9);pc.fillText('GOAL',288,9);
- pc.fillStyle='#aac5ce';pc.fillText('高低差（概略）',115,85);
+ pc.fillStyle='#aac5ce';pc.fillText('高低差',140,69);
  rect(8,14,304,3,'#688195',pc);
  if(s)rect(8,14,clamp(s.player.km/co.km,0,1)*304,3,'#ffe500',pc);
  for(let i=0;i<=4;i++)rect(8+i*76,13,1,5,'#e0edf7',pc);

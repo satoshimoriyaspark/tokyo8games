@@ -5,7 +5,7 @@ const html=fs.readFileSync(path.join(GAME_DIR,'index.html'),'utf8');
 function makeEnv(failFirst=false,storage=new Map()){
  const nodes={},listeners={};let now=0,fail=failFirst;
  function el(tag='div',id=''){
-  const obj=tag==='canvas'?createCanvas(['game','profile','resultScene','exchangeCanvas'].includes(id)?320:96,id==='game'?180:id==='profile'?88:id==='resultScene'?144:id==='exchangeCanvas'?120:96):{};
+  const obj=tag==='canvas'?createCanvas(['game','profile','resultScene','exchangeCanvas'].includes(id)?320:96,id==='game'?180:id==='profile'?70:id==='resultScene'?144:id==='exchangeCanvas'?120:96):{};
   Object.assign(obj,{id,tagName:tag.toUpperCase(),hidden:false,disabled:false,inert:false,children:[],style:{},textContent:'',attrs:{},classList:{add(){},remove(){},toggle(){}},addEventListener(k,fn){this.events??={};this.events[k]=fn},setAttribute(k,v){this.attrs[k]=v},appendChild(v){this.children.push(v)},replaceChildren(){this.children=[]},querySelector(){return el()},focus(){document.activeElement=this},scrollIntoView(){}});
   return obj;
  }
