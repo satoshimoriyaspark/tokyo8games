@@ -38,6 +38,14 @@
     {
       "source": "/aib/",
       "destination": "/games/aib/index.html"
+    },
+    {
+      "source": "/aib/cards",
+      "destination": "/games/aib/cards.html"
+    },
+    {
+      "source": "/aib/cards/",
+      "destination": "/games/aib/cards.html"
     }
   ]
 }
