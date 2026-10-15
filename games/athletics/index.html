@@ -5,7 +5,7 @@
 *{box-sizing:border-box}body{margin:0;background:#101927;color:#f9f4db;font:700 14px monospace;overscroll-behavior:none}.wrap{max-width:900px;margin:auto;padding:12px}header{text-align:center}h1{font-size:clamp(22px,6vw,40px);color:#ffdb65;text-shadow:3px 3px #9e4e45;margin:8px 0}p{line-height:1.6}canvas{display:block;width:100%;height:auto;aspect-ratio:6/5;image-rendering:pixelated;background:#203344;border:5px solid #e5ddc8}#msg{color:#ffdb65;text-align:center;min-height:42px;padding:12px}.buttons,.events,.pads{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:10px 0}button{font:700 14px monospace;background:#2e527b;color:#fff;border:3px solid #e9e5db;border-radius:3px;padding:10px 13px;touch-action:none;user-select:none;cursor:pointer;box-shadow:0 4px #070d16}button:active,.active{transform:translateY(3px);box-shadow:0 1px #070d16!important}.main{background:#278362}.pads{gap:40px}.pads button{width:min(39vw,190px);height:90px;font-size:34px;background:#3977bf}.pads button:last-child{background:#bb4b47}.events button{font-size:11px;padding:8px}.selected{border-color:#ffdb65;color:#ffdb65}#help{text-align:center;min-height:28px;color:#cbd8e1}#results{max-width:630px;margin:10px auto}table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #405164;text-align:left}td:last-child,th:last-child{text-align:right}.small{font-size:11px;text-align:center;color:#b8c6d0}
 #resultPanel{background:#17283d;border:4px solid #ffdb65;padding:14px;margin:10px auto;max-width:650px;text-align:center;box-shadow:5px 5px #080f1c}#resultPanel[hidden]{display:none}#resultPanel h2{color:#ffdb65;margin:3px 0 8px;font-size:21px}.record{font-size:clamp(26px,8vw,42px);color:#fff;margin:8px}.resultMeta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.resultMeta span{background:#36577d;border:2px solid #e4d8bb;padding:8px 12px}.resultRank{font-size:25px;color:#ffdb65;margin:8px}.rankTable{width:100%;margin:12px 0;border-collapse:collapse}.rankTable tr.you{background:#315c56;color:#ffefad}.rankTable td,.rankTable th{padding:9px;border-bottom:1px solid #607487;text-align:left}.rankTable td:last-child{text-align:right}#resultPanel .hint{color:#b9cbdc;font-size:12px}#tutorial{border:3px solid #ffdb65;background:#192c40;padding:12px;margin:10px 0;text-align:center}#tutorial h2{margin:3px 0;color:#ffdb65;font-size:18px}#tutorial p{margin:7px 0}#tutorial[hidden]{display:none}.pads button span{display:block;font-size:12px;margin-top:3px}.guide{background:#30445c;padding:8px;border:2px solid #879bb0;color:#fff}#help{font-size:15px;font-weight:bold;color:#ffdb65}@media(max-width:500px){.wrap{padding:7px}.pads{gap:16px}.pads button{height:78px}header p{margin:4px}} </style><link rel="stylesheet" href="./ui.css"></head><body><main id="opening" class="opening" aria-label="8BIT ATHLETICS オープニング">
  <div class="opening-shell">
-  <div class="opening-top"><span>STUDIO TOKYO 8</span><span class="beta-tag">WEB BETA</span></div>
+  <button id="openingSound" aria-pressed="true">音：ON</button><div class="opening-top"><span>STUDIO TOKYO 8</span><span class="beta-tag">WEB BETA</span></div>
   <section id="titleView" aria-labelledby="titleLogo">
    <p class="opening-kicker">走れ。跳べ。投げろ。</p>
    <h1 id="titleLogo" class="title-logo"><img src="./assets/branding/8bit-athletics-logo.png" alt="8BIT ATHLETICS" width="1774" height="887" fetchpriority="high"></h1>
@@ -22,6 +22,7 @@
  </div>
 </main>
 <div class="wrap" id="gameView" hidden><header class="game-header"><h1>8BIT ATHLETICS</h1><button id="sound" aria-pressed="true">音：ON</button></header><h2 id="menuTitle" tabindex="-1">競技を選ぶ</h2><label id="difficultyControl">難易度 <select id="difficulty" aria-label="難易度"><option value="0">1 やさしい</option><option value="1">2 気軽に</option><option value="2" selected>3 スタンダード</option><option value="3">4 むずかしい</option><option value="4">5 チャンピオン</option></select></label><canvas tabindex="-1" aria-label="競技画面" id="screen" width="384" height="320"></canvas><section id="tutorial" hidden><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p id="tutorialHint"></p><button class="main" id="tutorialGo">スタート</button></section><section id="resultPanel" hidden aria-live="polite"><h2 id="resultHeading" tabindex="-1">RESULT</h2><div id="resultRecord" class="record"></div><div id="resultRank" class="resultRank"></div><div id="resultMeta" class="resultMeta"></div><table class="rankTable" id="resultRanking"></table><p class="hint" id="resultHint"></p></section><p id="spriteStatus" class="small" aria-live="polite">キャラクター：画像ロード中</p><div id="msg" aria-live="polite">競技を選んでSTART！</div><div class="buttons"><button class="main" id="start">START</button><button id="cup">5種競技大会</button><button id="reset">タイトルへ</button><button id="menuBack">競技選択へ</button><button id="skipCeremony">結果を見る</button></div><div id="help"></div><div class="pads"><button id="a">A<span id="aLabel">連打</span></button><button id="b">B<span id="bLabel">ジャンプ</span></button></div><div class="events" id="events"></div><div id="results"></div></div>
+<script src="./audio.js"></script>
 <script>
 (()=>{'use strict';
 const events=[['100m走','A・Bを交互に連打','time'],['1500m走','Aで走る・残り300mからBでスパート','time'],['110mハードル','A連打で走り、Bでジャンプ','time'],['走り幅跳び','A連打→踏切線でB。3回挑戦','length'],['ジャベボール投げ','A連打→B長押しで角度→離して投げる','length']];
@@ -78,14 +79,16 @@ function advanceRunnerMotion(dt){
   m.frameTime=(m.frameTime+cycleDt*fps)%24;
  });
 }
-let audioContext=null,soundEnabled=true;
+const music=window.AthleticsAudio?new window.AthleticsAudio():null;
+let audioContext=null,soundEnabled=music?.enabled??true,resultNewRecord=false;
 async function unlockStartAudio(){
  if(!soundEnabled)return;
+ if(music){await music.unlock();audioContext=music.context;return;}
  try{const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;audioContext??=new Audio();if(audioContext.state==='suspended')await audioContext.resume().catch(()=>{});}catch{}
 }
 function playStartCue(phase){
  if(!soundEnabled||!audioContext||audioContext.state!=='running')return;
- const ctx=audioContext,t=ctx.currentTime,gain=ctx.createGain();gain.connect(ctx.destination);
+ const ctx=audioContext,t=ctx.currentTime,gain=ctx.createGain();gain.connect(music?.output||ctx.destination);
  if(phase===2){
   const length=Math.floor(ctx.sampleRate*.18),buffer=ctx.createBuffer(1,length,ctx.sampleRate),data=buffer.getChannelData(0);
   for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*(1-i/length);
@@ -96,7 +99,10 @@ function playStartCue(phase){
   gain.gain.setValueAtTime(.001,t);gain.gain.exponentialRampToValueAtTime(.12,t+.01);gain.gain.exponentialRampToValueAtTime(.001,t+.16);tone.start(t);tone.stop(t+.17);
  }
 }
-$('#sound').onclick=()=>{soundEnabled=!soundEnabled;$('#sound').textContent='音：'+(soundEnabled?'ON':'OFF');$('#sound').setAttribute('aria-pressed',String(soundEnabled));if(soundEnabled){unlockStartAudio();}};
+function soundUI(){for(const id of ['#sound','#openingSound']){const el=$(id);el.textContent=soundEnabled?'🔊 音：ON':'🔇 音：OFF';el.setAttribute('aria-pressed',String(soundEnabled));}}
+function toggleSound(){soundEnabled=!soundEnabled;music?.setEnabled(soundEnabled);soundUI();if(soundEnabled)unlockStartAudio();}
+$('#sound').onclick=toggleSound;$('#openingSound').onclick=toggleSound;soundUI();
+function syncMusic(){if(!music)return;const result=mode==='result'||mode==='finished';const name=openingPage!=='game'||mode==='menu'||mode==='tutorial'?'opening':mode==='run'?'game':result?(ceremonyRank===1?'champion':resultNewRecord&&!ceremonyTotal?'record':'result'):null;music.setScene(name,result&&ceremonyRank===1&&resultNewRecord&&!ceremonyTotal);}
 // Opening presentation stays separate from competition state and controls.
 let openingPage='title',storyIndex=0,storyChars=0,storyElapsed=0;
 const storyPages=[
@@ -106,7 +112,7 @@ const storyPages=[
 ];
 const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 function showOpening(page){
- openingPage=page;downs.clear();bHeld=false;for(const el of document.querySelectorAll('.pads button'))el.classList.remove('active');
+ openingPage=page;syncMusic();downs.clear();bHeld=false;for(const el of document.querySelectorAll('.pads button'))el.classList.remove('active');
  $('#opening').hidden=page==='game';$('#gameView').hidden=page!=='game';
  $('#titleView').hidden=page!=='title';$('#titleActions').hidden=page!=='title';$('#storyView').hidden=page!=='story';$('#storyActions').hidden=page!=='story';
  window.scrollTo(0,0);
@@ -162,7 +168,7 @@ function raceSeconds(i,seconds,progress=1){const [course,rate]=RACE_CLOCKS[i];re
 function timeText(i,seconds){const ticks=Math.round(seconds*100);return i===1?Math.floor(ticks/6000)+':'+(Math.floor(ticks/100)%60).toString().padStart(2,'0')+'.'+(ticks%100).toString().padStart(2,'0'):(ticks/100).toFixed(2)}
 const label=(i,v)=>events[i][2]==='time'?timeText(i,raceSeconds(i,v))+(i===1?'':'秒'):v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
-function resetRun(){longJumpFoul='';fallenHurdles.clear();falseStartUntil=0;spurtUsed=false;spurtActive=false;startPhase=0;resetRunnerMotion();jumpStarted=-10;longJumpAge=0;longJumpOrigin=0;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
+function resetRun(){resultNewRecord=false;longJumpFoul='';fallenHurdles.clear();falseStartUntil=0;spurtUsed=false;spurtActive=false;startPhase=0;resetRunnerMotion();jumpStarted=-10;longJumpAge=0;longJumpOrigin=0;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
 function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';resetRun();$('#resultPanel').hidden=true;$('#tutorial').hidden=true;render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=e[0];b.setAttribute('aria-label',e[0]);const meta=document.createElement('span');meta.textContent=best[i]==null?'PLAY →':'BEST '+label(i,best[i]);b.appendChild(meta);b.className=i===selected?'selected':'';b.onclick=()=>{select(i);showGuide();syncUI()};$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
 function start(){showGuide()}
@@ -194,14 +200,14 @@ function cpuRaceTime(j,i){
  }
  return 300;
 }
-function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);if(improved){best[selected]=v;try{selected===1?localStorage.setItem('athletics_1500_pace_v2',String(v)):localStorage.setItem('athletics_bests_pace_v2',JSON.stringify({...best,1:undefined}))}catch{}}let p=points(selected,v);let cpuVals=rivals.map((r,j)=>selected<3?cpuRaceTime(j,selected):(cpuRecords[j]||0));let cpuPts=cpuVals.map(val=>points(selected,val));const thisRank=1+cpuVals.filter(val=>selected<3?val<v-0.005:val>v+0.005).length;ceremonyRank=thisRank;ceremonyTotal=false;ceremonyScores=[];
+function finish(v){mode='result';v=Math.round(v*100)/100;const old=best[selected],improved=old==null||(events[selected][2]==='time'?v<old:v>old);resultNewRecord=improved;if(improved){best[selected]=v;try{selected===1?localStorage.setItem('athletics_1500_pace_v2',String(v)):localStorage.setItem('athletics_bests_pace_v2',JSON.stringify({...best,1:undefined}))}catch{}}let p=points(selected,v);let cpuVals=rivals.map((r,j)=>selected<3?cpuRaceTime(j,selected):(cpuRecords[j]||0));let cpuPts=cpuVals.map(val=>points(selected,val));const thisRank=1+cpuVals.filter(val=>selected<3?val<v-0.005:val>v+0.005).length;ceremonyRank=thisRank;ceremonyTotal=false;ceremonyScores=[];
 const ranking=[{name:'YOU',score:p,record:v,you:true},...cpuPts.map((score,j)=>({name:'CPU '+(j+1),score,record:cpuVals[j],you:false}))].sort((a,b)=>selected<3?a.record-b.record:b.record-a.record);
 $('#resultPanel').hidden=true;
 $('#resultHeading').textContent=events[selected][0]+' 競技結果';
 $('#resultRecord').textContent=label(selected,v);
 $('#resultRank').textContent=thisRank===1?'1位！ 優勝！':thisRank+'位 / 4人';
 $('#resultMeta').replaceChildren();
-for(const item of [p+' / 1000点',improved?'★ NEW BEST!':'記録確定']){const span=document.createElement('span');span.textContent=item;$('#resultMeta').appendChild(span)}
+for(const item of [p+' / 1000点',improved?'★ NEW RECORD!':'記録確定']){const span=document.createElement('span');span.textContent=item;$('#resultMeta').appendChild(span)}
 $('#resultRanking').replaceChildren();
 ranking.forEach((r,i)=>{const tr=document.createElement('tr');if(r.you)tr.className='you';for(const value of [(i+1)+'位',r.name,label(selected,r.record)+' / '+r.score+'点']){const td=document.createElement('td');td.textContent=value;tr.appendChild(td)}$('#resultRanking').appendChild(tr)});
 $('#resultHint').textContent=cup?'この競技の結果です。次の競技へ進んでください。':'記録を更新できるか、もう一度挑戦しよう！';
@@ -253,8 +259,8 @@ const FRAME_SIZE=48;
 const SPRITE_COUNTS=[1,3,8,6,3,1,7,2,3,3,2,2];
 const CHEST_ANCHORS=[[28], [35, 35, 29], [29, 29, 29, 29, 29, 29, 29, 29], [29, 29, 29, 29, 29, 29], [29, 28, 29], [29], [24, 26, 28, 24, 25, 20, 25], [23, 29], [25, 21, 24], [35, 27, 28], [22, 25], [0, 0]];
 const ART_VERSION='approved-source-v1.5.1-edge-cleanup';
-const SHEET_URLS=["./assets/sprites/approved_v15/idle_right.png", "./assets/sprites/approved_v15/start_right.png", "./assets/sprites/approved_v15/sprint_right.png", "./assets/sprites/approved_v15/jog_right.png", "./assets/sprites/approved_v15/victory_front.png", "./assets/sprites/approved_v15/podium_front.png", "./assets/sprites/approved_v15/hurdle_right.png", "./assets/sprites/approved_v15/javeball_prepare_right.png", "./assets/sprites/approved_v15/javeball_release_right.png", "./assets/sprites/approved_v15/long_jump_provisional.png", "./assets/sprites/approved_v15/javeball_follow_right.png", "./assets/sprites/approved_v15/props.png"];
-const spriteDebug={version:ART_VERSION,ready:false,draws:0,last:[],source:'approved_v15',sheets:SHEET_URLS.length};
+const SHEET_URLS=["./assets/sprites/cute_v2/idle_right.png", "./assets/sprites/cute_v2/start_right.png", "./assets/sprites/cute_v2/sprint_right.png", "./assets/sprites/cute_v2/jog_right.png", "./assets/sprites/cute_v2/victory_front.png", "./assets/sprites/cute_v2/podium_front.png", "./assets/sprites/cute_v2/hurdle_right.png", "./assets/sprites/cute_v2/javeball_prepare_right.png", "./assets/sprites/cute_v2/javeball_release_right.png", "./assets/sprites/cute_v2/long_jump_provisional.png", "./assets/sprites/cute_v2/javeball_follow_right.png", "./assets/sprites/approved_v15/props.png"];
+const spriteDebug={version:ART_VERSION,ready:false,draws:0,last:[],source:'cute_v2',sheets:SHEET_URLS.length};
 window.athleticsSpriteInfo=spriteDebug;
 function setSpriteStatus(value){$('#spriteStatus').textContent=spriteReady?'':value;$('#spriteStatus').hidden=spriteReady;}
 function spriteFailure(reason){spriteReady=false;spriteDebug.ready=false;spriteDebug.error=String(reason);setSpriteStatus('画像を読み込めませんでした。ページを再読み込みしてください。');$('#start').disabled=true;$('#cup').disabled=true;$('#tutorialGo').disabled=true;}
@@ -500,6 +506,7 @@ function drawCeremony(t){
  }
 }
 function syncUI(){
+ syncMusic();
  const key=mode+':'+selected+':'+cup;if(key===uiState)return;uiState=key;
  const menu=mode==='menu',tutorial=mode==='tutorial',result=mode==='result'||mode==='finished',race=['ready','run','between','finishDash'].includes(mode);
  $('#gameView').setAttribute('data-screen',menu?'menu':tutorial?'tutorial':result?'result':'race');

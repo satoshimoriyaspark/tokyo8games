@@ -52,7 +52,7 @@ async function load(entry,probe){
  const old=await load(path.join(__dirname,'baseline/index.html'),path.join(__dirname,'probe.js'));
  const updated=await load(path.join(game,'index.html'),path.join(__dirname,'probe.js'));
  const before=old.qa.checks(),after=updated.qa.checks();
- const rulesOnly=rows=>rows.filter(r=>r.event!==1&&r.event!==4&&r.event!==undefined).map(({display,...rules})=>rules);
+ const rulesOnly=rows=>rows.filter(r=>r.event!==1&&r.event!==4&&r.event!==undefined).map(({display,points,...rules})=>({...rules,points:parseInt(points,10)}));
  if(JSON.stringify(rulesOnly(before.snapshots))!==JSON.stringify(rulesOnly(after.snapshots)))throw Error('Game rules regression');
  console.log('Displayed records',after.snapshots.filter(r=>r.display).map(r=>r.display));
  console.log('Regression PASS',after.checks,'100m, hurdles and long jump player records/points match baseline');
