@@ -439,8 +439,28 @@ let spriteReady=false,spriteLoading=false;
 const spriteSheets={};
 const spritePalette=[[249,191,28],[255,221,75],[219,160,28]];
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
-function teamSheet(img,team,key){
+// The approved PNGs contain pale matte remnants on some exterior head/arm edges.
+// Flood only the exact matte color from transparency; keep enclosed detail and shoes.
+function cleanSpriteMatte(img){
  const sheet=document.createElement('canvas');sheet.width=img.naturalWidth;sheet.height=48;
+ const g=sheet.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);
+ const data=g.getImageData(0,0,sheet.width,48),p=data.data;
+ for(let f=0;f<sheet.width/48;f++){
+  const seen=new Uint8Array(48*48),queue=[];
+  const index=(x,y)=>(y*sheet.width+f*48+x)*4;
+  const matte=(x,y)=>{const k=index(x,y);return y<38&&p[k]===184&&p[k+1]===189&&p[k+2]===200&&p[k+3]>0;};
+  function visit(x,y){if(x<0||y<0||x>=48||y>=48)return;const n=y*48+x;if(seen[n])return;const k=index(x,y);if(p[k+3]&&!matte(x,y))return;seen[n]=1;queue.push(n);}
+  for(let i=0;i<48;i++){visit(i,0);visit(i,47);visit(0,i);visit(47,i);}
+  for(let n=0;n<queue.length;n++){
+   const x=queue[n]%48,y=Math.floor(queue[n]/48),k=index(x,y);
+   if(matte(x,y))p[k+3]=0;
+   for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)visit(x+dx,y+dy);
+  }
+ }
+ g.putImageData(data,0,0);return sheet;
+}
+function teamSheet(img,team,key){
+ const sheet=document.createElement('canvas');sheet.width=img.naturalWidth||img.width;sheet.height=48;
  const target=sheet.getContext('2d',{willReadFrequently:true});
  target.drawImage(img,0,0);const data=target.getImageData(0,0,sheet.width,48),pixels=data.data;
  const primary=rgb(team[1]),secondary=team[2]?rgb(team[2]):null;
@@ -529,7 +549,8 @@ async function loadSprites(){
   const ready=await Promise.all(Object.entries(spriteDefs).map(([key,def])=>new Promise((resolve,reject)=>{
    const img=new Image();img.onload=()=>{try{
     if(img.naturalWidth!==def.frames*48||img.naturalHeight!==48)throw Error('Sprite dimensions: '+key);
-    resolve([key,teamColors.map(team=>teamSheet(img,team,key))]);
+    const clean=cleanSpriteMatte(img);
+    resolve([key,teamColors.map(team=>teamSheet(clean,team,key))]);
    }catch(error){reject(error)}};img.onerror=()=>reject(Error('Sprite load: '+key));
    img.src='./assets/sprites/athletics-v15/'+def.file+'.png';
   })));
@@ -697,4 +718,5 @@ chooseTeam(1);chooseCourse(0);chooseDifficulty(0);showStep(0,false);chooseMode('
 })();
 </script>
 </body></html>
+
 
