@@ -145,9 +145,9 @@
 
       <section class="panel rules">
         <h2>試遊版ルール</h2>
-        <p><strong>各自6枚</strong>を配ります。残りのカードはそのゲームでは使いません。</p>
+        <p><strong>各自6枚</strong>を配り、残りは交換用の山札にします。</p>
         <p>自分の手札から「相棒だと思う2人」を選び、理由を説明します。他のプレイヤーが投票し、<strong>承認が過半数なら2枚を捨てられます</strong>。否認なら2枚とも手札に戻ります。</p>
-        <p>同じ人物どうしはペアにできません。最初に手札を0枚にした人の勝ちです。</p>
+        <p>相棒になる2枚が作れないと判断した場合は、<strong>手札から1枚を選んで山札の1枚と交換</strong>できます。交換したらその手番は終了です。山札が尽きたら交換済みカードを混ぜ直します。</p><p>同じ人物どうしはペアにできません。最初に手札を0枚にした人の勝ちです。</p>
       </section>
     </section>
 
@@ -174,7 +174,7 @@
         <div id="hand" class="cards"></div>
         <div class="sticky">
           <div id="handError" class="error"></div>
-          <button id="proposeBtn" class="primary" type="button">この2人を「相棒」として出す</button>
+          <button id="proposeBtn" class="primary" type="button">この2人を「相棒」として出す</button><button id="exchangeBtn" class="secondary" style="width:100%;margin-top:8px" type="button">捜査継続：選んだ1枚を交換して手番終了</button>
         </div>
       </section>
 
@@ -243,7 +243,7 @@
 
     const els = Object.fromEntries([
       "setupScreen","gameScreen","playerCount","nameFields","startBtn","scorebar","activeName",
-      "privacyPhase","privacyName","revealBtn","handPhase","hand","selectCount","handError","proposeBtn",
+      "privacyPhase","privacyName","revealBtn","handPhase","hand","selectCount","handError","proposeBtn","exchangeBtn",
       "proposalPhase","proposerName","proposalPair","beginVoteBtn","votePhase","votePair","voteProgress",
       "voterName","approveBtn","objectBtn","resultPhase","resultBox","resultMark","resultTitle","resultText",
       "nextBtn","winnerPhase","winnerName","againBtn","resetBtn"
@@ -257,7 +257,10 @@
       voters: [],
       voterIndex: 0,
       votes: [],
-      lastAccepted: false
+      drawPile: [],
+      exchangePile: [],
+      lastAccepted: false,
+      lastAction: "pair"
     };
 
     const shuffle = (arr) => {
@@ -324,7 +327,10 @@
         voters:[],
         voterIndex:0,
         votes:[],
-        lastAccepted:false
+        drawPile:deck,
+        exchangePile:[],
+        lastAccepted:false,
+        lastAction:"pair"
       };
 
       els.setupScreen.classList.add("hidden");
@@ -349,6 +355,7 @@
       state.selected = [];
       state.proposed = [];
       state.votes = [];
+      state.lastAction = "pair";
       state.voters = [];
       state.voterIndex = 0;
       renderScores();
@@ -402,11 +409,48 @@
       els.selectCount.textContent = state.selected.length + " / 2 枚選択";
       els.proposeBtn.disabled = state.selected.length !== 2;
       els.proposeBtn.style.opacity = state.selected.length === 2 ? "1" : ".55";
+      els.exchangeBtn.disabled = state.selected.length !== 1;
+      els.exchangeBtn.style.opacity = state.selected.length === 1 ? "1" : ".55";
     };
 
     const renderPair = (container) => {
       container.innerHTML = "";
       state.proposed.forEach(card => container.appendChild(cardNode(card,false)));
+    };
+
+    const exchangeSelectedCard = () => {
+      if (state.selected.length !== 1) {
+        els.handError.textContent = "交換するカードを1枚だけ選んでください。";
+        return;
+      }
+      const p = state.players[state.turn];
+      const oldCard = p.hand.find(c => c.id === state.selected[0]);
+      if (!oldCard) return;
+
+      if (state.drawPile.length === 0 && state.exchangePile.length > 0) {
+        state.drawPile = shuffle(state.exchangePile);
+        state.exchangePile = [];
+      }
+      if (state.drawPile.length === 0) {
+        els.handError.textContent = "交換できるカードがありません。";
+        return;
+      }
+
+      const replacement = state.drawPile.pop();
+      p.hand = p.hand.map(c => c.id === oldCard.id ? replacement : c);
+      state.exchangePile.push(oldCard);
+      state.selected = [];
+      state.lastAccepted = false;
+      state.lastAction = "exchange";
+
+      renderScores();
+      els.resultBox.className = "result ok";
+      els.resultMark.textContent = "↻";
+      els.resultTitle.textContent = "捜査継続";
+      els.resultText.textContent = "手札を1枚交換しました。この手番は終了です。";
+      els.nextBtn.textContent = "次の手番へ";
+      setPhase("resultPhase");
+      window.scrollTo({top:0,behavior:"smooth"});
     };
 
     const propose = () => {
@@ -419,6 +463,7 @@
         return;
       }
       state.proposed = cards;
+      state.lastAction = "pair";
       els.proposerName.textContent = p.name;
       renderPair(els.proposalPair);
       setPhase("proposalPhase");
@@ -480,7 +525,7 @@
 
     const nextTurn = () => {
       const p = state.players[state.turn];
-      if (state.lastAccepted && p.hand.length === 0) {
+      if (state.lastAction === "pair" && state.lastAccepted && p.hand.length === 0) {
         els.winnerName.textContent = p.name + " さんの勝ち！";
         setPhase("winnerPhase");
         renderScores();
@@ -501,6 +546,7 @@
     els.startBtn.addEventListener("click", () => startGame(false));
     els.revealBtn.addEventListener("click", revealHand);
     els.proposeBtn.addEventListener("click", propose);
+    els.exchangeBtn.addEventListener("click", exchangeSelectedCard);
     els.beginVoteBtn.addEventListener("click", beginVote);
     els.approveBtn.addEventListener("click", () => castVote(true));
     els.objectBtn.addEventListener("click", () => castVote(false));
