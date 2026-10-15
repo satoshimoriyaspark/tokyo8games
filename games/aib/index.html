@@ -174,7 +174,7 @@
         <div id="hand" class="cards"></div>
         <div class="sticky">
           <div id="handError" class="error"></div>
-          <button id="proposeBtn" class="primary" type="button">この2人を「相棒」として出す</button><button id="exchangeBtn" class="secondary" style="width:100%;margin-top:8px" type="button">捜査継続：選んだ1枚を交換して手番終了</button>
+          <button id="proposeBtn" class="primary" type="button">この2人を「相棒」として出す</button><button id="exchangeBtn" class="secondary" style="width:100%;margin-top:8px" type="button">捜査継続：選んだ1枚を交換して手番終了</button><button id="reassignBtn" class="ghost" style="width:100%;margin-top:8px" type="button">人事異動：手札を全部交換（1回限り）</button>
         </div>
       </section>
 
@@ -243,7 +243,7 @@
 
     const els = Object.fromEntries([
       "setupScreen","gameScreen","playerCount","nameFields","startBtn","scorebar","activeName",
-      "privacyPhase","privacyName","revealBtn","handPhase","hand","selectCount","handError","proposeBtn","exchangeBtn",
+      "privacyPhase","privacyName","revealBtn","handPhase","hand","selectCount","handError","proposeBtn","exchangeBtn","reassignBtn",
       "proposalPhase","proposerName","proposalPair","beginVoteBtn","votePhase","votePair","voteProgress",
       "voterName","approveBtn","objectBtn","resultPhase","resultBox","resultMark","resultTitle","resultText",
       "nextBtn","winnerPhase","winnerName","againBtn","resetBtn"
@@ -314,7 +314,7 @@
       }
 
       const deck = shuffle(fullDeck());
-      const players = names.map(name => ({ name, hand: [] }));
+      const players = names.map(name => ({ name, hand: [], usedReassignment: false }));
       for (let round=0; round<6; round++) {
         players.forEach(p => p.hand.push(deck.pop()));
       }
@@ -411,6 +411,10 @@
       els.proposeBtn.style.opacity = state.selected.length === 2 ? "1" : ".55";
       els.exchangeBtn.disabled = state.selected.length !== 1;
       els.exchangeBtn.style.opacity = state.selected.length === 1 ? "1" : ".55";
+      const currentPlayer = state.players[state.turn];
+      els.reassignBtn.disabled = !!currentPlayer.usedReassignment;
+      els.reassignBtn.style.opacity = currentPlayer.usedReassignment ? ".45" : "1";
+      els.reassignBtn.textContent = currentPlayer.usedReassignment ? "人事異動：使用済み" : "人事異動：手札を全部交換（1回限り）";
     };
 
     const renderPair = (container) => {
@@ -448,6 +452,45 @@
       els.resultMark.textContent = "↻";
       els.resultTitle.textContent = "捜査継続";
       els.resultText.textContent = "手札を1枚交換しました。この手番は終了です。";
+      els.nextBtn.textContent = "次の手番へ";
+      setPhase("resultPhase");
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+
+    const reassignHand = () => {
+      const p = state.players[state.turn];
+      if (p.usedReassignment) {
+        els.handError.textContent = "人事異動は1ゲームにつき1回だけ使えます。";
+        return;
+      }
+
+      const need = p.hand.length;
+      if (need <= 0) return;
+
+      if (state.drawPile.length < need && state.exchangePile.length > 0) {
+        state.drawPile = shuffle(state.drawPile.concat(state.exchangePile));
+        state.exchangePile = [];
+      }
+      if (state.drawPile.length < need) {
+        els.handError.textContent = "全交換に必要なカードが山札に足りません。";
+        return;
+      }
+
+      const oldHand = p.hand.slice();
+      const newHand = [];
+      for (let i=0; i<need; i++) newHand.push(state.drawPile.pop());
+      p.hand = newHand;
+      p.usedReassignment = true;
+      state.exchangePile.push(...oldHand);
+      state.selected = [];
+      state.lastAccepted = false;
+      state.lastAction = "reassign";
+
+      renderScores();
+      els.resultBox.className = "result ok";
+      els.resultMark.textContent = "⇄";
+      els.resultTitle.textContent = "人事異動";
+      els.resultText.textContent = "手札をすべて交換しました。この手番は終了です。人事異動はこのゲームではもう使えません。";
       els.nextBtn.textContent = "次の手番へ";
       setPhase("resultPhase");
       window.scrollTo({top:0,behavior:"smooth"});
@@ -547,6 +590,7 @@
     els.revealBtn.addEventListener("click", revealHand);
     els.proposeBtn.addEventListener("click", propose);
     els.exchangeBtn.addEventListener("click", exchangeSelectedCard);
+    els.reassignBtn.addEventListener("click", reassignHand);
     els.beginVoteBtn.addEventListener("click", beginVote);
     els.approveBtn.addEventListener("click", () => castVote(true));
     els.objectBtn.addEventListener("click", () => castVote(false));
