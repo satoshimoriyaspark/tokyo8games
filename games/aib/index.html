@@ -40,6 +40,7 @@
     select:focus,input:focus{border-color:#8ba5c3;box-shadow:0 0 0 3px rgba(139,165,195,.14)}
     .names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .primary,.secondary,.approve,.object,.ghost{border:0;border-radius:13px;min-height:48px;padding:12px 16px;font-weight:800}
+    .linkbtn{display:block;text-align:center;text-decoration:none;border-radius:13px;min-height:48px;padding:13px 16px;font-weight:800}
     .primary{width:100%;background:var(--paper);color:var(--ink)}
     .secondary{background:#203653;color:var(--text);border:1px solid #3f5d80}
     .ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
@@ -151,6 +152,7 @@
           <div id="nameFields" class="names"></div>
         </div>
         <button id="startBtn" class="primary" type="button">54枚を混ぜてスタート</button>
+        <a class="linkbtn secondary" style="margin-top:10px" href="/aib/cards">カード図鑑を見る</a>
       </section>
 
       <section class="panel rules">
@@ -231,6 +233,7 @@
         <p>最初に手札をなくしました。</p>
         <div class="row">
           <button id="againBtn" class="primary" type="button">同じメンバーでもう一度</button>
+          <a class="linkbtn secondary" href="/aib/cards">カード図鑑で確認</a>
           <button id="resetBtn" class="ghost" type="button">タイトルへ</button>
         </div>
       </section>
