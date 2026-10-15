@@ -387,7 +387,10 @@ function drawLongJumpAthlete(){
 }
 function drawLongJumpField(){
  const view=longJumpView(),line=LONG_JUMP_LINE-view.camera;
+ const takeoffStart=32+32*7.1-view.camera;
  rect(0,77,384,212,'#365e4d');rect(0,241,Math.max(0,line),48,'#a54b3e');
+ // Tint the full valid take-off zone; the yellow board remains the foul boundary.
+ rect(takeoffStart,241,line+4-takeoffStart,48,'#e8c998');
  rect(Math.max(0,line+4),259,384,30,'#d9b474');
  rect(0,289,384,31,'#203b36');
  for(let m=0;m<=20;m++){
@@ -395,7 +398,7 @@ function drawLongJumpField(){
   rect(x,278,1,11,'#967249');if(m%2===0)txt(m+'m',x,305,11,'#fff4d3','center');
  }
  rect(0,286,384,3,'#f1e2b7');
- if(line>-5&&line<389){rect(line,259,4,30,'#ffde65');rect(line-12,282,12,4,'#fff4d3');}
+ if(line>-5&&line<389){rect(line,259,4,30,'#ffde65');}
  txt('TRY '+attempt+' / 3',8,59,12,'#ffdb65');
  if(view.active){txt(view.valid?(view.landed?'LANDING!':'JUMP!'):'FOUL',192,111,18,view.valid?'#ffdb65':'#ff8585','center');if(!view.valid)txt(longJumpFoul+'・記録なし',192,132,11,'#fff','center');}
  else{txt('Bで踏切!',Math.min(320,Math.max(64,line-36)),177,12,'#ffdb65','center');txt('助走 '+Math.floor(pos)+' / 40m',8,305,10,'#fff4d3');}
