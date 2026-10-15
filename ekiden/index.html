@@ -292,7 +292,9 @@ function handoffSheet(team){
  const i=teamColors.indexOf(team);if(handoffSheets[i])return handoffSheets[i];
  const c=document.createElement('canvas');c.width=192;c.height=48;const g=c.getContext('2d');
  for(let f=0;f<4;f++){
-  const ox=f*48;g.drawImage(spriteSheets.idle[i],ox,0);
+  const ox=f*48;
+  // Receiver faces the approaching runner until the sash is in hand.
+  g.save();if(f>=2){g.translate(ox+48,0);g.scale(-1,1);g.drawImage(spriteSheets.idle[i],0,0);}else g.drawImage(spriteSheets.idle[i],ox,0);g.restore();
   // Clear the worn sash: the sash is now carried in the hand, then put on by the receiver.
   rect(ox+23,26,7,7,'#eff3f3',g);
   const hand=f<2?[40,27]:[8,27];
@@ -640,7 +642,8 @@ function draw(){
   if(co.km-p.km<1.25){const x=playerX+(co.km-p.km)*165;rect(x,roadY(x),3,98,'#fff');for(let y=0;y<96;y+=8)rect(x,roadY(x)+y,3,4,'#23324b');
    if(![5,10].includes(co.id)&&!s.done){
     const feet=clamp(169+roadY(x)-78,84,172);
-    blitRunner(ctx,x+14,feet,p.team,'idle',0,.75);
+    ctx.save();ctx.translate(x+14,feet);ctx.scale(-1,1);
+    blitRunner(ctx,0,0,p.team,'idle',0,.75);ctx.restore();
     rect(x+6,feet-42,18,9,'#ffe500');ctx.font='7px monospace';ctx.fillStyle='#18334e';ctx.fillText('NEXT',x+7,feet-35);
    }
   }
