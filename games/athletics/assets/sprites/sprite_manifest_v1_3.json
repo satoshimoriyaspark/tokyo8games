@@ -1,0 +1,55 @@
+{
+  "version": "1.3-beta",
+  "file": "./assets/sprites/player/athletics_atlas_v2.png",
+  "frameWidth": 32,
+  "frameHeight": 48,
+  "atlasWidth": 256,
+  "atlasHeight": 528,
+  "rows": {
+    "idle_right": {
+      "row": 0,
+      "frames": 1
+    },
+    "start_right": {
+      "row": 1,
+      "frames": 3
+    },
+    "sprint_right": {
+      "row": 2,
+      "frames": 8
+    },
+    "jog_right": {
+      "row": 3,
+      "frames": 6
+    },
+    "victory_front": {
+      "row": 4,
+      "frames": 3
+    },
+    "podium_front": {
+      "row": 5,
+      "frames": 1
+    },
+    "hurdle_right": {
+      "row": 6,
+      "frames": 7
+    },
+    "javelin_prepare_right": {
+      "row": 7,
+      "frames": 2
+    },
+    "javelin_release_right": {
+      "row": 8,
+      "frames": 3
+    },
+    "hurdle_recovery_right": {
+      "row": 9,
+      "frames": 2
+    },
+    "javelin_followthrough_right": {
+      "row": 10,
+      "frames": 2
+    }
+  },
+  "notes": "Beta art; same yellow player palette, three CPU palette variants generated in browser. User-visible sprite assets are real 32x48 PNG frames."
+}

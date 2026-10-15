@@ -1,0 +1,42 @@
+/* Screen-specific UI; game simulation and approved PNG artwork are unchanged. */
+.wrap{max-width:720px;min-height:100svh;padding:12px 16px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.game-header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+.game-header h1{font-size:18px;margin:0;text-shadow:2px 2px #9e4e45;letter-spacing:1px}
+.game-header #sound{font-size:11px;min-height:40px;padding:7px 10px;border-width:2px;box-shadow:none;background:transparent;color:#becdd7}
+button:focus-visible{outline:3px solid #ffdb65;outline-offset:4px}button:disabled{opacity:.5;cursor:wait}
+#menuTitle{font-size:24px;margin:20px 0 4px;color:#ffdb65}
+#events{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0;order:2}
+#events button{min-height:92px;text-align:left;font-size:16px;padding:16px;background:#203b55;border:2px solid #6e8ca3;border-radius:0;box-shadow:0 4px #070d16;color:#f9f4db}
+#events button:last-child{grid-column:1/-1}
+#events button span{display:block;font-size:10px;letter-spacing:1px;color:#b6d0de;margin-top:13px}
+#events button:hover{border-color:#ffdb65;background:#2a4965}
+.buttons{margin:0;gap:12px;order:3;flex-wrap:wrap}
+.buttons button{min-height:48px;border-radius:0}
+#gameView[data-screen=menu] .buttons{margin-top:8px}
+#cup{flex:1 0 100%;background:#278362;font-size:17px}
+#reset,#menuBack{background:transparent;border-color:#718b9c;box-shadow:none;color:#c3d3df}
+#screen{width:min(100%,calc((100svh - 205px)*1.2));height:auto;max-width:688px;margin:0 auto;border:3px solid #d8d2b9;outline:0}
+.pads{order:2;margin:0;gap:16px;flex-wrap:nowrap}
+.pads button{width:50%;max-width:260px;height:82px;border-radius:0;border-width:3px;font-size:30px}
+.pads button span{font-size:12px;margin-top:3px}
+#tutorial{margin:30px 0 0;padding:28px 22px;border:2px solid #758e9e;box-shadow:6px 6px #080f1c}
+#tutorial h2{font-size:22px;line-height:1.5;margin:0 0 24px}
+#tutorialText{font-size:18px;line-height:1.8!important;margin-bottom:20px!important}
+#tutorialHint{font-size:12px;color:#b9cbd8;line-height:1.7}
+#tutorialGo{display:block;min-height:54px;width:100%;margin-top:26px;font-size:19px;border-radius:0}
+#resultPanel{width:100%;max-width:none;margin:10px 0 0;padding:20px 16px;border-width:2px;box-shadow:5px 5px #080f1c}
+#resultPanel h2{font-size:18px}.record{margin:18px 0 8px;font-size:42px}.resultRank{font-size:21px;margin:8px}
+.resultMeta{gap:8px;margin:16px 0}.resultMeta span{font-size:11px;border:0;background:#28445e;padding:7px 10px}
+.rankTable{margin:14px 0 0;font-size:12px}.rankTable td{padding:13px 7px}
+#gameView[data-screen=result] #start{width:100%;font-size:18px}
+#gameView[data-screen=result] #menuBack,#gameView[data-screen=tutorial] #menuBack{width:100%}
+#skipCeremony{min-width:180px;background:transparent;border-color:#7e98a9;box-shadow:none}
+#spriteStatus{order:4;color:#ffcf67}
+.opening{padding:14px}.opening-shell{padding:20px;width:min(100%,580px)}
+.opening-kicker{margin:18px 0 4px!important}.title-logo{margin:8px -8px 12px}.opening-primary{margin:24px 0 10px}
+.opening-shell:has(#storyView:not([hidden])) #openingArt{max-height:180px;object-fit:contain}
+.story-dialog{min-height:124px;margin:16px 0}.opening-footer{margin-top:16px}
+@media(max-width:420px){.wrap{padding:10px 10px max(14px,env(safe-area-inset-bottom));gap:12px}.game-header h1{font-size:16px}#events{gap:10px}#events button{padding:13px;font-size:14px;min-height:82px}#menuTitle{margin-top:12px}#tutorial{padding:22px 16px;margin-top:18px}.rankTable{font-size:11px}.rankTable td{padding:12px 4px}#resultPanel{padding:16px 12px}.record{font-size:38px}}
+@media(max-height:560px) and (orientation:landscape){.wrap[data-screen=race]{display:grid;grid-template-columns:1fr 100px;gap:8px;max-width:900px}.game-header{grid-column:1/-1}.wrap[data-screen=race] #screen{width:min(100%,calc((100svh - 84px)*1.2))}.wrap[data-screen=race] .pads{flex-direction:column;gap:12px}.wrap[data-screen=race] .pads button{width:100%;height:82px}.wrap[data-screen=race] .buttons{grid-column:2}}
+
+#difficultyControl{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0;color:#c6d2e1}#difficultyControl[hidden]{display:none}#difficulty{font:700 14px monospace;color:#ffdb65;background:#17283d;border:2px solid #879bb0;padding:10px;max-width:70%}
