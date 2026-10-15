@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#081426" />
+  <title>相棒ゲーム｜試遊版</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --panel:#0e1d32;
+      --panel2:#132641;
+      --line:#315071;
+      --text:#f4f1e8;
+      --muted:#aab7c8;
+      --accent:#c7373f;
+      --ok:#2f8f68;
+      --paper:#f2efe6;
+      --ink:#172130;
+      --gold:#d1b56b;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:linear-gradient(180deg,#06101d 0%,#0a1830 55%,#101a28 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;min-height:100%}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .app{max-width:760px;margin:0 auto;padding:18px 14px 44px}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .back{font-size:13px;color:var(--muted);text-decoration:none}
+    .badge{font-size:11px;letter-spacing:.08em;border:1px solid var(--line);padding:5px 8px;border-radius:999px;color:var(--muted)}
+    .hero{padding:24px 18px 12px;text-align:center}
+    .title{font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(44px,13vw,72px);line-height:1;margin:0 0 10px;letter-spacing:.18em;text-indent:.18em}
+    .tagline{margin:0;color:#d6dbe4;font-weight:700;letter-spacing:.08em}
+    .notice{margin:18px 0;background:#0a1526;border:1px solid #263a54;border-radius:16px;padding:12px 14px;color:var(--muted);font-size:12px;line-height:1.7}
+    .panel{background:rgba(14,29,50,.92);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:16px}
+    .panel h2{font-size:18px;margin:0 0 12px}
+    .field{margin:12px 0}
+    .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    select,input{width:100%;border:1px solid #416184;background:#071426;color:var(--text);border-radius:12px;padding:13px 14px;outline:none}
+    select:focus,input:focus{border-color:#8ba5c3;box-shadow:0 0 0 3px rgba(139,165,195,.14)}
+    .names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .primary,.secondary,.approve,.object,.ghost{border:0;border-radius:13px;min-height:48px;padding:12px 16px;font-weight:800}
+    .primary{width:100%;background:var(--paper);color:var(--ink)}
+    .secondary{background:#203653;color:var(--text);border:1px solid #3f5d80}
+    .ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+    .approve{background:var(--ok);color:white}
+    .object{background:var(--accent);color:white}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row>*{flex:1 1 140px}
+    .rules{font-size:14px;line-height:1.8;color:#dbe1ea}
+    .rules strong{color:white}
+    .hidden{display:none!important}
+    .scorebar{display:flex;gap:8px;overflow:auto;padding:4px 1px 8px}
+    .score{flex:0 0 auto;min-width:104px;border:1px solid var(--line);background:#0b1a2d;border-radius:14px;padding:9px 10px}
+    .score.active{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+    .score .name{font-weight:800;font-size:13px}
+    .score .count{font-size:12px;color:var(--muted);margin-top:3px}
+    .turnhead{margin-top:12px;padding:14px 16px;border-radius:16px;background:rgba(7,20,38,.8);border:1px solid #263f60}
+    .turnhead .who{font-size:13px;color:var(--muted)}
+    .turnhead .big{font-size:25px;font-weight:900;margin-top:3px}
+    .privacy{padding:28px 12px 18px;text-align:center}
+    .privacy p{color:var(--muted);line-height:1.7}
+    .back-card{width:min(190px,48vw);aspect-ratio:63/88;margin:18px auto;border-radius:15px;border:4px double #8193aa;background:linear-gradient(180deg,#06101f 0%,#122842 62%,#080d16 100%);position:relative;overflow:hidden;box-shadow:0 16px 30px rgba(0,0,0,.32)}
+    .back-card:before{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:
+      linear-gradient(90deg,transparent 0 6%,#111923 6% 14%,transparent 14% 18%,#0b111a 18% 31%,transparent 31% 36%,#151e29 36% 46%,transparent 46% 53%,#0c131c 53% 65%,transparent 65% 69%,#121a25 69% 82%,transparent 82% 86%,#0c121a 86% 100%)}
+    .back-card:after{content:"相棒";position:absolute;inset:21% 0 auto;text-align:center;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:42px;letter-spacing:.18em;text-indent:.18em;color:#eee8db;text-shadow:0 2px 0 #000}
+    .detectives{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);display:flex;gap:10px;z-index:2}
+    .person{width:31px;height:72px;position:relative}
+    .person:before{content:"";position:absolute;width:23px;height:23px;border-radius:50%;background:#02060b;left:4px;top:0}
+    .person:after{content:"";position:absolute;width:31px;height:50px;border-radius:10px 10px 3px 3px;background:#02060b;left:0;bottom:0;clip-path:polygon(16% 0,84% 0,100% 100%,0 100%)}
+    .person:nth-child(2){transform:scale(.94) translateY(4px)}
+    .handtitle{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:18px 0 10px}
+    .handtitle h2{margin:0}
+    .selectcount{font-size:13px;color:var(--muted)}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .card{aspect-ratio:63/88;border-radius:13px;border:2px solid #d6d0c4;background:var(--paper);color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(16px,4.6vw,22px);font-weight:700;line-height:1.35;box-shadow:0 5px 14px rgba(0,0,0,.18);position:relative;user-select:none}
+    .card:before{content:"";position:absolute;inset:6px;border:1px solid #b6aa93;border-radius:8px;pointer-events:none}
+    .card.selected{outline:4px solid var(--gold);transform:translateY(-4px)}
+    .card:disabled{opacity:.55;cursor:not-allowed}
+    .sticky{position:sticky;bottom:10px;margin-top:14px;background:rgba(6,14,25,.94);border:1px solid #314760;border-radius:16px;padding:10px;backdrop-filter:blur(8px)}
+    .error{min-height:20px;color:#ff9ca1;font-size:13px;text-align:center;margin:6px 0}
+    .proposal{text-align:center;padding:18px 0}
+    .proposal h2{font-size:20px;margin:0 0 6px}
+    .proposal p{color:var(--muted);line-height:1.7}
+    .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:440px;margin:18px auto}
+    .pair .card{font-size:clamp(20px,6vw,28px)}
+    .versus{font-size:12px;color:var(--muted);letter-spacing:.16em;margin-top:-5px}
+    .voteBox{max-width:480px;margin:18px auto;padding:16px;border:1px solid var(--line);border-radius:16px;background:#0a1729}
+    .voteBox .voter{font-size:26px;font-weight:900;margin:4px 0 14px}
+    .vote-progress{font-size:12px;color:var(--muted)}
+    .result{max-width:500px;margin:18px auto;text-align:center;border-radius:20px;padding:24px 18px}
+    .result.ok{background:rgba(47,143,104,.18);border:1px solid #3e9c78}
+    .result.ng{background:rgba(199,55,63,.16);border:1px solid #a7474c}
+    .result .mark{font-size:46px}
+    .result h2{font-size:26px;margin:6px 0}
+    .result p{color:#dce3eb;line-height:1.7}
+    .winner{text-align:center;padding:26px 16px}
+    .winner .cup{font-size:62px}
+    .winner h2{font-size:30px;margin:6px 0 10px}
+    .footer{font-size:11px;color:#7f8fa4;text-align:center;margin-top:24px;line-height:1.7}
+    @media(max-width:480px){
+      .names{grid-template-columns:1fr}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .app{padding-left:10px;padding-right:10px}
+      .panel{padding:14px}
+      .title{font-size:52px}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topline">
+      <a class="back" href="/">← TOKYO 8 GAMES</a>
+      <span class="badge">非公式 試遊版</span>
+    </div>
+
+    <section id="setupScreen">
+      <div class="hero">
+        <h1 class="title">相棒</h1>
+        <p class="tagline">二人を選べ。理由を語れ。</p>
+      </div>
+
+      <div class="notice">
+        ドラマ「相棒」の登場人物名を用いた非公式のゲーム試作です。公式ロゴ・写真・映像は使用していません。一般公開・販売等を行う場合は権利確認を前提とします。
+      </div>
+
+      <section class="panel">
+        <h2>ゲームをはじめる</h2>
+        <div class="field">
+          <label for="playerCount">プレイヤー人数</label>
+          <select id="playerCount">
+            <option value="2">2人</option>
+            <option value="3">3人</option>
+            <option value="4" selected>4人</option>
+            <option value="5">5人</option>
+            <option value="6">6人</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>プレイヤー名</label>
+          <div id="nameFields" class="names"></div>
+        </div>
+        <button id="startBtn" class="primary" type="button">54枚を混ぜてスタート</button>
+      </section>
+
+      <section class="panel rules">
+        <h2>試遊版ルール</h2>
+        <p><strong>各自6枚</strong>を配ります。残りのカードはそのゲームでは使いません。</p>
+        <p>自分の手札から「相棒だと思う2人」を選び、理由を説明します。他のプレイヤーが投票し、<strong>承認が過半数なら2枚を捨てられます</strong>。否認なら2枚とも手札に戻ります。</p>
+        <p>同じ人物どうしはペアにできません。最初に手札を0枚にした人の勝ちです。</p>
+      </section>
+    </section>
+
+    <section id="gameScreen" class="hidden">
+      <div id="scorebar" class="scorebar"></div>
+      <div class="turnhead">
+        <div class="who">現在の手番</div>
+        <div id="activeName" class="big"></div>
+      </div>
+
+      <section id="privacyPhase" class="privacy">
+        <div class="back-card" aria-hidden="true">
+          <div class="detectives"><span class="person"></span><span class="person"></span></div>
+        </div>
+        <p><strong id="privacyName"></strong>さんに端末を渡してください。<br>他の人は手札を見ないようにしてください。</p>
+        <button id="revealBtn" class="primary" type="button">自分の手札を見る</button>
+      </section>
+
+      <section id="handPhase" class="hidden">
+        <div class="handtitle">
+          <h2>手札</h2>
+          <div id="selectCount" class="selectcount">0 / 2 枚選択</div>
+        </div>
+        <div id="hand" class="cards"></div>
+        <div class="sticky">
+          <div id="handError" class="error"></div>
+          <button id="proposeBtn" class="primary" type="button">この2人を「相棒」として出す</button>
+        </div>
+      </section>
+
+      <section id="proposalPhase" class="proposal hidden">
+        <h2>この2人は「相棒」？</h2>
+        <p><strong id="proposerName"></strong>さんは、なぜこの2人が相棒なのか説明してください。</p>
+        <div id="proposalPair" class="pair"></div>
+        <div class="versus">PAIR CHECK</div>
+        <div class="panel" style="text-align:left">
+          <strong>判定の目安</strong>
+          <p style="margin-bottom:0;color:var(--muted);line-height:1.7">刑事コンビだけでなく、家族・上司部下・共闘・強い因縁なども「相棒」と主張できます。最終判断はその場のプレイヤーです。</p>
+        </div>
+        <button id="beginVoteBtn" class="primary" type="button">説明できたので投票へ</button>
+      </section>
+
+      <section id="votePhase" class="hidden">
+        <div class="proposal">
+          <h2>投票</h2>
+          <div id="votePair" class="pair"></div>
+        </div>
+        <div class="voteBox">
+          <div id="voteProgress" class="vote-progress"></div>
+          <div id="voterName" class="voter"></div>
+          <div class="row">
+            <button id="approveBtn" class="approve" type="button">承認</button>
+            <button id="objectBtn" class="object" type="button">異議あり</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="resultPhase" class="hidden">
+        <div id="resultBox" class="result">
+          <div id="resultMark" class="mark"></div>
+          <h2 id="resultTitle"></h2>
+          <p id="resultText"></p>
+        </div>
+        <button id="nextBtn" class="primary" type="button">次の手番へ</button>
+      </section>
+
+      <section id="winnerPhase" class="winner hidden">
+        <div class="cup">🏆</div>
+        <h2 id="winnerName"></h2>
+        <p>最初に手札をなくしました。</p>
+        <div class="row">
+          <button id="againBtn" class="primary" type="button">同じメンバーでもう一度</button>
+          <button id="resetBtn" class="ghost" type="button">タイトルへ</button>
+        </div>
+      </section>
+
+      <div class="footer">初回版プロトタイプ / 54枚構成 / 1端末パス＆プレイ</div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    const CARD_COUNTS = {
+      "杉下右京":4, "亀山薫":3, "神戸尊":2, "甲斐享":2, "冠城亘":2,
+      "伊丹憲一":2, "芹沢慶二":2, "社美彌子":2, "甲斐峯秋":2, "米沢守":2, "角田六郎":2,
+      "三浦信輔":1, "出雲麗音":1, "大河内春樹":1, "陣川公平":1, "青木年男":1,
+      "内村完爾":1, "中園照生":1, "小野田公顕":1, "亀山美和子":1, "宮部たまき":1,
+      "月本幸子":1, "笛吹悦子":1, "日下部彌彦":1, "片山雛子":1, "瀬戸内米蔵":1,
+      "衣笠藤治":1, "益子桑栄":1, "土師太":1, "風間楓子":1, "鑓鞍兵衛":1,
+      "南井十":1, "浅倉禄郎":1, "本多篤人":1, "本多茉莉":1, "ヤロポロク":1,
+      "大木長十郎":1, "小松真琴":1, "小出茉梨":1, "遠峰小夜子":1
+    };
+
+    const els = Object.fromEntries([
+      "setupScreen","gameScreen","playerCount","nameFields","startBtn","scorebar","activeName",
+      "privacyPhase","privacyName","revealBtn","handPhase","hand","selectCount","handError","proposeBtn",
+      "proposalPhase","proposerName","proposalPair","beginVoteBtn","votePhase","votePair","voteProgress",
+      "voterName","approveBtn","objectBtn","resultPhase","resultBox","resultMark","resultTitle","resultText",
+      "nextBtn","winnerPhase","winnerName","againBtn","resetBtn"
+    ].map(id => [id, document.getElementById(id)]));
+
+    let state = {
+      players: [],
+      turn: 0,
+      selected: [],
+      proposed: [],
+      voters: [],
+      voterIndex: 0,
+      votes: [],
+      lastAccepted: false
+    };
+
+    const shuffle = (arr) => {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    };
+
+    const fullDeck = () => {
+      let serial = 0;
+      const deck = [];
+      Object.entries(CARD_COUNTS).forEach(([name,count]) => {
+        for (let i=0;i<count;i++) deck.push({ id: name + "-" + (++serial), name });
+      });
+      return deck;
+    };
+
+    const setPhase = (phase) => {
+      ["privacyPhase","handPhase","proposalPhase","votePhase","resultPhase","winnerPhase"]
+        .forEach(id => els[id].classList.add("hidden"));
+      els[phase].classList.remove("hidden");
+    };
+
+    const buildNameFields = () => {
+      const count = Number(els.playerCount.value);
+      const current = [...els.nameFields.querySelectorAll("input")].map(i => i.value);
+      els.nameFields.innerHTML = "";
+      for (let i=0;i<count;i++) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 12;
+        input.placeholder = "プレイヤー" + (i+1);
+        input.value = current[i] || "プレイヤー" + (i+1);
+        input.setAttribute("aria-label","プレイヤー" + (i+1) + "の名前");
+        els.nameFields.appendChild(input);
+      }
+    };
+
+    const startGame = (reuseNames=false) => {
+      const count = reuseNames ? state.players.length : Number(els.playerCount.value);
+      let names;
+      if (reuseNames) {
+        names = state.players.map(p => p.name);
+      } else {
+        names = [...els.nameFields.querySelectorAll("input")]
+          .slice(0,count)
+          .map((i,idx) => i.value.trim() || "プレイヤー" + (idx+1));
+      }
+
+      const deck = shuffle(fullDeck());
+      const players = names.map(name => ({ name, hand: [] }));
+      for (let round=0; round<6; round++) {
+        players.forEach(p => p.hand.push(deck.pop()));
+      }
+
+      state = {
+        players,
+        turn:0,
+        selected:[],
+        proposed:[],
+        voters:[],
+        voterIndex:0,
+        votes:[],
+        lastAccepted:false
+      };
+
+      els.setupScreen.classList.add("hidden");
+      els.gameScreen.classList.remove("hidden");
+      beginTurn();
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+
+    const renderScores = () => {
+      els.scorebar.innerHTML = "";
+      state.players.forEach((p,idx) => {
+        const d = document.createElement("div");
+        d.className = "score" + (idx===state.turn ? " active" : "");
+        d.innerHTML = '<div class="name"></div><div class="count"></div>';
+        d.querySelector(".name").textContent = p.name;
+        d.querySelector(".count").textContent = "残り " + p.hand.length + "枚";
+        els.scorebar.appendChild(d);
+      });
+    };
+
+    const beginTurn = () => {
+      state.selected = [];
+      state.proposed = [];
+      state.votes = [];
+      state.voters = [];
+      state.voterIndex = 0;
+      renderScores();
+      const p = state.players[state.turn];
+      els.activeName.textContent = p.name;
+      els.privacyName.textContent = p.name;
+      setPhase("privacyPhase");
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+
+    const cardNode = (card, selectable=false) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "card";
+      b.textContent = card.name;
+      if (selectable) {
+        b.dataset.id = card.id;
+        if (state.selected.includes(card.id)) b.classList.add("selected");
+        b.addEventListener("click", () => toggleCard(card));
+      } else {
+        b.disabled = true;
+      }
+      return b;
+    };
+
+    const revealHand = () => {
+      els.hand.innerHTML = "";
+      const p = state.players[state.turn];
+      p.hand.forEach(card => els.hand.appendChild(cardNode(card,true)));
+      updateSelectionUI();
+      setPhase("handPhase");
+    };
+
+    const toggleCard = (card) => {
+      const idx = state.selected.indexOf(card.id);
+      if (idx >= 0) {
+        state.selected.splice(idx,1);
+        els.handError.textContent = "";
+      } else {
+        if (state.selected.length >= 2) {
+          els.handError.textContent = "選べるのは2枚までです。";
+          return;
+        }
+        state.selected.push(card.id);
+        els.handError.textContent = "";
+      }
+      revealHand();
+    };
+
+    const updateSelectionUI = () => {
+      els.selectCount.textContent = state.selected.length + " / 2 枚選択";
+      els.proposeBtn.disabled = state.selected.length !== 2;
+      els.proposeBtn.style.opacity = state.selected.length === 2 ? "1" : ".55";
+    };
+
+    const renderPair = (container) => {
+      container.innerHTML = "";
+      state.proposed.forEach(card => container.appendChild(cardNode(card,false)));
+    };
+
+    const propose = () => {
+      if (state.selected.length !== 2) return;
+      const p = state.players[state.turn];
+      const cards = state.selected.map(id => p.hand.find(c => c.id === id)).filter(Boolean);
+      if (cards.length !== 2) return;
+      if (cards[0].name === cards[1].name) {
+        els.handError.textContent = "同じ人物どうしは「相棒」として出せません。";
+        return;
+      }
+      state.proposed = cards;
+      els.proposerName.textContent = p.name;
+      renderPair(els.proposalPair);
+      setPhase("proposalPhase");
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+
+    const beginVote = () => {
+      state.voters = state.players.map((_,i) => i).filter(i => i !== state.turn);
+      state.voterIndex = 0;
+      state.votes = [];
+      renderPair(els.votePair);
+      setPhase("votePhase");
+      renderVoter();
+    };
+
+    const renderVoter = () => {
+      const voterPlayerIndex = state.voters[state.voterIndex];
+      els.voterName.textContent = state.players[voterPlayerIndex].name + " さん";
+      els.voteProgress.textContent = (state.voterIndex + 1) + " / " + state.voters.length + " 人目";
+    };
+
+    const castVote = (approve) => {
+      state.votes.push(approve);
+      state.voterIndex++;
+      if (state.voterIndex < state.voters.length) {
+        renderVoter();
+      } else {
+        resolveVote();
+      }
+    };
+
+    const resolveVote = () => {
+      const approvals = state.votes.filter(Boolean).length;
+      const total = state.votes.length;
+      const accepted = approvals > total / 2;
+      state.lastAccepted = accepted;
+
+      const p = state.players[state.turn];
+      if (accepted) {
+        const ids = new Set(state.proposed.map(c => c.id));
+        p.hand = p.hand.filter(c => !ids.has(c.id));
+      }
+
+      renderScores();
+      els.resultBox.className = "result " + (accepted ? "ok" : "ng");
+      els.resultMark.textContent = accepted ? "○" : "×";
+      els.resultTitle.textContent = accepted ? "承認！" : "否認";
+      els.resultText.textContent = accepted
+        ? approvals + " / " + total + "票が承認。2枚を捨てました。"
+        : approvals + " / " + total + "票が承認。過半数に届かなかったため2枚とも手札に戻ります。";
+      setPhase("resultPhase");
+
+      if (accepted && p.hand.length === 0) {
+        els.nextBtn.textContent = "結果を見る";
+      } else {
+        els.nextBtn.textContent = "次の手番へ";
+      }
+    };
+
+    const nextTurn = () => {
+      const p = state.players[state.turn];
+      if (state.lastAccepted && p.hand.length === 0) {
+        els.winnerName.textContent = p.name + " さんの勝ち！";
+        setPhase("winnerPhase");
+        renderScores();
+        return;
+      }
+      state.turn = (state.turn + 1) % state.players.length;
+      beginTurn();
+    };
+
+    const resetToTitle = () => {
+      els.gameScreen.classList.add("hidden");
+      els.setupScreen.classList.remove("hidden");
+      buildNameFields();
+      window.scrollTo({top:0,behavior:"smooth"});
+    };
+
+    els.playerCount.addEventListener("change", buildNameFields);
+    els.startBtn.addEventListener("click", () => startGame(false));
+    els.revealBtn.addEventListener("click", revealHand);
+    els.proposeBtn.addEventListener("click", propose);
+    els.beginVoteBtn.addEventListener("click", beginVote);
+    els.approveBtn.addEventListener("click", () => castVote(true));
+    els.objectBtn.addEventListener("click", () => castVote(false));
+    els.nextBtn.addEventListener("click", nextTurn);
+    els.againBtn.addEventListener("click", () => startGame(true));
+    els.resetBtn.addEventListener("click", resetToTitle);
+
+    buildNameFields();
+  })();
+  </script>
+</body>
+</html>
