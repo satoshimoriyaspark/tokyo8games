@@ -477,6 +477,8 @@ function softenRunnerFace(pixels,width,key){
   }
   for(let y=top;y<bottom;y++)for(let x=left;x<=right;x++)paint(x,y,base);
   if(front){
+   // Raised-arm poses retain their original mouth one row below the face fill.
+   if(key==='victory'&&f<2)for(let x=22;x<=26;x++)paint(x,22,base);
    for(const x of [20,27])for(let dy=0;dy<3;dy++)for(let dx=0;dx<2;dx++)paint(x+dx,16+dy,ink);
   }else{
    for(let y=top+2;y<top+5;y++)for(let x=right-3;x<=right-2;x++)paint(x,y,ink);
