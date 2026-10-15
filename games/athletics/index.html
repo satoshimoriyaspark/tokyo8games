@@ -59,8 +59,9 @@ let difficulty=2;
 try{const saved=localStorage.getItem('athletics_difficulty');if(saved!==null&&/^[0-4]$/.test(saved))difficulty=Number(saved)}catch{}
 $('#difficulty').value=String(difficulty);
 $('#difficulty').onchange=()=>{if(mode!=='menu')return;difficulty=lim(Number($('#difficulty').value)||0,0,4);try{localStorage.setItem('athletics_difficulty',String(difficulty))}catch{}};
-let fallenHurdles=new Map(),falseStartUntil=0;
-function cpuPace(j,i,d){return (i===1?distancePace(j,d)*1.03:(i===0?5.1:11.4)*rivals[j].skill)*DIFFICULTIES[difficulty]}
+let fallenHurdles=new Map(),falseStartUntil=0,hurdleQuality='',hurdleStumbleUntil=0;
+const HURDLE_CPU_PACE=[9.5,10.6,11.5,11.85,12.15];
+function cpuPace(j,i,d){if(i===2)return HURDLE_CPU_PACE[difficulty]*rivals[j].skill;return (i===1?distancePace(j,d)*1.03:(i===0?5.1:11.4)*rivals[j].skill)*DIFFICULTIES[difficulty]}
 function throwDistance(speed,degrees){return lim(4+speed*3.6*Math.max(0,Math.sin(degrees*Math.PI/90)),0,55)}
 let uiState='';
 let selected=0,mode='menu',cup=false,results=[],attempt=1,records=[],pos=0,spd=0,sta=100,last='',angle=42,bHeld=false,elapsed=0,prev=0,carry=0,deadline=0,invuln=0,hit=new Set(),feedback='',feedbackTime=0,downs=new Set();
@@ -170,7 +171,7 @@ function raceSeconds(i,seconds,progress=1){const [course,rate]=RACE_CLOCKS[i];re
 function timeText(i,seconds){const ticks=Math.round(seconds*100);return i===1?Math.floor(ticks/6000)+':'+(Math.floor(ticks/100)%60).toString().padStart(2,'0')+'.'+(ticks%100).toString().padStart(2,'0'):(ticks/100).toFixed(2)}
 const label=(i,v)=>events[i][2]==='time'?timeText(i,raceSeconds(i,v))+(i===1?'':'秒'):v.toFixed(2)+'m';
 function points(i,v){return Math.round(lim(i===0?(42-v)/27:i===1?(110-v)/65:i===2?(45-v)/28:i===3?(v-1)/6:(v-4)/46,0,1)*1000)}
-function resetRun(){resultNewRecord=false;longJumpFoul='';javeFoul='';fallenHurdles.clear();falseStartUntil=0;spurtUsed=false;spurtActive=false;startPhase=0;resetRunnerMotion();jumpStarted=-10;longJumpAge=0;longJumpOrigin=0;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
+function resetRun(){resultNewRecord=false;hurdleQuality='';hurdleStumbleUntil=0;longJumpFoul='';javeFoul='';fallenHurdles.clear();falseStartUntil=0;spurtUsed=false;spurtActive=false;startPhase=0;resetRunnerMotion();jumpStarted=-10;longJumpAge=0;longJumpOrigin=0;throwHeldStart=0;throwAge=0;throwOrigin=0;ceremonyTime=0;finishDashTime=0;finishDashRecord=0;finishDashSpeed=0;rivals.forEach(r=>r.dist=0);currentRank=1;pos=0;spd=0;sta=100;last='';bHeld=false;angle=42;elapsed=0;invuln=0;hit.clear();feedback=''}
 function select(i){if(['run','ready','finishDash','ceremony'].includes(mode))return;selected=i;cup=false;mode='menu';resetRun();$('#resultPanel').hidden=true;$('#tutorial').hidden=true;render();message(events[i][0]+' を選択しました')}
 function render(){ $('#events').replaceChildren();events.forEach((e,i)=>{const b=document.createElement('button');b.textContent=e[0];b.setAttribute('aria-label',e[0]);const meta=document.createElement('span');meta.textContent=best[i]==null?'PLAY →':'BEST '+label(i,best[i]);b.appendChild(meta);b.className=i===selected?'selected':'';b.onclick=()=>{select(i);showGuide();syncUI()};$('#events').appendChild(b)});guide();const rows=results.map(r=>'<tr><td>'+events[r.i][0]+'</td><td>'+label(r.i,r.v)+'</td><td>'+r.p+'点</td></tr>').join('');$('#results').innerHTML='<p>自己ベスト：'+(best[selected]==null?'—':label(selected,best[selected]))+'</p>'+(results.length?'<table><tr><th>競技</th><th>記録</th><th>得点</th></tr>'+rows+'<tr><th>合計</th><th>'+results.length+'/5</th><th>'+results.reduce((s,r)=>s+r.p,0)+'点</th></tr></table>':'')}
 function start(){showGuide()}
@@ -183,8 +184,13 @@ function input(k){
  if(mode!=='run')return;if(selected===4&&k==='B'){if(!bHeld){throwHeldStart=elapsed;angle=0;}bHeld=true;return}
 if(selected===0){if(k!==last){spd=lim(spd+1.6,0,13.5);last=k;flash('SPEED UP!')}else spd=Math.max(0,spd-.5);return}
 if(selected===1&&k==='B'){if(spurtUsed){flash('スパート使用済み');return}if(pos<120){flash('残り300mから！');return}if(sta<8){flash('スタミナ不足！');return}spurtUsed=true;spurtActive=true;flash('ラストスパート！');return}
-if(k==='A'){if(selected===1){spd=lim(spd+(sta>8?1.15:.12),0,11.5);sta=lim(sta-1.8,0,100)}else spd=lim(spd+1.3,0,12.5);return}
-if(selected===2&&k==='B'){let next=12+Math.ceil(Math.max(0,pos-12)/10)*10,delta=next-pos;if(delta>=0&&delta<4.6){jumpStarted=elapsed;invuln=elapsed+.44;flash(delta<2?'PERFECT!':'GOOD!')}else flash('TOO EARLY!')}
+if(k==='A'){if(selected===2&&elapsed<hurdleStumbleUntil)return;if(selected===1){spd=lim(spd+(sta>8?1.15:.12),0,11.5);sta=lim(sta-1.8,0,100)}else spd=lim(spd+1.3,0,12.5);return}
+if(selected===2&&k==='B'){
+ if(elapsed-jumpStarted<.6)return;
+ const next=12+Math.ceil(Math.max(0,pos-12)/10)*10,lead=(next-pos)/Math.max(.1,spd*1.1);
+ if(next<=102&&lead>=.08&&lead<=.42){jumpStarted=elapsed;invuln=elapsed+.44;hurdleQuality=lead>=.18&&lead<=.30?'PERFECT!':'GOOD!';flash(hurdleQuality)}
+ else flash(lead<.08?'TOO LATE!':'TOO EARLY!');
+}
 if(selected===3&&k==='B')finishAttempt()}
 function release(k){if(k==='B'&&bHeld){bHeld=false;if(mode==='run'&&selected===4)finishAttempt()}}
 function flash(s){feedback=s;feedbackTime=elapsed+.75}
@@ -242,7 +248,7 @@ if(selected<3){rivals.forEach((r,j)=>{const pace=cpuPace(j,selected,r.dist);r.di
 if(selected===1){spd=Math.max(0,spd-(sta<8?2.3:1.35)*dt);sta=lim(sta+(spurtActive?-10:spd<7?7:2.8)*dt,0,100);if(sta<=0)spurtActive=false}else spd=Math.max(0,spd-1.55*dt);
 let factor=selected===0?.39:selected===1?(.45*(spurtActive?1.35:1)):selected>=3?.85:1.1,old=pos;pos+=spd*factor*dt;
 if(selected<3)currentRank=1+rivals.filter(r=>r.dist>pos).length;
-if(selected===2){for(let i=0;i<10;i++){const h=12+10*i;if(old<h&&pos>=h&&!hit.has(i)){hit.add(i);if(elapsed>invuln){spd*=.48;fallenHurdles.set(i,elapsed);flash('HIT!')}else flash('CLEAR!')}}}
+if(selected===2){for(let i=0;i<10;i++){const h=12+10*i;if(old<h&&pos>=h&&!hit.has(i)){hit.add(i);if(elapsed>invuln){spd*=.72;hurdleStumbleUntil=elapsed+.16;hurdleQuality='';fallenHurdles.set(i,elapsed);flash('HIT!')}else{if(hurdleQuality==='PERFECT!')spd=lim(spd+.45,0,12.5);flash(hurdleQuality||'CLEAR!');hurdleQuality='';}}}}
 const goal=selected===1?150:selected===2?110:selected>=3?40:100;
 if(pos>=(selected>=3?FIELD_FOUL_POS:goal)){
  pos=selected>=3?FIELD_FOUL_POS:goal;
