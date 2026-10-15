@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const sharp=require(require.resolve('sharp',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES]}));
 const {armEdge}=require('../tools/align-victory-arms.cjs');
-const {headPixel}=require('../tools/unify-victory-face.cjs');
+const {headPixel,canonicalPixel}=require('../tools/unify-victory-face.cjs');
 (async()=>{
  const before=await sharp(path.join(__dirname,'evidence/victory-face-before.png')).ensureAlpha().raw().toBuffer();
  const {data:after,info}=await sharp(path.join(__dirname,'../assets/sprites/cute_v2/victory_front.png')).ensureAlpha().raw().toBuffer({resolveWithObject:true});
@@ -10,7 +10,7 @@ const {headPixel}=require('../tools/unify-victory-face.cjs');
   const k=(y*144+frame*48+x)*4,mirror=(frame===2?48:47)-x;
   const arm=mirror>=0&&mirror<=armEdge(frame,y);
   if(arm){const j=(y*144+frame*48+mirror)*4;assert.deepEqual(after.subarray(k,k+4),after.subarray(j,j+4),'Both arms must match');}
-  else if(frame!==1&&headPixel(frame,x,y)){const j=(y*144+48+x)*4;const expected=headPixel(1,x,y)?after.subarray(j,j+4):Buffer.alloc(4);assert.deepEqual(after.subarray(k,k+4),expected,'All heads must match the middle frame');}
+  else if(frame!==1&&headPixel(frame,x,y)){const j=(y*144+48+x)*4;const expected=canonicalPixel(after,x,y)?after.subarray(j,j+4):Buffer.alloc(4);assert.deepEqual(after.subarray(k,k+4),expected,'All heads must match the middle frame');}
   else assert.deepEqual(after.subarray(k,k+4),before.subarray(k,k+4),'Pixels outside edited head must stay unchanged');
   if(!after.subarray(k,k+4).equals(before.subarray(k,k+4)))changed++;
   assert.ok(after[k+3]===0||after[k+3]===255,'No translucent edge pixels');
