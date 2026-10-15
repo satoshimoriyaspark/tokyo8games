@@ -475,6 +475,7 @@ function drawTapeBurst(t){
  }
  if(p<.8){rect(115,113,154,7,'#f8edd7');txt('GOAL!!',192,102,25,'#ffdc55','center')}
 }
+function victoryFrameAt(seconds){return [2,0,1,1,0,2][Math.min(5,Math.max(0,Math.floor(seconds*5)))];}
 function drawCeremony(t){
  const p=ceremonyTime;
  rect(0,35,384,285,'#16233a');
@@ -482,7 +483,7 @@ function drawCeremony(t){
  if(p<1.25){
   txt('FINISH!',192,91,30,'#ffdb65','center');
   const jump=Math.abs(Math.sin(p*7))*12,x=180,y=175-jump;
-  drawFrontSprite(x-3,y-1,'victory',Math.floor(p*5)%3);
+  drawFrontSprite(x-3,y-1,'victory',victoryFrameAt(p));
   txt((selected<3?'ナイスラン！':'ナイストライ！'),192,260,15,'#fff','center');
  }else if(p<2.2){
   txt('RESULT',192,104,28,'#ffdb65','center');
