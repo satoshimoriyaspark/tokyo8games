@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#081426">
+  <title>カード図鑑｜相棒ゲーム</title>
+  <style>
+    :root{--bg:#07111f;--panel:#0e1d32;--line:#315071;--text:#f4f1e8;--muted:#aab7c8;--paper:#f2efe6;--ink:#172130;--gold:#d1b56b}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:linear-gradient(180deg,#06101d 0%,#0a1830 55%,#101a28 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .app{max-width:860px;margin:0 auto;padding:18px 14px 48px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .back{color:var(--muted);text-decoration:none;font-size:13px}
+    .badge{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:var(--muted)}
+    .hero{text-align:center;padding:16px 10px 18px}
+    .hero h1{font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(34px,9vw,54px);letter-spacing:.12em;text-indent:.12em;margin:0 0 8px}
+    .hero p{margin:0;color:var(--muted);line-height:1.7}
+    .tools{position:sticky;top:0;z-index:10;background:rgba(7,17,31,.95);backdrop-filter:blur(10px);padding:10px 0 12px}
+    .search{width:100%;border:1px solid #416184;background:#071426;color:var(--text);border-radius:13px;padding:13px 14px;outline:none;font-size:16px}
+    .search:focus{border-color:#8ba5c3;box-shadow:0 0 0 3px rgba(139,165,195,.14)}
+    .meta{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:12px;margin-top:8px}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+    .card{aspect-ratio:63/88;border-radius:13px;border:2px solid #d6d0c4;background:var(--paper);color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(15px,3.2vw,21px);font-weight:800;line-height:1.35;box-shadow:0 5px 14px rgba(0,0,0,.18);position:relative}
+    .card:before{content:"";position:absolute;inset:6px;border:1px solid #b6aa93;border-radius:8px;pointer-events:none}
+    .count{position:absolute;right:8px;top:8px;z-index:1;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;font-size:10px;background:#172130;color:white;border-radius:999px;padding:3px 6px}
+    .empty{display:none;text-align:center;color:var(--muted);padding:32px 8px}
+    .notice{margin-top:22px;border:1px solid #263a54;background:#0a1526;border-radius:16px;padding:13px 14px;color:var(--muted);font-size:12px;line-height:1.7}
+    .actions{display:flex;gap:10px;margin-top:16px}
+    .actions a{flex:1;text-align:center;text-decoration:none;border-radius:13px;padding:13px 12px;font-weight:800;background:var(--paper);color:var(--ink)}
+    .actions a.secondary{background:#203653;color:var(--text);border:1px solid #3f5d80}
+    .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,7,14,.74);backdrop-filter:blur(6px)}
+    .modal.hidden{display:none}
+    .sheet{width:min(430px,100%);background:var(--paper);color:var(--ink);border:2px solid #c5bba8;border-radius:20px;padding:22px;box-shadow:0 22px 60px rgba(0,0,0,.45);position:relative}
+    .sheet:before{content:"";position:absolute;inset:7px;border:1px solid #c8bda8;border-radius:14px;pointer-events:none}
+    .kicker{font-size:11px;letter-spacing:.14em;color:#697486;font-weight:800;margin-bottom:7px;position:relative}
+    .name{font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:31px;margin:0;position:relative}
+    .role{font-size:13px;color:#586577;font-weight:800;margin:7px 0 14px;position:relative}
+    .text{font-size:15px;line-height:1.85;margin:0;position:relative}
+    .owned{font-size:12px;margin-top:12px;color:#6b7481;font-weight:700;position:relative}
+    .close{width:100%;margin-top:18px;border:0;border-radius:12px;min-height:46px;background:#172130;color:#fff;font-weight:800;position:relative}
+    @media(max-width:640px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:430px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.app{padding-left:10px;padding-right:10px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <a class="back" href="/aib">← 相棒ゲーム</a>
+      <span class="badge">リアル版でも使える</span>
+    </div>
+
+    <section class="hero">
+      <h1>カード図鑑</h1>
+      <p>初回版54枚に収録された人物を確認できます。<br>リアルカードで遊ぶときの人物確認にも使えます。</p>
+    </section>
+
+    <section class="tools">
+      <input id="search" class="search" type="search" placeholder="人物名・立場・説明から検索" aria-label="カード図鑑を検索">
+      <div class="meta">
+        <span id="resultCount"></span>
+        <span>人物40人 / カード54枚</span>
+      </div>
+    </section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+    <div id="empty" class="empty">該当する人物が見つかりません。</div>
+
+    <div class="actions">
+      <a href="/aib">WEBゲームへ</a>
+      <a class="secondary" href="#top" id="toTop">上へ戻る</a>
+    </div>
+
+    <div class="notice">
+      ドラマ「相棒」の登場人物名を用いた非公式の試作用図鑑です。公式ロゴ・写真・映像は使用していません。一般公開・配布・販売等を行う場合は権利確認を前提とします。
+    </div>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <div class="sheet">
+      <div class="kicker">CHARACTER FILE</div>
+      <h2 id="modalName" class="name"></h2>
+      <div id="modalRole" class="role"></div>
+      <p id="modalText" class="text"></p>
+      <div id="modalCount" class="owned"></div>
+      <button id="close" class="close" type="button">閉じる</button>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+    const CARD_COUNTS = {
+      "杉下右京":4, "亀山薫":3, "神戸尊":2, "甲斐享":2, "冠城亘":2,
+      "伊丹憲一":2, "芹沢慶二":2, "社美彌子":2, "甲斐峯秋":2, "米沢守":2, "角田六郎":2,
+      "三浦信輔":1, "出雲麗音":1, "大河内春樹":1, "陣川公平":1, "青木年男":1,
+      "内村完爾":1, "中園照生":1, "小野田公顕":1, "亀山美和子":1, "宮部たまき":1,
+      "月本幸子":1, "笛吹悦子":1, "日下部彌彦":1, "片山雛子":1, "瀬戸内米蔵":1,
+      "衣笠藤治":1, "益子桑栄":1, "土師太":1, "風間楓子":1, "鑓鞍兵衛":1,
+      "南井十":1, "浅倉禄郎":1, "本多篤人":1, "本多茉莉":1, "ヤロポロク":1,
+      "大木長十郎":1, "小松真琴":1, "小出茉梨":1, "遠峰小夜子":1
+    };
+    const CHARACTER_INFO = {
+      "杉下右京": { role:"警視庁・特命係", text:"卓越した推理力と強い正義感を持つ警部。亀山薫をはじめ、歴代の相棒たちと数々の事件を追ってきた。" },
+      "亀山薫": { role:"警視庁・特命係", text:"行動力と人情味にあふれる刑事。右京の初代相棒で、長い時を経て再び特命係でコンビを組む。" },
+      "神戸尊": { role:"元・警視庁特命係", text:"警察庁から特命係へ送り込まれた経歴を持つ、頭脳派の元相棒。右京とは価値観をぶつけながら信頼を築いた。" },
+      "甲斐享": { role:"元・警視庁特命係", text:"若さと行動力を持つ右京の元相棒。警察幹部の父・甲斐峯秋との複雑な親子関係も物語の大きな軸となった。" },
+      "冠城亘": { role:"元・警視庁特命係", text:"法務省キャリアから警察官へ転じ、右京の相棒となった人物。柔軟な発想と独自の人脈で捜査を支えた。" },
+      "伊丹憲一": { role:"警視庁・捜査一課", text:"熱血で実直な捜査一課刑事。特命係には何かと厳しいが、事件解決への執念と正義感は強い。" },
+      "芹沢慶二": { role:"警視庁・捜査一課", text:"伊丹と行動を共にすることが多い捜査一課刑事。柔軟な性格で、特命係にも比較的協力的。" },
+      "社美彌子": { role:"警察組織のキャリア", text:"警察組織の要職を歴任する切れ者。特命係とは協力と牽制を繰り返し、国際的な過去にも深い秘密を持つ。" },
+      "甲斐峯秋": { role:"警察庁幹部", text:"警察庁の要職にあるキャリア官僚で、甲斐享の父。右京や特命係を評価しつつ、組織人として複雑な距離を取る。" },
+      "米沢守": { role:"元・警視庁鑑識課", text:"鑑識の専門知識で特命係を何度も助けてきた人物。右京の能力を高く評価し、捜査に協力することが多い。" },
+      "角田六郎": { role:"警視庁・組織犯罪対策部門", text:"特命係の部屋へ気軽に立ち寄る理解者。何気ない会話や情報が事件解決のきっかけになることも多い。" },
+      "三浦信輔": { role:"元・警視庁捜査一課", text:"伊丹、芹沢と長く捜査一課で行動したベテラン刑事。落ち着いた人柄でチームのまとめ役でもあった。" },
+      "出雲麗音": { role:"警視庁・捜査一課", text:"捜査一課で伊丹、芹沢らと事件を追う刑事。芯が強く、独自の視点で捜査に向き合う。" },
+      "大河内春樹": { role:"警視庁・監察官", text:"警察内部を監察する立場の警察官。神戸尊とは特に深い接点があり、特命係とも長く関わっている。" },
+      "陣川公平": { role:"警視庁刑事", text:"思い込みが強く恋愛にも一直線な刑事。特命係と事件を共にすることが多く、右京たちを慕っている。" },
+      "青木年男": { role:"警視庁・サイバー分野", text:"コンピューターに強い警察官。特命係とは協力する一方で反発もあり、ひと筋縄ではいかない関係を築く。" },
+      "内村完爾": { role:"警視庁・刑事部長", text:"刑事部を率いる幹部。勝手に捜査へ首を突っ込む特命係を疎むことが多く、中園と共に対応に追われる。" },
+      "中園照生": { role:"警視庁・刑事部参事官", text:"内村刑事部長を支える警視庁幹部。特命係の扱いに頭を悩ませながら、長年その動向を見てきた。" },
+      "小野田公顕": { role:"警察庁幹部", text:"右京のかつての上司であり、最大の理解者の一人でもあり対立相手でもあった人物。特命係誕生にも深く関わる。" },
+      "亀山美和子": { role:"ジャーナリスト", text:"亀山薫の妻。記者としての行動力と情報力を持ち、薫や右京の捜査に関わることも多い。" },
+      "宮部たまき": { role:"「花の里」初代女将", text:"右京の元妻で、小料理屋「花の里」の初代女将。右京をよく理解し、特命係の面々を温かく迎えていた。" },
+      "月本幸子": { role:"「花の里」二代目女将", text:"事件を通じて右京と知り合い、のちに「花の里」の女将となった人物。特命係にとって大切な日常の場所を支えた。" },
+      "笛吹悦子": { role:"甲斐享のパートナー", text:"甲斐享と長く交際し、私生活を支えた存在。享とその家族をめぐる物語にも深く関わる。" },
+      "日下部彌彦": { role:"法務省幹部", text:"冠城亘の法務省時代の上司。政官界に影響力を持ち、冠城や社美彌子を通じて特命係とも接点を持つ。" },
+      "片山雛子": { role:"政治家", text:"したたかな政治感覚を持つ人物。事件や政界の動きの中で右京と何度も対峙し、ときに利害が交差する。" },
+      "瀬戸内米蔵": { role:"元法務大臣・僧侶", text:"強い正義感を持つ元政治家。特命係の力を評価し、右京たちと協力したこともある一方、自ら事件の当事者にもなった。" },
+      "衣笠藤治": { role:"警視庁幹部", text:"警視庁上層部にいる有力者。組織の論理を重視し、自由に動く特命係を警戒する立場に回ることが多い。" },
+      "益子桑栄": { role:"警視庁・鑑識課", text:"米沢の後を担う鑑識担当。現場資料や鑑定を通じ、特命係の捜査と接点を持つ。" },
+      "土師太": { role:"警視庁・サイバー分野", text:"ITやサイバー分野に強い警察官。青木年男とも関わりが深く、デジタル捜査で存在感を見せる。" },
+      "風間楓子": { role:"週刊誌記者", text:"取材力と行動力を持つ記者。スクープを追う中で特命係や社美彌子らと何度も接点を持つ。" },
+      "鑓鞍兵衛": { role:"政界の有力者", text:"大きな影響力を持つ政治家。政界を巻き込む事件を通して、特命係と接点を持つ人物。" },
+      "南井十": { role:"元刑事", text:"右京がロンドン時代に知り合った人物。右京の過去と深く結びつき、長い因縁を持つ特別な存在。" },
+      "浅倉禄郎": { role:"元検事", text:"亀山薫の旧友でもある元検事。強烈な事件を通じて、右京と亀山の双方に忘れがたい影響を残した。" },
+      "本多篤人": { role:"元過激派幹部", text:"かつて過激派組織に関わった人物。本多茉莉の父で、公安や特命係を巻き込む事件の中心となった。" },
+      "本多茉莉": { role:"本多篤人の娘", text:"本多篤人の娘。父をめぐる複雑な事情の中で、特命係や警察組織と関わることになる。" },
+      "ヤロポロク": { role:"ロシア人スパイ", text:"社美彌子の過去と深く結びつく人物。美彌子との関係は、その後の彼女の人生や物語に大きな影響を与えた。" },
+      "大木長十郎": { role:"警視庁・組織犯罪対策部門", text:"小松真琴と行動を共にすることが多い刑事。特命係の近くで、二人組として長く登場してきた。" },
+      "小松真琴": { role:"警視庁・組織犯罪対策部門", text:"大木長十郎とコンビのように行動する刑事。特命係の周辺で、二人そろって姿を見せることが多い。" },
+      "小出茉梨": { role:"「こてまり」女将", text:"小料理屋「こてまり」の女将。政財界にも幅広い人脈を持ち、右京たちの会話相手として日常を支える。" },
+      "遠峰小夜子": { role:"事件関係者", text:"鋭い観察力と人の心理を読む力を持ち、右京たちと複数回にわたって対峙する印象的な人物。" }
+    };
+
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const resultCount = document.getElementById("resultCount");
+    const empty = document.getElementById("empty");
+    const modal = document.getElementById("modal");
+    const modalName = document.getElementById("modalName");
+    const modalRole = document.getElementById("modalRole");
+    const modalText = document.getElementById("modalText");
+    const modalCount = document.getElementById("modalCount");
+    const close = document.getElementById("close");
+    const toTop = document.getElementById("toTop");
+
+    const names = Object.keys(CARD_COUNTS);
+
+    const show = (name) => {
+      const info = CHARACTER_INFO[name];
+      modalName.textContent = name;
+      modalRole.textContent = info.role;
+      modalText.textContent = info.text;
+      modalCount.textContent = "初回版収録：" + CARD_COUNTS[name] + "枚";
+      modal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+      close.focus();
+    };
+
+    const hide = () => {
+      modal.classList.add("hidden");
+      document.body.style.overflow = "";
+    };
+
+    const render = () => {
+      const q = search.value.trim().toLowerCase();
+      const filtered = names.filter(name => {
+        const info = CHARACTER_INFO[name];
+        return !q || [name, info.role, info.text].join(" ").toLowerCase().includes(q);
+      });
+
+      grid.innerHTML = "";
+      filtered.forEach(name => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "card";
+        button.setAttribute("aria-label", name + "の人物紹介を見る");
+
+        const label = document.createElement("span");
+        label.textContent = name;
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = "×" + CARD_COUNTS[name];
+
+        button.append(label, count);
+        button.addEventListener("click", () => show(name));
+        grid.appendChild(button);
+      });
+
+      resultCount.textContent = filtered.length + "人表示";
+      empty.style.display = filtered.length ? "none" : "block";
+    };
+
+    search.addEventListener("input", render);
+    close.addEventListener("click", hide);
+    modal.addEventListener("click", event => { if (event.target === modal) hide(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && !modal.classList.contains("hidden")) hide(); });
+    toTop.addEventListener("click", event => { event.preventDefault(); window.scrollTo({top:0,behavior:"smooth"}); });
+    render();
+  })();
+  </script>
+</body>
+</html>
