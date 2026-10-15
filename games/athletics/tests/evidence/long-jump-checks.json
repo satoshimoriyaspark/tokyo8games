@@ -1,6 +1,6 @@
 {
   "environment": "Node + native Canvas; not a browser/device test",
-  "count": 38,
+  "count": 39,
   "passed": [
     "unchanged take-off rule and distance 32",
     "athlete rises and remains in camera 32",
@@ -28,8 +28,9 @@
     "retry resets jump and camera 40",
     "foul stays a foul 31.99",
     "foul advances to next attempt 31.99",
-    "foul stays a foul 40.01",
-    "foul advances to next attempt 40.01",
+    "foul stays a foul 41.981830985915494",
+    "foul advances to next attempt 41.981830985915494",
+    "old boundary remains playable before yellow board",
     "running past board without B is foul 1",
     "late B cannot rescue attempt 1",
     "foul consumes exactly one attempt 1",

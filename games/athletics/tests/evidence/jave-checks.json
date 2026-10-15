@@ -1,7 +1,7 @@
 {
   "environment": "Node + @napi-rs/canvas; not a browser/device test",
   "javeball": {
-    "count": 38,
+    "count": 39,
     "passed": [
       "A accelerates and uses running legs",
       "run plays all eight approved running frames",
@@ -26,6 +26,7 @@
       "wall clock cannot skip flight 8",
       "landing is held before retry 8",
       "retry clears camera and motion 8",
+      "old boundary remains playable before yellow board",
       "overrun is foul held=false",
       "foul has no flight or camera held=false",
       "late release cannot rescue foul held=false",

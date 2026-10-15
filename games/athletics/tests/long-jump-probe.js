@@ -8,7 +8,7 @@ window.longJumpQA={
   else deadline=performance.now()+1200*(1-u);
   draw(0);return cv;
  },
- foul(){selected=3;cup=false;begin();step(1/60,deadline+1);pos=39.99;spd=12;step(1/60,0);draw(0);return cv;},
+ foul(){selected=3;cup=false;begin();step(1/60,deadline+1);pos=(typeof FIELD_FOUL_POS==='number'?FIELD_FOUL_POS:40)-.01;spd=12;step(1/60,0);draw(0);return cv;},
  checks(){
   const passed=[],assert=(name,ok)=>{if(!ok)throw Error(name);passed.push(name);};
   for(const origin of [32,36,40]){
@@ -29,19 +29,20 @@ window.longJumpQA={
    longJumpAge=duration+.5;step(1/60,deadline+100000);assert('landing is held '+origin,mode==='between');
    longJumpAge=duration+LONG_JUMP_HOLD;step(1/60,deadline+100000);assert('retry resets jump and camera '+origin,mode==='ready'&&attempt===2&&longJumpAge===0&&longJumpOrigin===0&&longJumpView().camera===0);
   }
-  for(const origin of [31.99,40.01]){
+  for(const origin of [31.99,FIELD_FOUL_POS+.01]){
    selected=3;cup=false;begin();step(1/60,deadline+1);pos=origin;spd=12;input('B');
    assert('foul stays a foul '+origin,records[0]===0&&!longJumpView().valid&&longJumpView().camera===0);
    for(let i=0;mode==='between'&&i<100;i++)step(1/60,0);
    assert('foul advances to next attempt '+origin,attempt===2&&mode==='ready');
   }
+  selected=3;cup=false;begin();step(1/60,deadline+1);pos=40;spd=1;step(1/60,0);assert('old boundary remains playable before yellow board',mode==='run'&&records.length===0);
   for(const speed of [1,12.5]){
-   selected=3;cup=false;begin();step(1/60,deadline+1);pos=39.999;spd=speed;step(1/60,0);
-   assert('running past board without B is foul '+speed,mode==='between'&&records.length===1&&records[0]===0&&longJumpFoul==='踏切線を越えました');
+   selected=3;cup=false;begin();step(1/60,deadline+1);pos=FIELD_FOUL_POS-.001;spd=speed;step(1/60,0);
+   assert('running past board without B is foul '+speed,mode==='between'&&records.length===1&&records[0]===0&&longJumpFoul==='踏切線を踏みました');
    input('B');assert('late B cannot rescue attempt '+speed,records.length===1&&records[0]===0&&!longJumpView().valid);
    longJumpAge=LONG_JUMP_HOLD;step(1/60,0);assert('foul consumes exactly one attempt '+speed,attempt===2&&mode==='ready'&&longJumpFoul==='');
   }
-  selected=3;cup=false;begin();step(1/60,deadline+1);pos=39.999;spd=12;input('B');assert('B immediately before line valid',records[0]>0&&longJumpFoul==='');
+  selected=3;cup=false;begin();step(1/60,deadline+1);pos=FIELD_FOUL_POS-.001;spd=12;input('B');assert('B immediately before line valid',records[0]>0&&longJumpFoul==='');
   selected=3;cup=false;begin();step(1/60,deadline+1);pos=36;elapsed=150;step(1/60,0);assert('timeout never auto jumps',records[0]===0&&longJumpFoul==='時間切れ');
   selected=3;cup=false;begin();const values=[];
   for(let n=1;n<=3;n++){
