@@ -5,6 +5,7 @@ window.javeQA={
  scene(kind,frame=0){
   selected=4;cup=false;begin();step(1/60,deadline+1);pos=24;spd=12;elapsed=2;
   runnerMotion[0].moving=true;runnerMotion[0].frameTime=frame;runnerMotion[0].travel=pos;
+  if(kind==='foul'){pos=39.99;bHeld=true;step(1/60,performance.now());}
   if(kind==='hold'){bHeld=true;throwHeldStart=elapsed-.5;}
   if(kind==='flight'||kind==='land'){
    finishAttempt();throwAge=kind==='land'?(typeof javeFlightDuration==='function'?javeFlightDuration():1.2):frame*(typeof javeFlightDuration==='function'?javeFlightDuration():1.2);
@@ -52,6 +53,15 @@ window.javeQA={
    throwAge=duration+JAVE_LANDING_HOLD;step(1/60,deadline+100000);
    assert('retry clears camera and motion '+speed,attempt===2&&mode==='ready'&&throwAge===0&&javeView().camera===0&&runnerMotion.every(m=>!m.moving));
   }
+  for(const held of [false,true]){
+   this.start();pos=39.99;spd=12;bHeld=held;step(1/60,0);
+   assert('overrun is foul held='+held,mode==='between'&&records.length===1&&records[0]===0&&!!javeFoul&&!bHeld);
+   assert('foul has no flight or camera held='+held,!javeView().active&&javeView().camera===0&&javeFlightDuration()===0);
+   release('B');finishAttempt();assert('late release cannot rescue foul held='+held,records.length===1&&records[0]===0);
+   step(JAVE_LANDING_HOLD,0);assert('foul consumes one attempt and clears held='+held,attempt===2&&mode==='ready'&&!javeFoul);
+  }
+  this.start();pos=40.01;spd=12;input('B');release('B');assert('late input is foul',records[0]===0&&!!javeFoul);
+  this.start();pos=39.99;spd=12;input('B');release('B');assert('release before line stays valid',records[0]>0&&!javeFoul);
   this.start();const values=[];
   for(let n=1;n<=3;n++){
    if(mode==='ready')step(1/60,deadline+1);spd=4+n*2;angle=42;pos=25;finishAttempt();values.push(records.at(-1));

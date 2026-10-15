@@ -3,7 +3,7 @@
 <style>body{margin:0;padding:18px;background:#172337;color:#fff4d3;font:15px/1.6 system-ui}h1{font-size:24px;margin:0}button,select{font:inherit;padding:8px;margin:4px}iframe{display:none}.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1250px}canvas{width:100%;image-rendering:pixelated;display:block}h2{font-size:18px;margin:10px 0}pre{white-space:pre-wrap}.info{min-height:26px;color:#9deac4}a{color:#9cdefa}@media(max-width:600px){.pair{grid-template-columns:1fr}}</style>
 <h1>ジャベボール｜走る助走・カメラ追従・距離目盛り</h1>
 <p>左：修正前 ／ 右：修正後。同じPNG・助走位置・投球記録で比較。実際のゲーム描画を使用。</p>
-<label>場面 <select id="scene"><option value="run">助走</option><option value="hold">角度調整中の助走</option><option value="flight0">リリース</option><option value="flight25">飛行25%</option><option value="flight50">飛行50%</option><option value="flight75">飛行75%</option><option value="land">着地</option></select></label>
+<label>場面 <select id="scene"><option value="run">助走</option><option value="hold">角度調整中の助走</option><option value="flight0">リリース</option><option value="flight25">飛行25%</option><option value="flight50">飛行50%</option><option value="flight75">飛行75%</option><option value="land">着地</option><option value="foul">ライン超過（ファウル）</option></select></label>
 <label>走行コマ <select id="frame"></select></label>
 <button id="play">3回の試技を自動再生</button><button id="pause">一時停止</button><button id="checks">動作検証</button>
 <div class="pair"><section><h2>修正前</h2><div class="info" id="oldInfo"></div><canvas id="old" width="384" height="320"></canvas><canvas id="oldZoom" width="64" height="52"></canvas></section><section><h2>修正後</h2><div class="info" id="newInfo"></div><canvas id="new" width="384" height="320"></canvas><canvas id="newZoom" width="64" height="52"></canvas></section></div>
