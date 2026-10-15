@@ -459,6 +459,33 @@ function cleanSpriteMatte(img){
  }
  g.putImageData(data,0,0);return sheet;
 }
+// Simplify facial details in the cached sprites, retaining the approved silhouette.
+// Coordinates are frame-local so eyes stay stable through the running cycle.
+function softenRunnerFace(pixels,width,key){
+ const skin=[[249,197,126],[231,166,85],[255,216,149],[202,130,53]];
+ const base=[255,211,153],shade=[238,180,117],ink=[41,31,23];
+ const profiles={idle:[[23,31,13,22]],jog:[[25,32,13,21],[24,31,13,21],[26,33,13,21],[25,32,13,21],[25,32,13,21],[25,33,13,21]],sprint:[[26,34,14,22],[25,33,14,22],[26,34,15,23],[26,34,14,22],[25,33,14,22],[26,33,14,22],[25,33,14,22],[25,33,14,22]]};
+ for(let f=0;f<width/48;f++){
+  const front=key==='victory'||key==='podium';
+  const [left,right,top,bottom]=front?[18,30,14,22]:profiles[key][f];
+  const at=(x,y)=>(y*width+f*48+x)*4;
+  const paint=(x,y,col)=>{const k=at(x,y);if(pixels[k+3])for(let c=0;c<3;c++)pixels[k+c]=col[c];};
+  // Flatten cheek highlights and heavy skin shadows; preserve hair and outer edge.
+  for(let y=top;y<=bottom;y++)for(let x=front?16:18;x<=right+1;x++){
+   const k=at(x,y);
+   if(skin.some(c=>c.every((v,i)=>pixels[k+i]===v)))paint(x,y,y===bottom?shade:base);
+  }
+  for(let y=top;y<bottom;y++)for(let x=left;x<=right;x++)paint(x,y,base);
+  if(front){
+   for(const x of [20,27])for(let dy=0;dy<3;dy++)for(let dx=0;dx<2;dx++)paint(x+dx,16+dy,ink);
+   for(let x=23;x<=25;x++)paint(x,21,ink);
+   paint(22,20,ink);paint(26,20,ink);
+  }else{
+   for(let y=top+2;y<top+5;y++)for(let x=right-3;x<=right-2;x++)paint(x,y,ink);
+   paint(right-2,bottom-2,ink);paint(right-1,bottom-2,ink);paint(right,bottom-3,ink);
+  }
+ }
+}
 function teamSheet(img,team,key){
  const sheet=document.createElement('canvas');sheet.width=img.naturalWidth||img.width;sheet.height=48;
  const target=sheet.getContext('2d',{willReadFrequently:true});
@@ -483,12 +510,7 @@ function teamSheet(img,team,key){
    pixels[k]=col[0];pixels[k+1]=col[1];pixels[k+2]=col[2];
   }
  }
- // Victory frame 0 has a three-pixel left eye and a two-pixel right eye.
- // Restore the extra column to adjacent skin; both eyes become exactly 2 x 5 pixels.
- if(key==='victory')for(let y=15;y<20;y++){
-  const dst=(y*sheet.width+21)*4,src=(y*sheet.width+22)*4;
-  for(let c=0;c<4;c++)pixels[dst+c]=pixels[src+c];
- }
+ softenRunnerFace(pixels,sheet.width,key);
  target.putImageData(data,0,0);return sheet;
 }
 // Build an eight-pose running cycle from the approved upper body and palette.
