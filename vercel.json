@@ -30,6 +30,14 @@
     {
       "source": "/sqz/",
       "destination": "/games/sqz/index.html"
+    },
+    {
+      "source": "/aib",
+      "destination": "/games/aib/index.html"
+    },
+    {
+      "source": "/aib/",
+      "destination": "/games/aib/index.html"
     }
   ]
 }
