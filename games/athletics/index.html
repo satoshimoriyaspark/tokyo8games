@@ -398,7 +398,7 @@ function drawLongJumpField(){
   rect(x,278,1,11,'#967249');if(m%2===0)txt(m+'m',x,305,11,'#fff4d3','center');
  }
  rect(0,286,384,3,'#f1e2b7');
- if(line>-5&&line<389){rect(line,259,4,30,'#ffde65');}
+ if(line>-5&&line<389){rect(line,241,4,48,'#ffde65');}
  txt('TRY '+attempt+' / 3',8,59,12,'#ffdb65');
  if(view.active){txt(view.valid?(view.landed?'LANDING!':'JUMP!'):'FOUL',192,111,18,view.valid?'#ffdb65':'#ff8585','center');if(!view.valid)txt(longJumpFoul+'・記録なし',192,132,11,'#fff','center');}
  else{txt('Bで踏切!',Math.min(320,Math.max(64,line-36)),177,12,'#ffdb65','center');txt('助走 '+Math.floor(pos)+' / 40m',8,305,10,'#fff4d3');}
