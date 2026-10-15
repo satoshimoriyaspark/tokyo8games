@@ -430,8 +430,9 @@ function rect(x,y,w,h,color,target=ctx){target.fillStyle=color;target.fillRect(M
 // Approved 8BIT ATHLETICS v1.5 assets remain the source for the runner and palette.
 const spriteDefs={
  idle:{file:'idle_right',frames:1,chest:[28]},
- jog:{file:'jog_right',frames:6,chest:[26,25,27,26,30,26]},
- sprint:{file:'sprint_right',frames:8,chest:[29,28,29,29,28,27,27,27]},
+ // Register each source pose to the same head/torso axis, independent of arm reach.
+ jog:{file:'jog_right',frames:6,chest:[26,25,27,26,26,27]},
+ sprint:{file:'sprint_right',frames:8,chest:[29,28,29,29,28,28,28,28]},
  victory:{file:'victory_front',frames:3,chest:[29,28,29]},
  podium:{file:'podium_front',frames:1,chest:[29]}
 };
@@ -594,7 +595,9 @@ function blitRunner(target,x,feet,team,key,phase,scale=1){
 function runner(x,feet,r,player=false,scale=1,walkingPhase=null){
  const key=s&&s.elapsed<r.startAt?(r.approachKm!==undefined?'jog':'idle'):walkingPhase!==null?'jog':r.finishTime!==null?'podium':r.km===0?'idle':r.sprint>0&&r.effort>=.7?'sprint':'jog';
  rect(x-10*scale,feet-1,Math.round(19*scale),2,player?'#d3ba56':'#535c68');
- blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*(key==='sprint'?1.4:1.7)+(r.index>=0?r.index*.7:0):walkingPhase,scale);
+ // Keep one continuous footfall phase when entering/leaving a sprint.
+ // Movement speed already controls the phase increment in moveRunner.
+ blitRunner(ctx,x,feet,r.team,key,walkingPhase===null?r.phase*1.7+(r.index>=0?r.index*.7:0):walkingPhase,scale);
  if(player){const top=feet-52*scale;rect(x-6,top,13,3,'#102137');rect(x-5,top-1,11,3,'#ffe500');rect(x-3,top+2,7,2,'#ffe500');rect(x-1,top+4,3,2,'#ffe500');}
 }
 const reduceCharacterMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
