@@ -33,19 +33,19 @@
     },
     {
       "source": "/aib",
-      "destination": "/games/aib/index.html"
+      "destination": "/aib-private.html"
     },
     {
       "source": "/aib/",
-      "destination": "/games/aib/index.html"
+      "destination": "/aib-private.html"
     },
     {
-      "source": "/aib/cards",
-      "destination": "/games/aib/cards.html"
+      "source": "/aib/:path*",
+      "destination": "/aib-private.html"
     },
     {
-      "source": "/aib/cards/",
-      "destination": "/games/aib/cards.html"
+      "source": "/games/aib/:path*",
+      "destination": "/aib-private.html"
     }
   ]
 }
