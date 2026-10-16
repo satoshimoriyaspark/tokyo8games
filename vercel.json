@@ -30,6 +30,14 @@
     {
       "source": "/sqz/",
       "destination": "/games/sqz/index.html"
+    },
+    {
+      "source": "/ath",
+      "destination": "/games/athletics/index.html"
+    },
+    {
+      "source": "/ath/",
+      "destination": "/games/athletics/index.html"
     }
   ]
 }

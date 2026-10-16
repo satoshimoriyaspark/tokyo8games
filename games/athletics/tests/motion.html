@@ -1,0 +1,28 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8BIT ATHLETICS｜走りモーション比較</title>
+<style>body{margin:0;padding:20px;background:#172337;color:#fff5d7;font:16px/1.6 system-ui}h1{font-size:25px;margin:0}button,select{font:inherit;padding:8px;margin:5px}a{color:#9ee1ff}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1200px}canvas{width:100%;image-rendering:pixelated;background:#9b4038}h2{margin-bottom:4px;font-size:20px}.info{font-family:monospace;font-size:14px;color:#acffcf}iframe{display:none}#result{white-space:pre-wrap;font-size:13px}small{color:#c9d6e4}@media(max-width:600px){body{padding:10px}.pair{gap:8px}h1{font-size:21px}}</style>
+<h1>走りモーション｜同じ移動速度で新旧PNGを比較</h1>
+<p>左：修正前 ／ 右：RUN 1.8。承認済みの顔・髪を保持し、腕・脚のPNGを変更。接地・支持・蹴り出し・空中姿勢を左右交互に再生します。</p>
+<label>種目 <select id="event"><option value="0">100m</option><option value="1">1500m</option></select></label>
+<label>移動速度 <select id="speed"><option value="2">低速 2</option><option value="5" selected>通常 5</option><option value="10">高速 10</option><option value="30">1500m高速 30</option></select></label>
+<button id="pause">一時停止</button><button id="restart">スタートから再生</button><button id="checks">モーション検証</button>
+<div class="pair"><section><h2>修正前</h2><div class="info" id="oldInfo">読込中</div><canvas id="old" width="96" height="60"></canvas><canvas id="oldScene" width="384" height="320"></canvas></section><section><h2>修正後</h2><div class="info" id="newInfo">読込中</div><canvas id="new" width="96" height="60"></canvas><canvas id="newScene" width="384" height="320"></canvas></section></div>
+<p><a href="../index.html">修正版をプレイ</a> ／ <a href="./visual.html">競技の回帰検証</a></p>
+<small>上段は選手を追従拡大、下段はゲーム描画。比較用の一定速度で自動再生し、競技の得点・タイムには保存しません。Chromeによる検証用画面です。</small><pre id="result"></pre>
+<script type="module">
+const $=s=>document.querySelector(s),frames=[],probe=await(await fetch('./motion-probe.js')).text();
+for(const path of ['./motion-baseline/index.html','../index.html']){
+ const html=await(await fetch(path)).text(),base=new URL('../',location.href).href;
+ const f=document.createElement('iframe');f.srcdoc=html.replace('<head>','<head><base href="'+base+'">').replaceAll('localStorage','qaStorage').replace("(()=>{'use strict';","(()=>{'use strict';const qaStorage={getItem:()=>null,setItem:()=>{}};").replace('render();requestAnimationFrame(loop);',probe+'\nrender();');document.body.append(f);frames.push(f);
+}
+const apis=()=>frames.map(f=>f.contentWindow.motionQA);
+await new Promise((resolve,reject)=>{const start=Date.now(),id=setInterval(()=>{if(apis().every(a=>a?.ready())){clearInterval(id);resolve()}else if(Date.now()-start>30000){clearInterval(id);reject(Error('PNG load timeout'))}},50)});
+let paused=false,last=0,carry=0,total=0;
+function reset(){apis().forEach(a=>a.reset(+$('#event').value));total=0;carry=0;last=0;}
+function paint(dt){apis().forEach((a,i)=>{const r=a.tick(dt,+$('#speed').value),id=i?'new':'old',ctx=$('#'+id).getContext('2d');ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,96,60);ctx.drawImage(r.canvas,r.dx-24,233,96,60,0,0,96,60);const scene=$('#'+id+'Scene').getContext('2d');scene.imageSmoothingEnabled=false;scene.drawImage(r.canvas,0,0);$('#'+id+'Info').textContent='コマ '+(r.frame+1)+' / row '+r.row+' / 足元 '+r.feet;});}
+function loop(t){const dt=last?Math.min((t-last)/1000,.05):0;last=t;if(!paused){carry+=dt;while(carry>=1/60){paint(1/60);carry-=1/60;total+=1/60;}if(total>12)reset();}requestAnimationFrame(loop);}
+$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?'再生':'一時停止'};
+$('#restart').onclick=reset;$('#event').onchange=reset;$('#speed').onchange=reset;
+$('#checks').onclick=()=>{try{const r=apis()[1].checks();$('#result').textContent='PASS '+r.count+' motion assertions\n'+r.passed.join('\n')}catch(e){$('#result').textContent='FAIL '+e.stack}reset()};
+reset();requestAnimationFrame(loop);
+</script></html>

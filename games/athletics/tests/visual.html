@@ -1,0 +1,65 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>8BIT ATHLETICS 1.7 — 修正前後の表示検証</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#172337;color:#f5f0df;font:14px system-ui;padding:16px}h1{font-size:24px;margin:0 0 8px}p{margin:5px 0 12px}button,select{font:inherit;padding:8px;margin-right:6px}nav{margin:10px 0}.pair{display:flex;gap:16px}.panel{width:calc(50% - 8px)}canvas{image-rendering:pixelated;max-width:100%;height:auto;display:block}h2{font-size:18px;margin:8px 0}#scene canvas{width:576px;border:2px solid #708096}#zoom canvas{width:576px}#atlas{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#334357;padding:8px}.card canvas{width:100%}.card h3{font:13px system-ui;margin:0 0 4px}iframe{display:none}#status{color:#8dffc1}#layout iframe{display:block;background:#101927;border:1px solid #8dffc1}#layout{display:flex;gap:20px;align-items:start;overflow:auto}pre{white-space:pre-wrap}section[hidden]{display:none}
+</style>
+<h1>8BIT ATHLETICS｜表示修正の比較</h1><p>左：修正前 0638498 ／ 右：修正後 ART 1.7。同じゲーム描画関数・同じ状態で比較。画像補間なし。</p>
+<p id="status">承認PNGを読み込み中…</p>
+<nav><button id="scenes">場面比較</button><button id="frames">全フレーム</button><button id="layouts">画面幅確認</button><button id="test">実行時検証</button></nav>
+<section id="scene"><select id="sample" aria-label="確認場面"></select><div class="pair"><div class="panel"><h2>修正前</h2><canvas id="before" width="384" height="320"></canvas></div><div class="panel"><h2>修正後</h2><canvas id="after" width="384" height="320"></canvas></div></div><h2>プレイヤーとゴール周辺（同一範囲を拡大）</h2><div id="zoom" class="pair"><div class="panel"><canvas width="160" height="64"></canvas></div><div class="panel"><canvas width="160" height="64"></canvas></div></div></section>
+<section id="gallery" hidden><select id="group" aria-label="アニメーション"></select><select id="color" aria-label="選手色"><option value="0">YOU 黄</option><option value="1">CPU 青</option><option value="2">CPU 赤</option><option value="3">CPU 緑</option></select><p>各カード：上段＝暗い背景、下段＝明るい背景。各段とも左が修正前、右が修正後。</p><div id="atlas"></div></section>
+<section id="layout" hidden></section><pre id="results"></pre>
+<script type="module">
+const $=s=>document.querySelector(s),sources=['./baseline/index.html','../index.html'],handles=[];
+const probe=await (await fetch('./probe.js')).text();
+for(const path of sources){
+ const url=new URL(path,location.href),html=await (await fetch(url)).text();
+ const hook='render();requestAnimationFrame(loop);';if(!html.includes(hook))throw Error('Game entry hook changed');
+ const prepared=html.replace('<head>','<head><base href="'+new URL('.',url).href+'">').replaceAll('localStorage','qaStorage').replace("(()=>{'use strict';","(()=>{'use strict';const qaStorage={getItem:()=>null,setItem:()=>{}};").replace(hook,probe+'\nrender();');
+ const frame=document.createElement('iframe');frame.srcdoc=prepared;document.body.append(frame);handles.push(frame);
+}
+const names=['待機','スタート','100m 走行','1500m 走行','正面ガッツポーズ','表彰台','ハードル','ジャベボール 構え','ジャベボール 放球','幅跳び（既存ポーズ）','ジャベボール フォロー','競技用具'];
+const samples=[
+ ['100m 開始前',{mode:'ready',pos:0,elapsed:0}],
+ ['100m 位置について',{mode:'ready',startPhase:0,pos:0,elapsed:0}],['100m 用意',{mode:'ready',startPhase:1,pos:0,elapsed:0}],['100m 号砲',{pos:0,elapsed:.05}],
+ ...Array.from({length:8},(_,f)=>['100m 走行 '+(f+1),{pos:(270+f+.1)/2.8,elapsed:19}]),
+ ['100m ゴール直前 96m',{pos:96}],['100m 胸部通過直前',{pos:99.99}],
+ ['100m 通過直後',{mode:'finishDash',pos:100,dash:0}],['100m 駆け抜け 0.5秒',{mode:'finishDash',pos:103.5,dash:.5}],['100m 演出終了後 1.2秒',{mode:'finishDash',pos:107.6,dash:1.2}],
+ ['100m 結果画面',{mode:'result',pos:114}],['100m 再挑戦',{mode:'ready',pos:0,elapsed:0}],
+ ['1500m ゴール前',{event:1,pos:146,elapsed:28}],['ハードル ゴール前',{event:2,pos:106,elapsed:22}],
+ ...Array.from({length:7},(_,f)=>['ハードル動作 '+(f+1),{event:2,pos:52,jumpAge:(f+.15)/7*.68}]),
+ ...Array.from({length:3},(_,f)=>['幅跳び '+(f+1),{event:3,mode:'between',pos:38,attemptRemain:1.2-(f+.1)*.4}]),
+ ['ジャベボール 構え',{event:4,pos:24,held:true,heldAge:.1}],['ジャベボール 引き込み',{event:4,pos:24,held:true,heldAge:.25}],['ジャベボール 放球',{event:4,mode:'between',pos:24,throwAge:.1}],['ジャベボール 飛翔',{event:4,mode:'between',pos:24,throwAge:.5}],['ジャベボール 次の試技',{event:4,mode:'ready',pos:0,elapsed:0}],
+ ...[.05,.25,.45].map((p,f)=>['正面ガッツポーズ '+(f+1),{mode:'ceremony',ceremony:p}]),
+ ['大会表彰台',{mode:'ceremony',ceremony:2.8,total:true}]
+];
+samples.forEach(([name],i)=>$('#sample').add(new Option(name,i)));names.forEach((name,i)=>$('#group').add(new Option(name,i)));
+const apis=()=>handles.map(f=>f.contentWindow.qa);
+function scene(){
+ const s=samples[+$('#sample').value][1];apis().forEach((api,i)=>{
+  api.scene(s);const out=$('#'+(i?'after':'before')),ctx=out.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(api.paint(),0,0);
+  const zoom=$$('#zoom canvas')[i],z=zoom.getContext('2d');z.imageSmoothingEnabled=false;z.clearRect(0,0,160,64);z.drawImage(out,190,231,160,64,0,0,160,64);
+ });
+}
+const $$=s=>Array.from(document.querySelectorAll(s));
+function gallery(){
+ const row=+$('#group').value,col=+$('#color').value;$('#atlas').replaceChildren();
+ for(let frame=0;frame<apis()[0].counts[row];frame++){
+  const box=document.createElement('div');box.className='card';const h=document.createElement('h3');h.textContent=names[row]+' / '+(frame+1);box.append(h);
+  const canvas=document.createElement('canvas');canvas.width=96;canvas.height=96;const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+  ['#172237','#fff4dc'].forEach((bg,y)=>apis().forEach((api,x)=>{ctx.fillStyle=bg;ctx.fillRect(x*48,y*48,48,48);ctx.drawImage(api.sheets()[col][row],frame*48,0,48,48,x*48,y*48,48,48)}));box.append(canvas);$('#atlas').append(box);
+ }
+}
+function show(id){for(const s of ['scene','gallery','layout'])$('#'+s).hidden=s!==id;$('#results').textContent=''}
+$('#scenes').onclick=()=>{show('scene');scene()};$('#frames').onclick=()=>{show('gallery');gallery()};$('#sample').onchange=scene;$('#group').onchange=gallery;$('#color').onchange=gallery;
+$('#layouts').onclick=()=>{
+ show('layout');if($('#layout').children.length)return;
+ for(const [width,height] of [[390,844],[820,1180]]){const box=document.createElement('div'),h=document.createElement('h2'),f=document.createElement('iframe');h.textContent=width+'×'+height+' CSS px（Chrome幅確認／実機ではありません）';f.width=width;f.height=height;f.src='../index.html';box.append(h,f);$('#layout').append(box)}
+};
+$('#test').onclick=()=>{
+ try{const result=apis().map(a=>a.checks());if(JSON.stringify(result[0].snapshots)!==JSON.stringify(result[1].snapshots))throw Error('Gameplay regression');$('#results').textContent='PASS — '+result[1].checks+' runtime assertions; all race times, points and tournament totals match baseline.\n'+JSON.stringify(result,null,2);$('#status').textContent='PASS：全コマ整数描画、胸部判定、タイム固定、右への駆け抜け、再挑戦、全5種目の大会進行。';scene()}
+ catch(e){$('#results').textContent='FAIL: '+e.stack;$('#status').textContent='FAIL'}
+};
+await new Promise((resolve,reject)=>{const started=Date.now(),timer=setInterval(()=>{if(apis().every(a=>a?.ready())){clearInterval(timer);resolve()}else if(Date.now()-started>30000){clearInterval(timer);reject(Error('Sprite timeout'))}},50)});
+$('#status').textContent='修正前・修正後とも12 PNG / 41 frames 読込完了';$('#sample').value='12';scene();
+</script></html>
