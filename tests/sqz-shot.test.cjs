@@ -264,3 +264,54 @@ test('500 pack adds 220 distinct sourced questions, with 131 beginner additions'
   for(const d of [1,2,3]){const ids=g.run(`selectQuestions(${d},'${cat}')`);assert.ok(ids.every(id=>g.run(`BANK.find(q=>q.id==='${id}').level`)<=d));}
  }
 });
+
+test('TOP cancellation preserves cup time, question order, records and other game storage',()=>{
+ const g=game();g.run("localStorage.setItem('tokyo8games.other.v1','keep');P.sound=true;P.readAloud=true;start('cup');S.ms=12345;save()");
+ g.node('#top').onclick();
+ const state=g.run('JSON.stringify(P)');
+ assert.equal(g.run('timer'),null);assert.equal(g.node('#overlay').hidden,false);
+ assert.equal(g.node('#dialogTitle').textContent,'TOPへ戻りますか？');
+ g.node('#dialogCancel').onclick();
+ assert.equal(g.run('view'),'question');assert.equal(g.run('JSON.stringify(P)'),state);
+ assert.equal(g.run('S.ms'),12345);assert.notEqual(g.run('timer'),null);
+ g.node('#top').onclick();g.node('#dialogOK').onclick();
+ assert.equal(g.run('view'),'home');assert.equal(g.run('S'),null);
+ assert.equal(g.run('JSON.parse(localStorage.getItem(KEY)).active'),null);
+ const expected=JSON.parse(state);expected.active=null;
+ assert.deepEqual(JSON.parse(g.run('JSON.stringify(P)')),expected);
+ assert.equal(g.run("localStorage.getItem('tokyo8games.other.v1')"),'keep');
+ g.events.get('pagehide')();g.run('document.hidden=false');g.events.get('visibilitychange')();
+ assert.equal(g.run('view'),'home');assert.equal(g.node('#overlay').hidden,true);
+ assert.doesNotMatch(g.node('#app').innerHTML,/id="resume"/);
+});
+
+test('TOP on resume modal cancels back to paused resume and survives visibility changes',()=>{
+ const g=game();g.run("start('cup');S.ms=9876;document.hidden=true");g.events.get('visibilitychange')();
+ g.node('#overlay').hidden=true;g.run('document.hidden=false');g.events.get('visibilitychange')();
+ assert.equal(g.node('#dialogTitle').textContent,'クイズを再開');
+ g.node('#dialogTop').onclick();const state=g.run('JSON.stringify(P)');
+ g.run('document.hidden=true');g.events.get('visibilitychange')();
+ g.run('document.hidden=false');g.events.get('visibilitychange')();
+ assert.equal(g.node('#dialogTitle').textContent,'TOPへ戻りますか？');
+ g.node('#dialogCancel').onclick();
+ assert.equal(g.node('#dialogTitle').textContent,'クイズを再開');assert.equal(g.run('timer'),null);
+ assert.equal(g.run('JSON.stringify(P)'),state);
+ g.node('#dialogOK').onclick();assert.notEqual(g.run('timer'),null);assert.equal(g.run('S.ms'),9876);
+ g.run('document.hidden=true');g.events.get('visibilitychange')();g.run('document.hidden=false');g.events.get('visibilitychange')();
+ g.node('#dialogTop').onclick();g.node('#dialogOK').onclick();
+ assert.equal(g.run('view'),'home');assert.equal(g.run('S'),null);assert.equal(g.run('timer'),null);
+});
+
+test('TOP works for saved rounds, training, review and answered animation without double scoring',async()=>{
+ for(const kind of ['cup','training','review']){
+  const g=game();g.run("P.mistakes=BANK.slice(0,10).map(q=>q.id)");g.run(`start('${kind}');answer(current().answer)`);
+  g.node('#top').onclick();const state=g.run('JSON.stringify(P)');
+  g.node('#dialogCancel').onclick();assert.equal(g.run('JSON.stringify(P)'),state);assert.equal(g.run('P.total'),1);
+  g.node('#pause').onclick();assert.equal(g.run('view'),'home');assert.match(g.node('#app').innerHTML,/id="top"/);
+  g.node('#top').onclick();g.node('#dialogCancel').onclick();assert.equal(g.run('JSON.stringify(P)'),state);
+  g.node('#top').onclick();g.node('#dialogOK').onclick();
+  await Promise.resolve();await Promise.resolve();
+  assert.equal(g.run('S'),null);assert.equal(g.run('view'),'home');assert.equal(g.run('P.total'),1);
+  assert.equal(g.run('shot'),null);
+ }
+});
