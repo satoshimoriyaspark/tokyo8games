@@ -46,6 +46,14 @@
     {
       "source": "/games/aib/:path*",
       "destination": "/aib-private.html"
+    },
+    {
+      "source": "/ath",
+      "destination": "/games/athletics/index.html"
+    },
+    {
+      "source": "/ath/",
+      "destination": "/games/athletics/index.html"
     }
   ]
 }
