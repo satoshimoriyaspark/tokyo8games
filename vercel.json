@@ -30,6 +30,22 @@
     {
       "source": "/sqz/",
       "destination": "/games/sqz/index.html"
+    },
+    {
+      "source": "/aib",
+      "destination": "/aib-private.html"
+    },
+    {
+      "source": "/aib/",
+      "destination": "/aib-private.html"
+    },
+    {
+      "source": "/aib/:path*",
+      "destination": "/aib-private.html"
+    },
+    {
+      "source": "/games/aib/:path*",
+      "destination": "/aib-private.html"
     }
   ]
 }
