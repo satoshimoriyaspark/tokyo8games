@@ -1,0 +1,20 @@
+// Keep original PNGs; one manifest maps every runtime image to identical lossless WebP.
+(()=>{'use strict';
+const root=document.getElementById('root'),status=document.getElementById('loadingStatus'),progress=document.getElementById('loadingProgress'),actions=document.getElementById('loadingActions');
+const files=[...new Set(Object.values(window.EMAMON_IMAGE_FILES))],cache=new Map(),failed=new Set();let running=false,started=false,done=0,epoch=0;
+const measures=[];const now=()=>performance.now();const initial=now();
+progress.max=files.length;
+function text(s){status.textContent=s;window.EMAMON_RUBY.apply(status)}
+function prepared(im){return new Promise(resolve=>{let settled=false;const start=now();const finish=ok=>{if(settled)return;settled=true;clearTimeout(timer);im.onload=im.onerror=null;resolve({ok,ms:now()-start,src:im.getAttribute('src')||im.src})};const timer=setTimeout(()=>finish(false),12000);const decode=()=>{if(typeof im.decode==='function')im.decode().then(()=>finish(true),()=>finish(false));else finish(im.naturalWidth>0)};im.onerror=()=>finish(false);im.onload=decode;if(im.complete&&im.naturalWidth>0)decode()})}
+function start(){if(started)return;started=true;root.dataset.initialImageMs=String(Math.round(now()-initial));window.EMAMON_START()}
+async function image(file){const im=new Image();im.src='assets/'+file;const r=await prepared(im);if(r.ok){failed.delete(file);cache.set(file,im)}else failed.add(file);done++;progress.value=done;text('画像の準備 '+done+' / '+files.length);measures.push(r)}
+async function run(list){if(running||started)return;running=true;done=files.length-list.length;progress.value=done;actions.replaceChildren();text('画像の準備 '+done+' / '+files.length);await Promise.all(list.map(image));running=false;progress.value=files.length-failed.size;if(!failed.size){start();return}text('画像の読み込みに失敗しました（'+failed.size+'枚）。もう一度試すか、待たずに進めます。');actions.innerHTML='<button class="btn primary" id="retryImages">もう一度読み込む</button><button class="btn accent" id="skipImages">待たずに進む</button>';document.getElementById('retryImages').onclick=()=>run([...failed]);document.getElementById('skipImages').onclick=start;window.EMAMON_RUBY.apply(actions)}
+const curtain=document.createElement('section');curtain.className='image-curtain';curtain.hidden=true;curtain.setAttribute('role','status');document.body.append(curtain);
+async function show(stage,commit){const token=++epoch,begin=now();root.inert=true;curtain.hidden=true;curtain.textContent='画像の準備中';window.EMAMON_RUBY.apply(curtain);const delay=setTimeout(()=>{if(token===epoch)curtain.hidden=false},180);
+ const imgs=[...stage.querySelectorAll('img')];for(const im of imgs){const name=im.getAttribute('src')?.replace(/^assets\//,'');if(window.EMAMON_IMAGE_FILES[name])im.src='assets/'+window.EMAMON_IMAGE_FILES[name];im.loading='eager';im.decoding='sync'}
+ const results=await Promise.all(imgs.map(prepared));clearTimeout(delay);if(token!==epoch)return;
+ const finish=()=>requestAnimationFrame(()=>{if(token!==epoch)return;curtain.hidden=true;root.inert=false;commit();root.dataset.transitionImageMs=String(Math.round(now()-begin));root.dataset.imageFailures=String(results.filter(r=>!r.ok).length);root.dataset.imageManifestCount=String(files.length)});
+ if(results.some(r=>!r.ok)){curtain.hidden=false;curtain.innerHTML='<p>画像の読み込みに失敗しました。</p><button class="btn" id="sceneRetryImages">もう一度読み込む</button><button class="btn accent" id="sceneSkipImages">待たずに進む</button>';window.EMAMON_RUBY.apply(curtain);document.getElementById('sceneRetryImages').onclick=()=>{results.forEach((r,i)=>{if(!r.ok)imgs[i].src=r.src.split('?')[0]+'?imageRetry='+Date.now()});show(stage,commit)};document.getElementById('sceneSkipImages').onclick=()=>{results.forEach((r,i)=>{if(!r.ok){const fallback=document.createElement('span');fallback.className='image-unavailable';fallback.textContent=imgs[i].alt||'画像';imgs[i].replaceWith(fallback)}});finish()};return}finish()
+}
+window.EMAMON_IMAGES={show,cache};window.EMAMON_RUBY.apply(document.body);run(files);
+})();

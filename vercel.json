@@ -54,6 +54,22 @@
     {
       "source": "/ath/",
       "destination": "/games/athletics/index.html"
+    },
+    {
+      "source": "/eqa",
+      "destination": "/games/eqa/index.html"
+    },
+    {
+      "source": "/eqa/",
+      "destination": "/games/eqa/index.html"
+    },
+    {
+      "source": "/elm",
+      "destination": "/games/elm/index.html"
+    },
+    {
+      "source": "/elm/",
+      "destination": "/games/elm/index.html"
     }
   ]
 }

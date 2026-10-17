@@ -1,0 +1,10 @@
+/* Five training regions. Presentation only: no movement or save-state changes. */
+const REGIONS=[
+ {name:'しる',subtitle:'発見のエリア',color:'#58a9e5',light:'#e7f4ff'},
+ {name:'そなえる',subtitle:'準備のエリア',color:'#72cba9',light:'#e3f7ed'},
+ {name:'みをまもる',subtitle:'安全のエリア',color:'#4870aa',light:'#e7edfa'},
+ {name:'にげる',subtitle:'道さがしのエリア',color:'#edc14f',light:'#fff7da'},
+ {name:'たすけあう',subtitle:'協力のエリア',color:'#ed9eba',light:'#ffebf3'}
+];
+function regionMarkup(){return `<defs><pattern id="mapDots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#87b7c5" opacity=".35"/></pattern></defs><image href="assets/guild-town.webp" width="500" height="600" preserveAspectRatio="xMidYMid slice"/><rect width="500" height="600" fill="#ffffff" opacity=".18"/>`+REGIONS.map((r,k)=>{let points=Array.from({length:6},(_,j)=>boardPoint(k*5+j)),path=points.map((p,j)=>`${j?'L':'M'}${p.x} ${p.y}`).join(' '),y=500-k*100;return `<path d="${path}" fill="none" stroke="${r.color}" stroke-opacity=".16" stroke-width="84" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="${r.color}" stroke-opacity=".5" stroke-width="80" stroke-linejoin="round" stroke-dasharray="2 10"/><g transform="translate(156 ${y-12})"><rect width="188" height="38" rx="6" fill="${r.light}" stroke="${r.color}" stroke-width="1.3"/><rect width="28" height="38" rx="5" fill="${r.color}"/><text x="14" y="24" text-anchor="middle" fill="#071727" font-family="sans-serif" font-size="10" font-weight="bold">0${k+1}</text><foreignObject x="32" y="0" width="152" height="38"><div xmlns="http://www.w3.org/1999/xhtml" class="regionLabel">${r.name} · ${r.subtitle}</div></foreignObject></g>`}).join('')}
+function badgeMarkup(m,earned){return `<div class="badge ${earned?'earned':'locked'}" style="--badge-color:${m.color}" aria-label="${m.name}の証：${earned?'獲得済み':'未獲得。'+m.at+'マスで挑戦'}"><span class="badgeMedal"><span class="symbol">${symbol(m)}</span><span class="badgeTick">${earned?'✓':'·'}</span></span><span class="badgeName">${m.name}</span><small>${earned?'獲得！':m.at+'マス'}</small></div>`}
