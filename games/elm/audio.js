@@ -13,7 +13,7 @@
     let enabled=false,volume=.3,scene=null,active=null,pending=null,epoch=0,held=false,blocked=false,finished=false,issue='';
     let cached=null; const loads=new Map(),failed=new Set();
     try { const value=env.storage?.getItem(BGM_VOLUME_KEY);if(value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value)))volume=Math.max(0,Math.min(1,Number(value))); } catch {}
-    const snapshot=()=>({volume,scene,playing:!!active,held,blocked,finished,issue});
+    const snapshot=()=>({volume,scene,playing:!!active,held,blocked,finished,issue,loading:!!pending,contextState:env.getContext()?.state||'未開始',loaded:cached?.name===scene?cached.buffer.duration:0,time:active?((env.getContext().currentTime-active.startedAt)%(active.source.buffer.duration||Infinity)):0});
     const notify=()=>{try{env.onChange?.();}catch{}};
     function halt(hold=held){epoch++;pending=null;held=hold;const previous=active;active=null;if(previous){try{previous.source.stop();}catch{}try{previous.source.disconnect();previous.gain.disconnect();}catch{}}}
     function load(name,context){
@@ -32,7 +32,7 @@
         source.buffer=buffer;source.loop=MUSIC[name].loop;source.connect(gain);gain.connect(context.destination);
         const level=volume*.5,t=context.currentTime||0;
         if(gain.gain.setValueAtTime&&gain.gain.linearRampToValueAtTime){gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(level,t+.7)}else gain.gain.value=level;
-        const voice={source,gain,name};active=voice;
+        const voice={source,gain,name,startedAt:context.currentTime};active=voice;
         source.onended=()=>{if(active===voice){active=null;if(!MUSIC[name].loop)finished=true;notify()}try{source.disconnect();gain.disconnect()}catch{}};
         try{source.start(0)}catch(error){halt();throw error}issue='';notify();return true;
       }).catch(()=>{if(pending===task)pending=null;issue='BGMを再生できませんでした。音なしでも遊べます。';notify();return false});
@@ -46,7 +46,7 @@
     return {snapshot,setScene,setEnabled,setVolume,resume,unlock,leave,stop:()=>halt(true)};
   }
   function createAudio(env) {
-    let context, master, ready = Promise.resolve(), active = null, suspending = null;
+    let context, master, ready = Promise.resolve(), active = null, suspending = null, recovering = null;
     let enabled = false, volume = .5, epoch = 0, request = 0, blocked = false, issue = '';
     const buffers = new Map(), loads = new Map(), last = new Map();
     const now = () => env.now ? env.now() : Date.now();
@@ -79,7 +79,11 @@
           if (!env.AudioContext) throw Error('audio unsupported');
           context = new env.AudioContext();
           context.addEventListener?.('statechange',()=>{
-            if(enabled&&!blocked&&!env.hidden?.()&&context.state==='running')music.unlock();
+            if(!enabled||blocked||env.hidden?.())return;
+            if(context.state==='running'){music.unlock();return;}
+            if(!recovering&&['suspended','interrupted'].includes(context.state)){
+              recovering=Promise.resolve().then(()=>context.resume()).then(()=>{if(enabled&&!blocked&&!env.hidden?.())music.unlock();}).catch(()=>{issue='音声が一時停止しています。音ONを押し直すと再試行できます。';notify();}).finally(()=>{recovering=null});
+            }
           });
           master = context.createGain(); master.connect(context.destination); applyVolume();
         }
@@ -168,6 +172,10 @@
     if(find('setupSoundVolume'))find('setupSoundVolume').oninput=event=>audio.setVolume(Number(event.target.value)/100);
     update(audio.snapshot());
   };
+  if(new URLSearchParams(root.location.search).get('audioDebug')==='1'){
+    const box=doc.createElement('output');box.id='audioDebug';box.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99999;background:#111e;color:#fff;padding:6px;font:11px monospace;pointer-events:none;white-space:pre';doc.body.appendChild(box);
+    root.setInterval(()=>{const m=audio.music.snapshot();box.textContent='BGM '+(audio.snapshot().enabled?'ON':'OFF')+' '+(m.loading?'準備中':m.playing?'再生':'停止')+'\n'+m.time.toFixed(1)+'s 読込 '+m.loaded.toFixed(1)+'s\nAudio '+m.contextState+' / '+m.scene},500);
+  }
   update(audio.snapshot());
 })(typeof window!=='undefined'?window:null);
 function playSound(name){try{const pending=typeof window!=='undefined'&&window.EmamonAudio?.play(name);pending?.catch?.(()=>{});}catch{}}
