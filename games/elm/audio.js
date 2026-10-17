@@ -37,7 +37,7 @@
         try{source.start(0)}catch(error){halt();throw error}issue='';notify();return true;
       }).catch(()=>{if(pending===task)pending=null;issue='BGMを再生できませんでした。音なしでも遊べます。';notify();return false});
     }
-    function setScene(value){const next=MUSIC[value]?value:null;if(next===scene)return;halt();scene=next;finished=false;start();}
+    function setScene(value){const next=MUSIC[value]?value:null;if(next===scene)return;halt(next ? false : held);scene=next;finished=false;start();}
     function setEnabled(value){enabled=!!value;halt(false);finished=false;if(enabled){failed.clear();issue=''}notify();}
     function setVolume(value){const n=Number(value);if(!Number.isFinite(n))return;volume=Math.max(0,Math.min(1,n));if(!volume)halt();else if(active){const g=active.gain.gain,t=env.getContext()?.currentTime||0;g.cancelScheduledValues?.(t);if(g.setTargetAtTime)g.setTargetAtTime(volume*.5,t,.08);else g.value=volume*.5;}else start();try{env.storage?.setItem(BGM_VOLUME_KEY,String(volume))}catch{}notify();}
     function resume(){held=false;finished=false;failed.clear();start();}
@@ -77,7 +77,11 @@
       try {
         if (!context) {
           if (!env.AudioContext) throw Error('audio unsupported');
-          context = new env.AudioContext(); master = context.createGain(); master.connect(context.destination); applyVolume();
+          context = new env.AudioContext();
+          context.addEventListener?.('statechange',()=>{
+            if(enabled&&!blocked&&!env.hidden?.()&&context.state==='running')music.unlock();
+          });
+          master = context.createGain(); master.connect(context.destination); applyVolume();
         }
         // Called synchronously from the user's gesture, including Safari/iOS resume.
         if (context.state !== 'running' || suspending) {
@@ -146,7 +150,8 @@
   doc.addEventListener('pointerdown',resumeEnabled,{capture:true,passive:true});
   doc.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')resumeEnabled();},{capture:true});
   doc.addEventListener('click',resumeEnabled,{capture:true});
-  doc.addEventListener('visibilitychange',()=>{if(doc.hidden)audio.leave();});
+  doc.addEventListener('visibilitychange',()=>{if(doc.hidden)audio.leave();else resumeEnabled();});
+  root.addEventListener('pageshow',resumeEnabled);
   root.addEventListener('pagehide',()=>audio.leave());
   if(find('soundToggle'))find('soundToggle').onclick=()=>audio.setEnabled(!audio.snapshot().enabled);
   if(find('soundVolume'))find('soundVolume').oninput=event=>audio.setVolume(Number(event.target.value)/100);
@@ -172,3 +177,5 @@ function resumeMusic(){try{if(typeof window!=='undefined')window.EmamonAudio?.mu
 
 function setupSoundMarkup(){return `<fieldset class="setupSound soundSettings" aria-describedby="setupSoundHelp"><legend>音の設定</legend><div class="soundButtons" role="group" aria-label="BGMと効果音のオン・オフ"><button type="button" id="setupSoundOff" class="secondary" aria-pressed="true">音：OFF</button><button type="button" id="setupSoundOn" class="secondary" aria-pressed="false">音：ON</button><button type="button" id="setupSoundTest" class="secondary" disabled>音をためす</button></div><label for="setupSoundVolume">効果音の音量 <output id="setupSoundVolumeValue" for="setupSoundVolume">50%</output></label><input id="setupSoundVolume" type="range" min="0" max="100" step="5" value="50" aria-describedby="setupSoundHelp"><label for="setupSoundBgmVolume">BGMの音量 <output id="setupSoundBgmVolumeValue" for="setupSoundBgmVolume">30%</output></label><input id="setupSoundBgmVolume" type="range" min="0" max="100" step="5" value="30" aria-describedby="setupSoundHelp"><p id="setupSoundHelp" class="caption">はじめは音OFFです。音ONを押すとBGMと効果音が鳴ります。音量は別々に変えられます。あとでメニューから変えられます。</p><p id="setupSoundStatus" class="caption" role="status" hidden></p></fieldset>`;}
 function bindSetupSound(){if(typeof window!=='undefined')window.EmamonAudio?.bindSetup?.();}
+
+function stopEffects(){try{if(typeof window!=='undefined')window.EmamonAudio?.stop();}catch{}}

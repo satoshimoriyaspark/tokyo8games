@@ -39,7 +39,7 @@ function showSetupTitle(){
  titleVisible=true;
  if(typeof stopSound==='function')stopSound();
  if($('playDialog').open)$('playDialog').close();
- render();
+ render();if(typeof resumeMusic==='function')resumeMusic();
 }
 function requestReset(){
  if(typeof boardBusy!=='undefined'&&boardBusy)return;
